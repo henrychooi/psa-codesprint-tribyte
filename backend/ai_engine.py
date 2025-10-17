@@ -11,6 +11,19 @@ from sklearn.metrics.pairwise import cosine_similarity
 from typing import List, Dict, Any
 from dotenv import load_dotenv
 
+# Local embeddings fallback
+try:
+    from sentence_transformers import SentenceTransformer
+    print("📦 Loading local embedding model (all-MiniLM-L6-v2)...")
+    LOCAL_EMBEDDING_MODEL = SentenceTransformer('all-MiniLM-L6-v2')
+    USE_LOCAL_EMBEDDINGS = True
+    print("✅ Using local sentence-transformers for embeddings")
+except Exception as e:
+    LOCAL_EMBEDDING_MODEL = None
+    USE_LOCAL_EMBEDDINGS = False
+    print(f"⚠️ Failed to load sentence-transformers: {type(e).__name__}: {e}")
+    print("⚠️ Will use Azure OpenAI instead")
+
 # -------------------------
 # Load environment variables
 # -------------------------
@@ -43,14 +56,24 @@ client = AzureOpenAI(
 # ----------------------------
 def generate_embedding(text: str, model: str = None) -> List[float]:
     """
-    Generate embedding vector for given text using Azure OpenAI (deployment).
+    Generate embedding vector for given text.
+    Uses local sentence-transformers if available, otherwise Azure OpenAI.
     Args:
         text: Input text to embed
-        model: Embeddings deployment name. If None, uses AZURE_EMBED_DEPLOYMENT
+        model: Embeddings deployment name (only used for Azure). If None, uses AZURE_EMBED_DEPLOYMENT
     """
+    # Try local embeddings first (fast and free!)
+    if USE_LOCAL_EMBEDDINGS and LOCAL_EMBEDDING_MODEL:
+        try:
+            embedding = LOCAL_EMBEDDING_MODEL.encode(text)
+            return embedding.tolist()
+        except Exception as e:
+            print(f"⚠️ Local embedding failed: {e}, falling back to Azure...")
+    
+    # Fallback to Azure OpenAI
     embed_deployment = model or os.getenv("AZURE_EMBED_DEPLOYMENT")
     if not embed_deployment:
-        raise RuntimeError("Set AZURE_EMBED_DEPLOYMENT to your embeddings deployment name.")
+        raise RuntimeError("Set AZURE_EMBED_DEPLOYMENT to your embeddings deployment name or install sentence-transformers.")
 
     try:
         response = client.embeddings.create(input=text, model=embed_deployment)
