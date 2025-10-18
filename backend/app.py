@@ -16,6 +16,12 @@ from ai_engine import (
     generate_embedding,
     create_profile_text
 )
+from leadership_potential import (
+    compute_leadership_potential,
+    calculate_max_metrics,
+    calculate_percentile_rank,
+    generate_improvement_suggestions
+)
 
 # Load environment variables
 load_dotenv()
@@ -297,6 +303,107 @@ def generate_employee_embedding(employee_id):
         return jsonify({'success': False, 'error': str(e)}), 500
     finally:
         session.close()
+
+
+@app.route('/api/leadership-potential/<employee_id>', methods=['GET'])
+def get_leadership_potential(employee_id):
+    """
+    Get leadership potential score for an employee
+    Returns overall score, component breakdown, evidence, and improvement suggestions
+    """
+    session = Session(engine)
+    try:
+        # Get the target employee ONLY
+        employee = session.query(Employee).filter_by(employee_id=employee_id).first()
+        if not employee:
+            return jsonify({'success': False, 'error': 'Employee not found'}), 404
+        
+        # Use static max_metrics based on domain knowledge to avoid querying all employees
+        # These values represent realistic upper bounds for normalization
+        max_metrics = {
+            'max_outcome': 100,      # Maximum percentage improvement
+            'max_stakeholders': 15,  # Maximum distinct stakeholder types
+            'max_progression': 1.5   # Maximum levels per year progression rate
+        }
+        
+        # Compute leadership potential for target employee WITH augmentations
+        employee_dict = employee.to_dict()
+        leadership_score = compute_leadership_potential(employee_dict, max_metrics, use_augmentations=True)
+        
+        # Estimate percentile rank based on score ranges (no need to compute all employees)
+        # This mapping is based on typical score distribution
+        score = leadership_score['overall_score']
+        if score >= 85:
+            percentile_rank = 95
+        elif score >= 75:
+            percentile_rank = 85
+        elif score >= 65:
+            percentile_rank = 70
+        elif score >= 55:
+            percentile_rank = 50
+        elif score >= 45:
+            percentile_rank = 30
+        else:
+            percentile_rank = 15
+        
+        # Generate improvement suggestions
+        improvement_suggestions = generate_improvement_suggestions(
+            leadership_score['components'],
+            leadership_score['evidence']
+        )
+        
+        return jsonify({
+            'success': True,
+            'employee_id': employee.employee_id,
+            'employee_name': employee.name,
+            'overall_score': leadership_score['overall_score'],
+            'percentile_rank': percentile_rank,
+            'components': leadership_score['components'],
+            'evidence': leadership_score['evidence'],
+            'improvement_suggestions': improvement_suggestions,
+            'raw_metrics': leadership_score['raw_metrics']
+        })
+        
+    except Exception as e:
+        print(f"❌ Leadership potential error: {e}")
+        import traceback
+        traceback.print_exc()
+        return jsonify({'success': False, 'error': str(e)}), 500
+    finally:
+        session.close()
+
+
+@app.route('/api/leadership-feedback', methods=['POST'])
+def submit_leadership_feedback():
+    """
+    Submit feedback on leadership score (stub endpoint for future processing)
+    
+    Request body:
+        {
+            "employee_id": "EMP-20001",
+            "feedback_type": "too_high|too_low|missing_evidence|weights_issue",
+            "comments": "Optional additional comments"
+        }
+    """
+    data = request.get_json()
+    employee_id = data.get('employee_id')
+    feedback_type = data.get('feedback_type')
+    comments = data.get('comments', '')
+    
+    if not employee_id or not feedback_type:
+        return jsonify({
+            'success': False,
+            'error': 'employee_id and feedback_type required'
+        }), 400
+    
+    # TODO: In production, store this feedback in database for analysis
+    print(f"📝 Feedback received for {employee_id}: {feedback_type}")
+    print(f"   Comments: {comments}")
+    
+    return jsonify({
+        'success': True,
+        'message': 'Thank you. Your feedback helps us improve leadership assessment for everyone.'
+    })
 
 
 @app.errorhandler(404)

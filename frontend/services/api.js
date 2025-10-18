@@ -86,6 +86,21 @@ export const careerCompassAPI = {
     });
     return response.data;
   },
+
+  // Leadership Potential endpoints
+  getLeadershipPotential: async (employeeId) => {
+    const response = await api.get(`/leadership-potential/${employeeId}`);
+    return response.data;
+  },
+
+  submitLeadershipFeedback: async (employeeId, feedbackType, comments = '') => {
+    const response = await api.post('/leadership-feedback', {
+      employee_id: employeeId,
+      feedback_type: feedbackType,
+      comments: comments,
+    });
+    return response.data;
+  },
 };
 
 export default api;
