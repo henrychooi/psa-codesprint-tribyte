@@ -6,6 +6,7 @@ from typing import Dict, List, Any, Tuple
 from datetime import datetime
 from dateutil.relativedelta import relativedelta
 import re
+from concurrent.futures import ThreadPoolExecutor, as_completed
 
 # Import augmentation functions (Azure OpenAI-based enhancements)
 try:
@@ -155,10 +156,21 @@ def calculate_progression_velocity(positions_history: List[Dict], hire_date: str
     return levels_advanced, years_tenure
 
 
-def get_top_project_outcomes(projects: List[Dict], n: int = 2) -> List[str]:
+def get_top_project_outcomes(projects: List[Dict], augmentation_data: Dict = None, n: int = 2) -> List[str]:
     """
     Get the top N project outcomes as evidence
     """
+    if augmentation_data and 'outcome_impact_augmentation' in augmentation_data:
+        outcome_aug = augmentation_data['outcome_impact_augmentation']
+        individual_analyses = outcome_aug.get('individual_analyses', [])
+        if individual_analyses:
+            evidence = []
+            for analysis in individual_analyses:
+                outcome_text = analysis.get('outcome_text', '')
+                if outcome_text:
+                    evidence.append(outcome_text)
+            return evidence if evidence else ["No projects recorded"]
+    
     if not projects:
         return ["No projects recorded"]
     
@@ -167,7 +179,6 @@ def get_top_project_outcomes(projects: List[Dict], n: int = 2) -> List[str]:
         project_name = project.get('project_name', 'Unnamed Project')
         outcomes = project.get('outcomes', [])
         if outcomes:
-            # Pick the first outcome as the primary one
             primary_outcome = outcomes[0] if isinstance(outcomes, list) else str(outcomes)
             evidence.append(f"{project_name}: {primary_outcome}")
         else:
@@ -254,31 +265,31 @@ def compute_leadership_potential(employee: Dict[str, Any], max_metrics: Dict[str
     augmentation_data = {}
     
     if AUGMENTATIONS_AVAILABLE and use_augmentations:
-        # Outcome Impact Augmentation: sentiment + quantitative evidence
-        outcome_augmentation = analyze_outcome_impact_augmented(projects)
-        augmentation_data['outcome_impact_augmentation'] = outcome_augmentation
-        
-        # Stakeholder Complexity Augmentation: partner/diversity + engagement grading
-        stakeholder_augmentation = analyze_stakeholder_complexity_augmented(projects, experiences)
-        augmentation_data['stakeholder_complexity_augmentation'] = stakeholder_augmentation
+        # Run both augmentations in parallel to reduce latency
+        with ThreadPoolExecutor(max_workers=2) as executor:
+            # Submit both tasks concurrently
+            future_outcome = executor.submit(analyze_outcome_impact_augmented, projects)
+            future_stakeholder = executor.submit(analyze_stakeholder_complexity_augmented, projects, experiences)
+            
+            # Collect results
+            outcome_augmentation = future_outcome.result()
+            stakeholder_augmentation = future_stakeholder.result()
+            
+            augmentation_data['outcome_impact_augmentation'] = outcome_augmentation
+            augmentation_data['stakeholder_complexity_augmentation'] = stakeholder_augmentation
     
     # Component 1: Outcome Impact (25% weight)
-    # EXISTING logic (preserved)
     project_metrics = extract_quantified_outcomes(projects)
-    if project_metrics:
-        avg_outcome = sum(project_metrics) / len(project_metrics)
-        max_outcome = max_metrics.get('max_outcome', 100)
-        outcome_impact_base = min(avg_outcome / max_outcome, 1.0) if max_outcome > 0 else 0.5
-    else:
-        outcome_impact_base = 0.5  # Default if no metrics
-    
-    # AUGMENTATION merge: combine base score with Azure-derived augmentation
     if AUGMENTATIONS_AVAILABLE and 'outcome_impact_augmentation' in augmentation_data:
-        augmented_outcome_score = augmentation_data['outcome_impact_augmentation'].get('augmented_outcome', 0.5)
-        # Merge strategy: 60% base (existing) + 40% augmented (Azure AI)
-        outcome_impact = 0.6 * outcome_impact_base + 0.4 * augmented_outcome_score
+        overall_sentiment = augmentation_data['outcome_impact_augmentation'].get('overall_sentiment', {})
+        outcome_impact = overall_sentiment.get('score', 0.5)
     else:
-        outcome_impact = outcome_impact_base
+        if project_metrics:
+            avg_outcome = sum(project_metrics) / len(project_metrics)
+            max_outcome = max_metrics.get('max_outcome', 100)
+            outcome_impact = min(avg_outcome / max_outcome, 1.0) if max_outcome > 0 else 0.5
+        else:
+            outcome_impact = 0.5
     
     # Component 2: Stakeholder Complexity (25% weight)
     # EXISTING logic (preserved)
@@ -321,7 +332,7 @@ def compute_leadership_potential(employee: Dict[str, Any], max_metrics: Dict[str
             'progression_velocity': round(progression_velocity * 100, 1)
         },
         'evidence': {
-            'outcome_impact': get_top_project_outcomes(projects, n=2),
+            'outcome_impact': get_top_project_outcomes(projects, augmentation_data, n=2),
             'stakeholder_complexity': get_stakeholder_examples(projects, experiences),
             'change_management': get_change_leadership_evidence(competencies, projects),
             'progression_velocity': f"{levels_advanced} levels advanced in {round(years_tenure, 1)} years"

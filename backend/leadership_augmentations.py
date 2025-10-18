@@ -47,13 +47,12 @@ def analyze_outcome_impact_augmented(projects: List[Dict]) -> Dict[str, Any]:
         }
     """
     if not client or not projects:
-        # Fallback: return neutral values with boosted baseline
         return {
-            'sentiment': {'label': 'neutral', 'confidence': 0.6},
+            'overall_sentiment': {'label': 'neutral', 'score': 0.55, 'confidence': 0.6},
             'quantitative_metrics': [],
             'Q': 0.0,
-            'S': 0.55,  # Boosted from 0.5 to align with less harsh grading
-            'augmented_outcome': 0.25  # Increased from 0.15
+            'S': 0.55,
+            'augmented_outcome': 0.25
         }
     
     # Collect all outcome text
@@ -68,7 +67,7 @@ def analyze_outcome_impact_augmented(projects: List[Dict]) -> Dict[str, Any]:
     combined_text = " ".join([t for t in outcome_texts if t]).strip()
     if not combined_text:
         return {
-            'sentiment': {'label': 'neutral', 'confidence': 0.6},
+            'overall_sentiment': {'label': 'neutral', 'score': 0.55, 'confidence': 0.6},
             'quantitative_metrics': [],
             'Q': 0.0,
             'S': 0.55,
@@ -133,16 +132,25 @@ Weigh higher-impact outcomes (those mentioning numbers, results, or clear progre
     user_prompt = f"Analyze these project outcomes and extract metrics:\n\n{combined_text[:2000]}"
     
     try:
+        print(f"🔵 Calling outcome impact API with model: gpt-5-mini")
         response = client.chat.completions.create(
-            model=AZURE_CHAT_DEPLOYMENT,
+            model="gpt-5-mini",
             messages=[
                 {"role": "system", "content": system_prompt},
                 {"role": "user", "content": user_prompt}
             ],
-            response_format={"type": "json_object"}
+            max_completion_tokens=3000  # Increased to allow room for reasoning + output
         )
         
-        result = json.loads(response.choices[0].message.content)
+        print(f"🔵 Response finish_reason: {response.choices[0].finish_reason if response.choices else 'NO CHOICES'}")
+        print(f"🔵 Response usage: {response.usage}")
+        
+        content = response.choices[0].message.content if response.choices else None
+        
+        if not content or content.strip() == "":
+            raise ValueError(f"Empty response from API (finish_reason: {response.choices[0].finish_reason if response.choices else 'unknown'})")
+        
+        result = json.loads(content)
         print(f"📊 Outcome Impact Augmentation: {json.dumps(result, indent=2)}")
         
         # === SCORING CONFIGURATION: Sentiment Confidence Boost ===
@@ -152,23 +160,12 @@ Weigh higher-impact outcomes (those mentioning numbers, results, or clear progre
         SENTIMENT_WEIGHT_IN_FINAL = 0.45  # Increased from 0.3 to give more credit to sentiment
         
         # Extract sentiment score S with boosted confidence
-        sentiment = result.get('sentiment', {'label': 'neutral', 'confidence': 0.5})
-        label = sentiment.get('label', 'neutral').lower()
-        raw_confidence = float(sentiment.get('confidence', 0.5))
+        overall_sentiment = result.get('overall_sentiment', {'label': 'neutral', 'score': 0.5, 'confidence': 0.5})
+        label = overall_sentiment.get('label', 'neutral').lower()
+        raw_score = float(overall_sentiment.get('score', 0.5))
+        raw_confidence = float(overall_sentiment.get('confidence', 0.5))
         
-        # Apply confidence boost and floor (capped at 0.95 to avoid inflation)
-        boosted_confidence = min(0.95, max(SENTIMENT_CONFIDENCE_FLOOR, raw_confidence * SENTIMENT_CONFIDENCE_BOOST))
-        
-        # Map sentiment label to base numeric score [0-1]
-        sentiment_mapping = {'negative': 0.3, 'neutral': 0.65, 'positive': 1.0}  # Raised floor for negative/neutral
-        base_sentiment_score = sentiment_mapping.get(label, 0.65)
-        
-        # Apply smoothing transform (softplus-like) to reduce volatility
-        # This reduces sensitivity to small fluctuations
-        smoothed_sentiment = base_sentiment_score ** 0.7  # Power <1 compresses low scores upward
-        
-        # Final sentiment score with boosted confidence
-        S = smoothed_sentiment * boosted_confidence
+        S = raw_score
         
         # Extract quantitative metrics and compute Q
         metrics = result.get('quantitative_metrics', [])
@@ -206,8 +203,11 @@ Weigh higher-impact outcomes (those mentioning numbers, results, or clear progre
         # To give more credit to sentiment-based assessment
         augmented_outcome = (1.0 - SENTIMENT_WEIGHT_IN_FINAL) * Q + SENTIMENT_WEIGHT_IN_FINAL * S
         
+        individual_analyses = result.get('individual_analyses', [])
+        
         return {
-            'sentiment': sentiment,
+            'individual_analyses': individual_analyses,
+            'overall_sentiment': overall_sentiment,
             'quantitative_metrics': metrics,
             'Q': round(Q, 3),
             'S': round(S, 3),
@@ -216,9 +216,8 @@ Weigh higher-impact outcomes (those mentioning numbers, results, or clear progre
         
     except Exception as e:
         print(f"⚠️ Outcome impact augmentation error: {e}")
-        # Graceful fallback with boosted baseline
         return {
-            'sentiment': {'label': 'neutral', 'confidence': 0.6},
+            'overall_sentiment': {'label': 'neutral', 'score': 0.55, 'confidence': 0.6},
             'quantitative_metrics': [],
             'Q': 0.0,
             'S': 0.55,
@@ -281,44 +280,55 @@ def analyze_stakeholder_complexity_augmented(projects: List[Dict], experiences: 
     # Azure OpenAI prompt for stakeholder analysis
     system_prompt = """You are an expert analyst assessing stakeholder complexity in projects.
 
-Return a JSON object with:
+Return ONLY a valid JSON object in this exact format:
 {
-  "distinct_stakeholder_groups": ["group1", "group2", ...],
+  "distinct_stakeholder_groups": ["group1", "group2"],
   "stakeholder_types": {
-    "internal": count_of_same_org_groups,
-    "cross_functional": count_of_other_units_same_org,
-    "external": count_of_partner_vendor_customer_groups,
-    "senior": count_of_executive_senior_leadership
+    "internal": 0,
+    "cross_functional": 0,
+    "external": 0,
+    "senior": 0
   },
   "engagement_quality": {
     "label": "low|medium|high",
-    "confidence": 0.0-1.0
+    "confidence": 0.5
   },
   "complexity_assessment": {
-    "score": 0.0-1.0,
+    "score": 0.5,
     "rationale": "brief explanation"
   }
 }
 
-Extract:
-- Distinct stakeholder groups/organizations mentioned
-- Classify as internal, cross-functional, external partners, or senior/executive level
-- Assess engagement quality based on described coordination difficulty
-- Rate overall complexity (0=simple single-team, 1=highly complex multi-org/executive)"""
+Instructions:
+1. Identify distinct stakeholder groups mentioned in the text
+2. Count how many are internal, cross-functional, external, or senior/executive
+3. Rate engagement quality (low/medium/high) based on coordination complexity
+4. Give overall complexity score 0.0-1.0 (0=simple, 1=very complex)
+
+Keep rationale brief (1 sentence)."""
 
     user_prompt = f"Analyze stakeholder engagement complexity:\n\n{combined_text[:2000]}"
     
     try:
+        print(f"🟣 Calling stakeholder complexity API with model: gpt-5-mini")
         response = client.chat.completions.create(
-            model=AZURE_CHAT_DEPLOYMENT,
+            model="gpt-5-mini",
             messages=[
                 {"role": "system", "content": system_prompt},
                 {"role": "user", "content": user_prompt}
             ],
-            response_format={"type": "json_object"}
+            max_completion_tokens=3000  # Increased further for complex reasoning
         )
         
-        result = json.loads(response.choices[0].message.content)
+        print(f"🟣 Response finish_reason: {response.choices[0].finish_reason if response.choices else 'NO CHOICES'}")
+        print(f"🟣 Response usage: {response.usage}")
+        
+        content = response.choices[0].message.content if response.choices else None
+        
+        if not content or content.strip() == "":
+            raise ValueError(f"Empty response from API (finish_reason: {response.choices[0].finish_reason if response.choices else 'unknown'})")
+        
+        result = json.loads(content)
         print(f"👥 Stakeholder Complexity Augmentation: {json.dumps(result, indent=2)}")
         
         # Extract data
