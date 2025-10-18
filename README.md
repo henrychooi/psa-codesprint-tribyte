@@ -117,7 +117,7 @@ notepad .env
 **Update `.env` with your credentials:**
 ```env
 AZURE_OPENAI_API_KEY=your-apim-subscription-key
-AZURE_OPENAI_ENDPOINT=https://psacodesprint2025.azure-api.net/openai/
+AZURE_OPENAI_ENDPOINT=https://psacodesprint2025.azure-api.net/
 AZURE_EMBED_DEPLOYMENT=text-embedding-3-small
 FLASK_ENV=development
 DATABASE_URL=sqlite:///compass.db
