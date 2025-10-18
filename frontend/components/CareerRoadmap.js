@@ -41,18 +41,43 @@ export default function CareerRoadmap({ employeeId, userRole = "employee" }) {
     setLoading(true);
     setError(null);
     try {
+      // Get the auth token
+      const token = localStorage.getItem("auth_token");
+
+      if (!token) {
+        setError("Authentication required. Please log in.");
+        setLoading(false);
+        return;
+      }
+
       // Always fetch current roadmap for employee - FAST
+      const API_BASE =
+        process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api";
       const currentRes = await fetch(
-        `/api/career-roadmap/current/${employeeId}?limit=50`,
+        `${API_BASE}/career-roadmap/current/${employeeId}?limit=50`,
         {
-          headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
         }
       );
-      if (currentRes.ok) {
-        const currentData = await currentRes.json();
+
+      if (!currentRes.ok) {
+        const errorData = await currentRes.json().catch(() => ({}));
+        throw new Error(
+          errorData.error || `Failed to fetch: ${currentRes.status}`
+        );
+      }
+
+      const currentData = await currentRes.json();
+      if (currentData.success && currentData.data) {
         setCurrentRoadmap(currentData.data);
+      } else {
+        throw new Error(currentData.error || "Invalid response format");
       }
     } catch (err) {
+      console.error("Roadmap fetch error:", err);
       setError(err.message || "Failed to load career roadmap");
     } finally {
       setLoading(false);
@@ -63,34 +88,88 @@ export default function CareerRoadmap({ employeeId, userRole = "employee" }) {
     if (adminDataLoading || predictedRoadmap) return; // Prevent duplicate fetches
     setAdminDataLoading(true);
     try {
+      // Get the auth token
+      const token = localStorage.getItem("auth_token");
+      const API_BASE =
+        process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api";
+
+      if (!token) {
+        setError("Authentication required. Please log in.");
+        setAdminDataLoading(false);
+        return;
+      }
+
       // Fetch predicted roadmap with only 2 quick scenarios
       const predictedRes = await fetch(
-        `/api/career-roadmap/predicted/${employeeId}?scenarios=steady_growth,aggressive_growth&limit=40`,
+        `${API_BASE}/career-roadmap/predicted/${employeeId}?scenarios=steady_growth,aggressive_growth&limit=40`,
         {
           headers: {
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
           },
         }
       );
+
       if (predictedRes.ok) {
         const predictedData = await predictedRes.json();
-        setPredictedRoadmap(predictedData.data);
+        console.log("Predicted roadmap response:", predictedData);
+        console.log(
+          "Predicted scenarios:",
+          Object.keys(predictedData.data?.scenarios || {})
+        );
+        console.log(
+          "Sample scenario data:",
+          predictedData.data?.scenarios?.steady_growth
+        );
+        if (predictedData.success && predictedData.data) {
+          setPredictedRoadmap(predictedData.data);
+        }
+      } else {
+        const errorData = await predictedRes.json().catch(() => ({}));
+        console.error(
+          "Predicted roadmap fetch failed:",
+          predictedRes.status,
+          errorData
+        );
+        setError(
+          `Failed to load predicted roadmap: ${
+            errorData.error || predictedRes.status
+          }`
+        );
       }
 
       // Fetch comparison for all 4 scenarios
       const comparisonRes = await fetch(
-        `/api/career-roadmap/comparison/${employeeId}?limit=40`,
+        `${API_BASE}/career-roadmap/comparison/${employeeId}?limit=40`,
         {
           headers: {
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
           },
         }
       );
+
       if (comparisonRes.ok) {
         const comparisonData = await comparisonRes.json();
-        setComparison(comparisonData.data);
+        console.log("Comparison response:", comparisonData);
+        if (comparisonData.success && comparisonData.data) {
+          setComparison(comparisonData.data);
+        }
+      } else {
+        const errorData = await comparisonRes.json().catch(() => ({}));
+        console.error(
+          "Comparison fetch failed:",
+          comparisonRes.status,
+          errorData
+        );
+        setError(
+          `Failed to load comparison: ${
+            errorData.error || comparisonRes.status
+          }`
+        );
       }
     } catch (err) {
+      console.error("Admin data fetch error:", err);
       setError(err.message || "Failed to load admin roadmap data");
     } finally {
       setAdminDataLoading(false);
@@ -425,6 +504,19 @@ function PredictedRoadmapView({ roadmap, selectedScenario, onScenarioChange }) {
     return <div>Scenario not found</div>;
   }
 
+  // Debug logging
+  console.log("Selected scenario:", selectedScenario);
+  console.log("Scenario data:", scenario);
+  console.log("Milestones:", scenario.milestones);
+
+  // Ensure milestones exist and have data
+  const validMilestones =
+    scenario.milestones?.filter(
+      (m) => m && (m.role || m.skills_acquired?.length > 0 || m.achievement)
+    ) || [];
+
+  console.log("Valid milestones count:", validMilestones.length);
+
   return (
     <div className="space-y-8">
       {/* Scenario Selector */}
@@ -485,86 +577,144 @@ function PredictedRoadmapView({ roadmap, selectedScenario, onScenarioChange }) {
         </div>
       </div>
 
-      {/* Year-by-Year Milestones */}
+      {/* Visual Timeline */}
       <div className="glass-card border border-white/55 px-8 py-8">
         <h3 className="text-2xl font-bold text-slate-900 mb-6">
-          10-Year Career Path
+          📈 10-Year Career Trajectory
         </h3>
 
-        <div className="space-y-4">
-          {scenario.milestones.map((milestone, idx) => (
-            <div
-              key={idx}
-              className="glass-panel border border-white/50 px-6 py-5 hover:shadow-lg transition-shadow"
-            >
-              <div className="flex items-start gap-4">
-                <div className="flex-shrink-0">
-                  <div className="w-12 h-12 rounded-full bg-gradient-to-br from-indigo-500 to-blue-500 text-white flex items-center justify-center font-bold">
-                    {milestone.year}
-                  </div>
-                </div>
+        {validMilestones.length === 0 ? (
+          <div className="text-center py-12">
+            <AlertCircle className="w-12 h-12 text-amber-500 mx-auto mb-4" />
+            <p className="text-slate-600 mb-2">
+              No career predictions generated
+            </p>
+            <p className="text-sm text-slate-500">
+              AI response may be empty or improperly formatted. Check console
+              for details.
+            </p>
+          </div>
+        ) : (
+          <>
+            {/* Timeline visualization */}
+            <div className="relative">
+              {/* Vertical line */}
+              <div className="absolute left-6 top-0 bottom-0 w-0.5 bg-gradient-to-b from-indigo-500 via-blue-500 to-purple-500"></div>
 
-                <div className="flex-1">
-                  <p className="text-sm text-slate-500 mb-1">
-                    {new Date(milestone.projected_date).toLocaleDateString()}
-                  </p>
+              <div className="space-y-6">
+                {validMilestones.map((milestone, idx) => {
+                  const hasRole = milestone.role && milestone.role.trim();
+                  const hasSkills =
+                    milestone.skills_acquired &&
+                    milestone.skills_acquired.length > 0;
+                  const hasAchievement = milestone.achievement;
 
-                  {milestone.role && (
-                    <div>
-                      <h4 className="font-semibold text-slate-900 text-lg">
-                        {milestone.role}
-                      </h4>
-                      <p className="text-sm text-slate-600 mt-1">
-                        {milestone.department}
-                        {milestone.level && ` • Level ${milestone.level}`}
-                      </p>
-                    </div>
-                  )}
+                  // Skip milestones with no meaningful data
+                  if (!hasRole && !hasSkills && !hasAchievement) {
+                    return null;
+                  }
 
-                  {/* Skills Acquired */}
-                  {milestone.skills_acquired.length > 0 && (
-                    <div className="mt-3">
-                      <p className="text-xs font-medium text-slate-600 mb-2">
-                        Skills Acquired:
-                      </p>
-                      <div className="flex flex-wrap gap-1">
-                        {milestone.skills_acquired
-                          .slice(0, 4)
-                          .map((skill, i) => (
-                            <span
-                              key={i}
-                              className="text-xs bg-indigo-100 text-indigo-700 px-2 py-1 rounded"
-                            >
-                              {skill}
-                            </span>
-                          ))}
+                  return (
+                    <div
+                      key={idx}
+                      className="relative flex items-start gap-6 pl-0"
+                    >
+                      {/* Timeline node */}
+                      <div className="flex-shrink-0 relative z-10">
+                        <div
+                          className={`w-12 h-12 rounded-full ${
+                            hasRole
+                              ? "bg-gradient-to-br from-indigo-500 to-blue-500 ring-4 ring-indigo-100"
+                              : "bg-slate-300"
+                          } text-white flex items-center justify-center font-bold shadow-lg`}
+                        >
+                          {milestone.year}
+                        </div>
+                      </div>
+
+                      {/* Content */}
+                      <div className="flex-1 pb-8">
+                        <div
+                          className={`glass-panel border ${
+                            hasRole
+                              ? "border-indigo-200/70 bg-indigo-50/30"
+                              : "border-white/50"
+                          } px-6 py-4 hover:shadow-lg transition-all`}
+                        >
+                          <p className="text-xs text-slate-500 mb-2">
+                            {new Date(
+                              milestone.projected_date
+                            ).toLocaleDateString("en-US", {
+                              month: "short",
+                              year: "numeric",
+                            })}
+                          </p>
+
+                          {hasRole ? (
+                            <div>
+                              <div className="flex items-start gap-2 mb-2">
+                                <TrendingUp className="w-5 h-5 text-indigo-600 mt-0.5 flex-shrink-0" />
+                                <div>
+                                  <h4 className="font-bold text-lg text-slate-900">
+                                    {milestone.role}
+                                  </h4>
+                                  {milestone.department && (
+                                    <p className="text-sm text-slate-600 mt-1">
+                                      {milestone.department}
+                                      {milestone.level &&
+                                        ` • Level ${milestone.level}`}
+                                    </p>
+                                  )}
+                                </div>
+                              </div>
+                            </div>
+                          ) : (
+                            <h4 className="font-semibold text-slate-700 mb-2">
+                              Skill Development Phase
+                            </h4>
+                          )}
+
+                          {/* Achievement */}
+                          {hasAchievement && (
+                            <div className="mt-3 p-3 bg-amber-50 border border-amber-200 rounded-lg">
+                              <p className="text-xs font-semibold text-amber-700 mb-1">
+                                🎯 Key Achievement:
+                              </p>
+                              <p className="text-sm text-slate-700">
+                                {milestone.achievement}
+                              </p>
+                            </div>
+                          )}
+
+                          {/* Skills */}
+                          {hasSkills && (
+                            <div className="mt-3">
+                              <p className="text-xs font-semibold text-slate-600 mb-2">
+                                💡 New Skills:
+                              </p>
+                              <div className="flex flex-wrap gap-2">
+                                {milestone.skills_acquired
+                                  .slice(0, 5)
+                                  .map((skill, i) => (
+                                    <span
+                                      key={i}
+                                      className="text-xs bg-indigo-100 text-indigo-700 px-3 py-1.5 rounded-full font-medium"
+                                    >
+                                      {skill}
+                                    </span>
+                                  ))}
+                              </div>
+                            </div>
+                          )}
+                        </div>
                       </div>
                     </div>
-                  )}
-
-                  {/* Competency Growth */}
-                  {milestone.competency_growth.length > 0 && (
-                    <div className="mt-2">
-                      <p className="text-xs font-medium text-slate-600 mb-1">
-                        Growth Areas:
-                      </p>
-                      <div className="flex flex-wrap gap-1">
-                        {milestone.competency_growth.map((comp, i) => (
-                          <span
-                            key={i}
-                            className="text-xs bg-green-100 text-green-700 px-2 py-1 rounded"
-                          >
-                            {comp.competency}
-                          </span>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-                </div>
+                  );
+                })}
               </div>
             </div>
-          ))}
-        </div>
+          </>
+        )}
       </div>
     </div>
   );
@@ -632,7 +782,9 @@ function ComparisonView({ comparison }) {
                   </span>
                 </td>
                 <td className="py-4 text-center text-slate-700">
-                  {scenario.salary_growth}
+                  {scenario.salary_growth?.total_growth_multiplier ||
+                    scenario.salary_growth?.annual_growth_rate ||
+                    "N/A"}
                 </td>
                 <td className="py-4 text-center text-slate-700">
                   {scenario.milestones_count > 3 ? "Multiple" : "Few"}

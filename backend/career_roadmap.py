@@ -2,12 +2,32 @@
 Career Roadmap Generation and Simulation Engine
 - Current roadmap for all users
 - Predicted roadmap with simulations for admins
+- AI-powered predictions using Azure OpenAI
 """
 
 from datetime import datetime, timedelta
 from typing import Dict, List, Any, Tuple
 import json
 import random
+import os
+from openai import AzureOpenAI
+from dotenv import load_dotenv
+
+# Load Azure OpenAI credentials
+load_dotenv()
+AZURE_API_KEY = os.getenv("AZURE_OPENAI_API_KEY")
+AZURE_ENDPOINT = os.getenv("AZURE_OPENAI_ENDPOINT")
+AZURE_API_VERSION = "2025-01-01-preview"
+
+# Initialize Azure OpenAI client
+azure_client = None
+if AZURE_API_KEY and AZURE_ENDPOINT:
+    azure_client = AzureOpenAI(
+        api_key=AZURE_API_KEY,
+        azure_endpoint=AZURE_ENDPOINT,
+        api_version=AZURE_API_VERSION,
+        default_headers={"Ocp-Apim-Subscription-Key": AZURE_API_KEY}
+    )
 
 def calculate_current_roadmap(employee: Dict[str, Any], all_roles: List[Dict[str, Any]]) -> Dict[str, Any]:
     """
@@ -49,6 +69,7 @@ def calculate_predicted_roadmap_with_simulations(
 ) -> Dict[str, Any]:
     """
     For ADMIN ONLY: Calculate predicted roadmap using multiple simulation scenarios
+    Uses Azure OpenAI to generate AI-powered predictions
     
     Scenarios:
     - "aggressive_growth": Fast-track progression
@@ -66,12 +87,22 @@ def calculate_predicted_roadmap_with_simulations(
         'scenarios': {}
     }
     
-    for scenario in scenarios:
-        predictions['scenarios'][scenario] = simulate_career_path(
-            employee, 
-            all_roles, 
-            scenario_type=scenario
-        )
+    # Use AI to generate enhanced predictions if available
+    if azure_client:
+        for scenario in scenarios:
+            predictions['scenarios'][scenario] = simulate_career_path_with_ai(
+                employee, 
+                all_roles, 
+                scenario_type=scenario
+            )
+    else:
+        # Fallback to rule-based simulation
+        for scenario in scenarios:
+            predictions['scenarios'][scenario] = simulate_career_path(
+                employee, 
+                all_roles, 
+                scenario_type=scenario
+            )
     
     # Add cross-scenario analysis
     predictions['optimal_path'] = determine_optimal_path(predictions['scenarios'])
@@ -79,6 +110,223 @@ def calculate_predicted_roadmap_with_simulations(
     predictions['retention_factors'] = identify_retention_factors(employee)
     
     return predictions
+
+
+def simulate_career_path_with_ai(
+    employee: Dict[str, Any],
+    all_roles: List[Dict[str, Any]],
+    scenario_type: str,
+    years: int = 10
+) -> Dict[str, Any]:
+    """
+    AI-powered career path simulation using Azure OpenAI
+    Generates multiple scenarios and predicts most likely career trajectory
+    """
+    
+    # First, get base simulation
+    base_simulation = simulate_career_path(employee, all_roles, scenario_type, years)
+    
+    # Prepare employee context for AI
+    employee_context = {
+        'current_role': employee['employment_info']['job_title'],
+        'department': employee['employment_info']['department'],
+        'tenure_years': calculate_tenure(employee['employment_info']['in_role_since']),
+        'skills_count': len(employee['skills']),
+        'top_skills': [s['skill_name'] for s in employee['skills'][:5]],
+        'competencies': employee.get('competencies', {}),
+        'projects_count': len(employee.get('projects', []))
+    }
+    
+    # Get available next roles
+    next_roles = find_next_roles(employee, all_roles, years=5)
+    next_role_titles = [role['title'] for role in next_roles[:5]]
+    
+    # Prepare prompt for AI
+    scenario_descriptions = {
+        'aggressive_growth': 'fast promotions every 1-2 years, targeting leadership roles, high visibility projects',
+        'steady_growth': 'stable progression every 2-3 years, balanced growth, gradual advancement',
+        'lateral_mobility': 'cross-functional moves, diverse experience, exploring different departments',
+        'specialization': 'deep technical expertise, becoming domain expert, principal/architect level'
+    }
+    
+    prompt = f"""You are a career trajectory analyst. Generate a precise 10-year career roadmap for graphical visualization.
+
+EMPLOYEE PROFILE:
+- Current Role: {employee_context['current_role']}
+- Department: {employee_context['department']}
+- Years in Role: {employee_context['tenure_years']}
+- Core Skills: {', '.join(employee_context['top_skills'][:3])}
+- Projects Delivered: {employee_context['projects_count']}
+
+AVAILABLE CAREER PATHS: {', '.join(next_role_titles[:3])}
+
+SCENARIO: {scenario_descriptions.get(scenario_type, '')}
+
+INSTRUCTIONS:
+1. Create a 10-year progression showing DIFFERENT milestones each year
+2. Years 1-3: Skill building in current role
+3. Years 4-6: Mid-career advancement (promotions/lateral moves)
+4. Years 7-10: Senior leadership or specialization
+5. Each year MUST have unique role/skills/achievement
+6. Use null for role only if no promotion that year
+
+OUTPUT FORMAT - Return ONLY this JSON structure (no markdown, no code blocks):
+{{
+  "year_1": {{
+    "role": "Senior Software Engineer",
+    "skills": ["Advanced Python", "System Design"],
+    "achievement": "Led migration project reducing costs by 30%"
+  }},
+  "year_2": {{
+    "role": null,
+    "skills": ["Machine Learning", "AWS Architecture"],
+    "achievement": "Implemented ML pipeline processing 1M records/day"
+  }},
+  "year_3": {{
+    "role": "Tech Lead",
+    "skills": ["Team Leadership", "Agile Coaching"],
+    "achievement": "Managed team of 5 engineers delivering 3 major releases"
+  }},
+  "year_4": {{
+    "role": null,
+    "skills": ["Strategic Planning", "Budget Management"],
+    "achievement": "Optimized development process, improving velocity 40%"
+  }},
+  "year_5": {{
+    "role": "Engineering Manager",
+    "skills": ["Cross-team Collaboration", "Hiring"],
+    "achievement": "Grew team from 5 to 15 engineers while maintaining quality"
+  }},
+  "year_6": {{
+    "role": null,
+    "skills": ["Product Strategy", "Stakeholder Management"],
+    "achievement": "Launched 2 new product lines generating $5M revenue"
+  }},
+  "year_7": {{
+    "role": "Senior Engineering Manager",
+    "skills": ["Organizational Design", "Mentorship"],
+    "achievement": "Established engineering practices adopted company-wide"
+  }},
+  "year_8": {{
+    "role": null,
+    "skills": ["Business Acumen", "Change Management"],
+    "achievement": "Led digital transformation initiative across 3 departments"
+  }},
+  "year_9": {{
+    "role": "Director of Engineering",
+    "skills": ["Executive Communication", "Vision Setting"],
+    "achievement": "Defined 3-year technical roadmap aligned with business goals"
+  }},
+  "year_10": {{
+    "role": null,
+    "skills": ["Board Presentations", "Industry Thought Leadership"],
+    "achievement": "Positioned company as innovation leader through conference talks"
+  }}
+}}
+
+CRITICAL: Each year must show clear progression and be completely different from others!
+"""
+
+    try:
+        # Call Azure OpenAI with JSON mode for structured output
+        response = azure_client.chat.completions.create(
+            model="gpt-4o-mini",  # Use the deployment name
+            messages=[
+                {
+                    "role": "system", 
+                    "content": "You are a career trajectory analyst. Always respond with valid JSON only, no markdown or explanations."
+                },
+                {"role": "user", "content": prompt}
+            ],
+            temperature=0.7,
+            max_tokens=2500,
+            response_format={"type": "json_object"}  # Force JSON output
+        )
+        
+        ai_response = response.choices[0].message.content.strip()
+        
+        print(f"🤖 AI Response for {scenario_type}:")
+        print(f"First 200 chars: {ai_response[:200]}")
+        
+        # Enhanced JSON extraction with multiple strategies
+        ai_predictions = None
+        try:
+            # Strategy 1: Try direct JSON parse (if AI returned clean JSON)
+            ai_predictions = json.loads(ai_response)
+            print("✅ Clean JSON parsed successfully")
+        except json.JSONDecodeError:
+            # Strategy 2: Extract JSON from markdown code blocks
+            try:
+                import re
+                # Remove markdown code blocks
+                clean_response = re.sub(r'```(?:json)?\n?', '', ai_response)
+                clean_response = clean_response.strip()
+                
+                # Try parsing cleaned response
+                ai_predictions = json.loads(clean_response)
+                print("✅ JSON extracted from markdown")
+            except json.JSONDecodeError:
+                # Strategy 3: Find JSON object with regex
+                try:
+                    json_pattern = r'\{[\s\S]*"year_1"[\s\S]*\}'
+                    json_match = re.search(json_pattern, ai_response)
+                    if json_match:
+                        ai_predictions = json.loads(json_match.group())
+                        print("✅ JSON extracted via regex")
+                except Exception as regex_error:
+                    print(f"⚠️ All JSON extraction strategies failed: {regex_error}")
+        
+        # If we successfully extracted AI predictions, apply them to milestones
+        if ai_predictions:
+            print(f"📊 Applying {len(ai_predictions)} year predictions to milestones")
+            enhanced_count = 0
+            
+            for milestone in base_simulation['milestones']:
+                year_key = f"year_{milestone['year']}"
+                if year_key in ai_predictions:
+                    ai_year = ai_predictions[year_key]
+                    
+                    # Validate AI data structure
+                    if not isinstance(ai_year, dict):
+                        continue
+                    
+                    # Update role (only if not null/None)
+                    if ai_year.get('role') and str(ai_year.get('role')).lower() not in ['null', 'none']:
+                        milestone['role'] = ai_year['role']
+                        milestone['department'] = employee_context['department']
+                        milestone['level'] = get_role_level(ai_year['role'])
+                    
+                    # Add skills (ensure it's a list)
+                    if ai_year.get('skills'):
+                        skills = ai_year['skills']
+                        if isinstance(skills, list) and len(skills) > 0:
+                            milestone['skills_acquired'] = skills[:5]  # Max 5 skills
+                    
+                    # Add achievement (ensure it's a string)
+                    if ai_year.get('achievement'):
+                        achievement = str(ai_year['achievement']).strip()
+                        if achievement and achievement.lower() != 'null':
+                            milestone['achievement'] = achievement
+                            milestone['competency_growth'] = [
+                                {
+                                    'competency': 'Leadership' if 'led' in achievement.lower() or 'managed' in achievement.lower() else 'Technical',
+                                    'growth': 'high',
+                                    'description': achievement
+                                }
+                            ]
+                    
+                    enhanced_count += 1
+            
+            print(f"✅ Enhanced {enhanced_count}/{len(base_simulation['milestones'])} milestones with AI data")
+        else:
+            print("⚠️ No AI predictions extracted - using base simulation")
+            print(f"Raw AI response: {ai_response[:500]}")
+        
+    except Exception as e:
+        print(f"⚠️ AI simulation error: {e}")
+        # Fallback to base simulation
+    
+    return base_simulation
 
 
 def simulate_career_path(
@@ -313,6 +561,20 @@ def calculate_tenure(in_role_since) -> int:
     if not in_role_since:
         return 0
     from datetime import datetime
+    
+    # Convert string date to date object if needed
+    if isinstance(in_role_since, str):
+        try:
+            # Try parsing ISO format first (YYYY-MM-DD)
+            in_role_since = datetime.fromisoformat(in_role_since).date()
+        except (ValueError, AttributeError):
+            try:
+                # Try other common formats
+                in_role_since = datetime.strptime(in_role_since, "%Y-%m-%d").date()
+            except ValueError:
+                # If parsing fails, return 0
+                return 0
+    
     tenure = (datetime.now().date() - in_role_since).days / 365.25
     return int(tenure)
 
