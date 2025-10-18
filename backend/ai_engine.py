@@ -11,18 +11,16 @@ from sklearn.metrics.pairwise import cosine_similarity
 from typing import List, Dict, Any
 from dotenv import load_dotenv
 
-# Local embeddings fallback
+# Local embeddings fallback (only if Azure fails)
 try:
     from sentence_transformers import SentenceTransformer
-    print("📦 Loading local embedding model (all-MiniLM-L6-v2)...")
+    print("📦 Local embedding model (all-MiniLM-L6-v2) available as fallback...")
     LOCAL_EMBEDDING_MODEL = SentenceTransformer('all-MiniLM-L6-v2')
-    USE_LOCAL_EMBEDDINGS = True
-    print("✅ Using local sentence-transformers for embeddings")
+    print("✅ Local sentence-transformers loaded as fallback")
 except Exception as e:
     LOCAL_EMBEDDING_MODEL = None
-    USE_LOCAL_EMBEDDINGS = False
     print(f"⚠️ Failed to load sentence-transformers: {type(e).__name__}: {e}")
-    print("⚠️ Will use Azure OpenAI instead")
+    print("⚠️ Only Azure OpenAI embeddings will be available")
 
 # -------------------------
 # Load environment variables
@@ -31,11 +29,21 @@ except Exception as e:
 #   AZURE_OPENAI_API_KEY=<your APIM subscription key>
 #   AZURE_OPENAI_ENDPOINT=https://psacodesprint2025.azure-api.net/openai/
 #   AZURE_EMBED_DEPLOYMENT=<your embeddings deployment name, e.g., text-embedding-3-small>
+# Optional:
+#   USE_LOCAL_EMBEDDINGS=true (set to 'true' to prioritize local embeddings, default is 'false' for Azure)
 load_dotenv()
 
 AZURE_API_KEY = os.getenv("AZURE_OPENAI_API_KEY")
 AZURE_ENDPOINT = os.getenv("AZURE_OPENAI_ENDPOINT")   # usually includes /openai/
 AZURE_API_VERSION = "2025-01-01-preview"
+
+# User preference for embedding method
+USE_LOCAL_EMBEDDINGS_FIRST = os.getenv("USE_LOCAL_EMBEDDINGS", "false").lower() == "true"
+
+if USE_LOCAL_EMBEDDINGS_FIRST:
+    print("🔧 Embedding mode: LOCAL FIRST (sentence-transformers) → Azure fallback")
+else:
+    print("🔧 Embedding mode: AZURE FIRST (OpenAI) → local fallback")
 
 if not AZURE_API_KEY or not AZURE_ENDPOINT:
     raise RuntimeError("Missing AZURE_OPENAI_API_KEY or AZURE_OPENAI_ENDPOINT in environment.")
@@ -57,30 +65,57 @@ client = AzureOpenAI(
 def generate_embedding(text: str, model: str = None) -> List[float]:
     """
     Generate embedding vector for given text.
-    Uses local sentence-transformers if available, otherwise Azure OpenAI.
+    Uses Azure OpenAI or local sentence-transformers based on USE_LOCAL_EMBEDDINGS env var.
+    
+    Priority order:
+    - If USE_LOCAL_EMBEDDINGS=true: Try local first, fallback to Azure
+    - If USE_LOCAL_EMBEDDINGS=false (default): Try Azure first, fallback to local
+    
     Args:
         text: Input text to embed
         model: Embeddings deployment name (only used for Azure). If None, uses AZURE_EMBED_DEPLOYMENT
     """
-    # Try local embeddings first (fast and free!)
-    if USE_LOCAL_EMBEDDINGS and LOCAL_EMBEDDING_MODEL:
-        try:
-            embedding = LOCAL_EMBEDDING_MODEL.encode(text)
-            return embedding.tolist()
-        except Exception as e:
-            print(f"⚠️ Local embedding failed: {e}, falling back to Azure...")
     
-    # Fallback to Azure OpenAI
-    embed_deployment = model or os.getenv("AZURE_EMBED_DEPLOYMENT")
-    if not embed_deployment:
-        raise RuntimeError("Set AZURE_EMBED_DEPLOYMENT to your embeddings deployment name or install sentence-transformers.")
-
-    try:
-        response = client.embeddings.create(input=text, model=embed_deployment)
-        return response.data[0].embedding
-    except Exception as e:
-        print(f"❌ Error generating embedding: {e}")
-        return []
+    if USE_LOCAL_EMBEDDINGS_FIRST:
+        # User prefers local embeddings - try local first
+        if LOCAL_EMBEDDING_MODEL:
+            try:
+                embedding = LOCAL_EMBEDDING_MODEL.encode(text)
+                return embedding.tolist()
+            except Exception as e:
+                print(f"⚠️ Local embedding failed: {e}, trying Azure fallback...")
+        
+        # Fallback to Azure OpenAI
+        embed_deployment = model or os.getenv("AZURE_EMBED_DEPLOYMENT")
+        if embed_deployment:
+            try:
+                response = client.embeddings.create(input=text, model=embed_deployment)
+                return response.data[0].embedding
+            except Exception as e:
+                print(f"❌ Azure embedding also failed: {e}")
+                return []
+    else:
+        # Default: Try Azure OpenAI embeddings first
+        embed_deployment = model or os.getenv("AZURE_EMBED_DEPLOYMENT")
+        if embed_deployment:
+            try:
+                response = client.embeddings.create(input=text, model=embed_deployment)
+                return response.data[0].embedding
+            except Exception as e:
+                print(f"⚠️ Azure embedding failed: {e}, trying local fallback...")
+        
+        # Fallback to local embeddings if Azure fails or not configured
+        if LOCAL_EMBEDDING_MODEL:
+            try:
+                embedding = LOCAL_EMBEDDING_MODEL.encode(text)
+                return embedding.tolist()
+            except Exception as e:
+                print(f"❌ Local embedding also failed: {e}")
+                return []
+    
+    # No embeddings available
+    print(f"❌ No embedding method available. Set AZURE_EMBED_DEPLOYMENT or install sentence-transformers.")
+    return []
 
 # ----------------------------
 # Profile/role text builders
