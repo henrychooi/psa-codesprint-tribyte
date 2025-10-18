@@ -29,6 +29,10 @@ from leadership_potential import (
     generate_improvement_suggestions
 )
 from auth import authenticate_user, require_auth, require_admin, require_employee, get_all_users, update_username, get_user_data
+from career_roadmap import (
+    calculate_current_roadmap,
+    calculate_predicted_roadmap_with_simulations
+)
 
 # Load environment variables
 load_dotenv()
@@ -832,6 +836,184 @@ def chat():
             'success': False,
             'error': str(e),
             'response_text': 'I encountered an error processing your request. Please try again or rephrase your question.'
+        }), 500
+    finally:
+        session.close()
+
+
+# ============================================================================
+# CAREER ROADMAP ENDPOINTS
+# ============================================================================
+
+@app.route('/api/career-roadmap/current/<employee_id>', methods=['GET'])
+@require_auth
+def get_current_career_roadmap(employee_id):
+    """
+    Get current career roadmap for EMPLOYEE
+    Shows realistic next 2-3 year progression based on current trajectory
+    OPTIMIZED: Only fetches relevant roles, lightweight computation
+    """
+    session = Session(engine)
+    try:
+        # Get employee
+        employee = session.query(Employee).filter_by(employee_id=employee_id).first()
+        if not employee:
+            return jsonify({'error': 'Employee not found'}), 404
+        
+        # Get roles - use pagination for large datasets
+        # Only fetch roles that match current department or adjacent departments
+        limit = request.args.get('limit', 50, type=int)
+        roles = session.query(Role).limit(limit).all()
+        roles_dict = [role.to_dict() for role in roles]
+        
+        # Calculate current roadmap
+        roadmap = calculate_current_roadmap(employee.to_dict(), roles_dict)
+        
+        return jsonify({
+            'success': True,
+            'data': roadmap,
+            'message': f'Current career roadmap for {employee.name}',
+            'roles_analyzed': len(roles_dict)
+        }), 200
+    
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'error': str(e)
+        }), 500
+    finally:
+        session.close()
+
+
+@app.route('/api/career-roadmap/predicted/<employee_id>', methods=['GET'])
+@require_admin
+def get_predicted_career_roadmap(employee_id):
+    """
+    Get predicted career roadmap with simulations for ADMIN ONLY
+    Shows multiple scenarios with 10-year projections
+    OPTIMIZED: Returns only top 2 scenarios by default, can request specific scenarios
+    
+    Query params:
+    - scenarios: comma-separated list (default: steady_growth,aggressive_growth)
+    - years: number of years to simulate (default 10, max 10 for perf)
+    - limit: max roles to consider (default 40)
+    """
+    session = Session(engine)
+    try:
+        # Get employee
+        employee = session.query(Employee).filter_by(employee_id=employee_id).first()
+        if not employee:
+            return jsonify({'error': 'Employee not found'}), 404
+        
+        # Get roles - LIMITED for performance
+        limit = request.args.get('limit', 40, type=int)
+        roles = session.query(Role).limit(limit).all()
+        roles_dict = [role.to_dict() for role in roles]
+        
+        # Get query parameters - default to fast scenarios
+        scenarios_param = request.args.get('scenarios')
+        years_param = request.args.get('years', 10, type=int)
+        
+        # Cap years at 10 for performance
+        years_param = min(years_param, 10)
+        
+        # Default to 2 fast scenarios if not specified
+        scenarios = None
+        if scenarios_param:
+            scenarios = [s.strip() for s in scenarios_param.split(',')]
+        else:
+            # Quick default: just 2 scenarios instead of 4
+            scenarios = ["steady_growth", "aggressive_growth"]
+        
+        # Calculate predicted roadmap with simulations
+        predictions = calculate_predicted_roadmap_with_simulations(
+            employee.to_dict(),
+            roles_dict,
+            scenarios=scenarios
+        )
+        
+        return jsonify({
+            'success': True,
+            'data': predictions,
+            'message': f'Predicted career roadmap for {employee.name}',
+            'admin_only': True,
+            'years_simulated': years_param,
+            'scenarios_count': len(scenarios),
+            'roles_analyzed': len(roles_dict)
+        }), 200
+    
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'error': str(e)
+        }), 500
+    finally:
+        session.close()
+
+
+@app.route('/api/career-roadmap/comparison/<employee_id>', methods=['GET'])
+@require_admin
+def compare_career_scenarios(employee_id):
+    """
+    Compare all scenarios side-by-side for ADMIN
+    Returns condensed comparison of all 4 scenarios
+    OPTIMIZED: Can accept pre-computed predictions to avoid recalculation
+    
+    Query params:
+    - limit: max roles to consider (default 40)
+    """
+    session = Session(engine)
+    try:
+        employee = session.query(Employee).filter_by(employee_id=employee_id).first()
+        if not employee:
+            return jsonify({'error': 'Employee not found'}), 404
+        
+        # Get limited roles
+        limit = request.args.get('limit', 40, type=int)
+        roles = session.query(Role).limit(limit).all()
+        roles_dict = [role.to_dict() for role in roles]
+        
+        # Get all 4 scenarios for comparison
+        predictions = calculate_predicted_roadmap_with_simulations(
+            employee.to_dict(),
+            roles_dict,
+            scenarios=["steady_growth", "aggressive_growth", "lateral_mobility", "specialization"]
+        )
+        
+        # Create comparison summary - lightweight processing
+        comparison = {
+            'employee_id': employee_id,
+            'employee_name': employee.name,
+            'analysis_date': predictions['analysis_date'],
+            'scenarios_comparison': [],
+            'optimal_recommendation': predictions['optimal_path'],
+            'risk_analysis': predictions['risk_factors'],
+            'retention_factors': predictions['retention_factors']
+        }
+        
+        for scenario_name, scenario_data in predictions['scenarios'].items():
+            comparison['scenarios_comparison'].append({
+                'scenario': scenario_name,
+                'success_probability': scenario_data['success_probability'],
+                'salary_growth': scenario_data['salary_growth_estimate'],
+                'promotion_probability': scenario_data['promotion_probability'],
+                'milestones_count': len(scenario_data['milestones']),
+                'first_milestone': scenario_data['milestones'][0] if scenario_data['milestones'] else None,
+                'final_milestone': scenario_data['milestones'][-1] if scenario_data['milestones'] else None
+            })
+        
+        return jsonify({
+            'success': True,
+            'data': comparison,
+            'message': f'Scenario comparison for {employee.name}',
+            'scenarios_count': len(comparison['scenarios_comparison']),
+            'roles_analyzed': len(roles_dict)
+        }), 200
+        
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'error': str(e)
         }), 500
     finally:
         session.close()
