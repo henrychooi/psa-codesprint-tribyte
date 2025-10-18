@@ -1,32 +1,94 @@
-# Career Compass - Module 1: Role Matching & Narrative Generation
+# PSA Code Sprint 2025 - Career Compass
 
-## 🎯 Overview
+![Flask](https://img.shields.io/badge/Flask-3.0-black)
+![React](https://img.shields.io/badge/React-18-61dafb)
+![Next.js](https://img.shields.io/badge/Next.js-14-black)
+![Python](https://img.shields.io/badge/Python-3.8+-blue)
+![License](https://img.shields.io/badge/License-MIT-green)
 
-Career Compass is an AI-powered career development platform that matches employees to ideal roles using advanced machine learning and generates personalized career narratives. This is Module 1 of the COMPASS Hackathon project.
+An AI-powered career development platform that matches employees to ideal roles using advanced machine learning and generates personalized career narratives. Built for **PSA Code Sprint Singapore 2025**.
 
-## 🏗️ Architecture
+## 🎯 Team Tribyte
 
-### Backend (Flask + Python)
-- **Framework**: Flask (lightweight REST API)
-- **Database**: SQLite (embedded, zero-config)
-- **ORM**: SQLAlchemy
-- **AI/ML**: OpenAI API (GPT-4 for narratives, text-embedding-3-small for embeddings)
-- **Matching**: Cosine similarity using scikit-learn
+Built with ❤️ for PSA Code Sprint 2025 hackathon.
 
-### Frontend (React)
-- **Framework**: React 18
-- **Styling**: Tailwind CSS
-- **Icons**: Lucide React
-- **HTTP Client**: Axios
+## ✨ Features
 
-## 🚀 Quick Start (30 minutes)
+### 🔍 Employee Search & Selection
 
-### Prerequisites
-- Python 3.8+
-- Node.js 16+
-- OpenAI API Key
+- **Smart Search Interface**: Real-time filtering by name, email, job title, or department
+- **Employee Profiles**: Comprehensive view of skills, competencies, and experience
+- **Visual Skill Badges**: Quick overview of employee capabilities
+- **Profile Details**:
+  - Personal information and contact details
+  - Current role and department
+  - Skills and competencies with proficiency levels
+  - Experience history and completed projects
+  - Education background
 
-### Step 1: Clone & Setup Backend
+### 🤖 AI-Powered Role Matching
+
+- **Intelligent Matching Algorithm**: Combines semantic similarity and skill analysis
+- **Top 5 Recommendations**: Best-fit roles ranked by match score
+- **Dual-Weight Scoring System**:
+  - 60% Semantic similarity using embeddings
+  - 40% Skill gap analysis
+- **Match Visualization**:
+  - Color-coded scores (Excellent/Strong/Good/Potential matches)
+  - Skill match breakdown (required vs. preferred)
+  - Missing skills identification
+
+### 📖 Career Narrative Generation
+
+- **AI-Generated Stories**: Personalized career narratives using Azure OpenAI
+- **Development Roadmap**: Prioritized action plans for skill development
+- **Actionable Insights**: Specific steps with estimated timelines
+- **Narrative Features**:
+  - Context-aware content based on employee profile and target role
+  - Skill gap bridging strategies
+  - Career progression guidance
+  - Next steps and recommendations
+
+### 🎨 Modern User Interface
+
+- **Responsive Design**: Seamless experience across all devices
+- **PSA Branding**: Custom color scheme with PSA blue theme
+- **Interactive Components**: Expandable role details and smooth transitions
+- **Visual Feedback**: Loading states, success indicators, and error handling
+
+## 🚀 Tech Stack
+
+### Backend
+- **Framework**: [Flask 3.0](https://flask.palletsprojects.com/)
+- **Database**: SQLite with [SQLAlchemy 2.0](https://www.sqlalchemy.org/)
+- **AI/ML**: 
+  - [Azure OpenAI](https://azure.microsoft.com/en-us/products/ai-services/openai-service) (via APIM)
+  - Local fallback: [Sentence Transformers](https://www.sbert.net/)
+  - [scikit-learn](https://scikit-learn.org/) for cosine similarity
+- **API**: RESTful endpoints with Flask-CORS
+
+### Frontend
+- **Framework**: [Next.js 14](https://nextjs.org/) with React 18
+- **Styling**: [Tailwind CSS 3](https://tailwindcss.com/)
+- **HTTP Client**: [Axios](https://axios-http.com/)
+- **Icons**: [Lucide React](https://lucide.dev/)
+
+## 📋 Prerequisites
+
+- Python 3.8 or higher
+- Node.js 18+ and npm
+- Azure OpenAI API access (or local embeddings fallback)
+
+## 🛠️ Installation & Setup
+
+### 1. Clone the repository
+
+```powershell
+git clone https://github.com/henrychooi/psa-codesprint-tribyte.git
+cd psa-codesprint-tribyte
+```
+
+### 2. Backend Setup
 
 ```powershell
 # Navigate to backend directory
@@ -40,43 +102,52 @@ python -m venv venv
 
 # Install dependencies
 pip install -r requirements.txt
+```
 
-# Create .env file
+### 3. Configure Environment Variables
+
+```powershell
+# Create .env file from example
 Copy-Item .env.example .env
 
-# Edit .env and add your OpenAI API key
+# Edit .env with your API credentials
 notepad .env
 ```
 
-**Add your OpenAI API key to `.env`:**
-```
-OPENAI_API_KEY=sk-your-actual-api-key-here
+**Update `.env` with your credentials:**
+```env
+AZURE_OPENAI_API_KEY=your-apim-subscription-key
+AZURE_OPENAI_ENDPOINT=https://psacodesprint2025.azure-api.net/openai/
+AZURE_EMBED_DEPLOYMENT=text-embedding-3-small
 FLASK_ENV=development
 DATABASE_URL=sqlite:///compass.db
 ```
 
-### Step 2: Load Data
+**Note**: The system will automatically fall back to local sentence-transformers if Azure OpenAI is unavailable.
+
+### 4. Initialize Database
 
 ```powershell
-# Still in backend directory
+# Load employee profiles and roles
 python load_data.py
 ```
 
-You should see:
+Expected output:
 ```
 ✅ Loaded 5 employees
 ✅ Loaded 5 roles
+✅ Database initialized successfully
 ```
 
-### Step 3: Start Backend Server
+### 5. Start Backend Server
 
 ```powershell
 python app.py
 ```
 
-Server will start on `http://localhost:5000`
+Backend API will start on `http://localhost:5000`
 
-### Step 4: Setup Frontend (New Terminal)
+### 6. Frontend Setup (New Terminal)
 
 ```powershell
 # Navigate to frontend directory
@@ -86,224 +157,119 @@ cd frontend
 npm install
 
 # Start development server
-npm start
+npm run dev
 ```
 
 Frontend will open at `http://localhost:3000`
 
-## 📊 Features Implemented
+## � Project Structure
 
-### ✅ Phase 1A: Data Foundation (Completed)
-- [x] Database schema with Employee, Role, CareerPath models
-- [x] SQLAlchemy ORM setup
-- [x] Data loading scripts for 5 employee profiles
-- [x] Sample roles with skill requirements
-
-### ✅ Phase 1B: AI Matching Engine (Completed)
-- [x] OpenAI embedding generation
-- [x] Cosine similarity matching (60% weight)
-- [x] Skill gap analysis (40% weight)
-- [x] Combined scoring algorithm
-- [x] Top-K role recommendations
-
-### ✅ Phase 1C: Narrative Generation (Completed)
-- [x] GPT-4 powered career narratives
-- [x] Context-aware prompts with employee & role data
-- [x] Development plan generation
-- [x] Actionable next steps
-
-### ✅ Phase 1D: REST API (Completed)
-- [x] GET `/api/employees` - List all employees
-- [x] GET `/api/employees/<id>` - Get employee profile
-- [x] GET `/api/roles` - List all roles
-- [x] GET `/api/match/employee/<id>` - Match employee to roles
-- [x] POST `/api/narrative/generate` - Generate narrative for specific pairing
-
-### ✅ Phase 1E: React Frontend (Completed)
-- [x] Employee search interface
-- [x] Employee profile display
-- [x] Role match cards with scores
-- [x] Skill gap visualization
-- [x] Career narrative display
-- [x] Development roadmap
-
-## 🎨 UI Components
-
-### 1. **EmployeeSearch.js**
-- Search bar with real-time filtering
-- Employee list with job titles and departments
-- Skill count badges
-
-### 2. **EmployeeProfile.js**
-- Personal information card
-- Current role details
-- Skills and competencies
-- Education history
-
-### 3. **RoleMatches.js**
-- Top 5 role recommendations
-- Match scores with color coding
-- Expandable skill details
-- Matched vs. missing skills
-
-### 4. **CareerNarrative.js**
-- AI-generated career story
-- Development roadmap with priorities
-- Actionable next steps
-- Timeline estimates
-
-## 📡 API Endpoints
-
-### Health Check
-```http
-GET /api/health
+```
+psa-codesprint-tribyte/
+├── backend/                         # Flask REST API
+│   ├── app.py                      # Main Flask application
+│   ├── ai_engine.py                # AI matching & narrative generation
+│   ├── models.py                   # SQLAlchemy database models
+│   ├── database.py                 # Database configuration
+│   ├── load_data.py                # Data loading script
+│   ├── requirements.txt            # Python dependencies
+│   ├── .env.example               # Environment variables template
+│   └── compass.db                 # SQLite database (generated)
+├── frontend/                       # Next.js React application
+│   ├── pages/                     # Next.js pages
+│   │   ├── index.js              # Main dashboard page
+│   │   ├── _app.js               # App wrapper
+│   │   └── _document.js          # Document structure
+│   ├── components/                # React components
+│   │   ├── EmployeeSearch.js     # Search interface
+│   │   ├── EmployeeProfile.js    # Profile display
+│   │   ├── RoleMatches.js        # Match results
+│   │   └── CareerNarrative.js    # AI narrative
+│   ├── services/                  # API services
+│   │   └── api.js                # Axios API client
+│   ├── styles/                    # Global styles
+│   │   └── globals.css
+│   ├── package.json              # Node dependencies
+│   ├── next.config.js            # Next.js configuration
+│   └── tailwind.config.js        # Tailwind CSS configuration
+├── Employee_Profiles.json         # Sample employee data
+├── README.md                      # This file
+└── LICENSE                        # MIT License
 ```
 
-### Get All Employees
-```http
-GET /api/employees
-```
+## 🎨 Design Philosophy
 
-### Match Employee to Roles
-```http
-GET /api/match/employee/EMP-20001?top_k=5&generate_narrative=true
-```
+- **AI-First Approach**: Leverages Azure OpenAI for intelligent matching and narratives
+- **User-Centric Design**: Intuitive interface optimized for HR professionals and employees
+- **Performance Optimized**: Fast embeddings with local fallback, efficient caching
+- **Scalable Architecture**: Modular design ready for enterprise integration
+- **Modern Stack**: Latest technologies with best practices
 
-**Response:**
-```json
-{
-  "success": true,
-  "employee": {
-    "id": "EMP-20001",
-    "name": "Samantha Lee",
-    "current_role": "Cloud Solutions Architect"
-  },
-  "matches": [
-    {
-      "role": { ... },
-      "match_score": 87.3,
-      "embedding_similarity": 89.2,
-      "skill_match": {
-        "overall_score": 85.0,
-        "required_matched": ["Cloud Architecture", "..."],
-        "required_missing": ["..."]
-      },
-      "career_narrative": "...",
-      "development_plan": [...]
-    }
-  ]
-}
-```
+## 🔮 Future Enhancements
 
-## 🧠 AI Matching Algorithm
+Based on PSA Code Sprint objectives, potential expansions include:
 
-### 1. Embedding Generation
-```python
-profile_text = create_profile_text(employee)
-embedding = generate_embedding(profile_text)  # OpenAI text-embedding-3-small
-```
+1. **Enhanced AI Capabilities**
+   - Multi-language narrative generation
+   - Sentiment analysis for career aspirations
+   - Predictive career path modeling
+   - Automated interview question generation
 
-### 2. Similarity Calculation
-```python
-cosine_sim = cosine_similarity([employee_emb], [role_emb])[0][0]
-```
+2. **Advanced Analytics**
+   - Skills gap heatmaps across departments
+   - Talent pipeline visualization
+   - Succession planning tools
+   - Career trajectory forecasting
 
-### 3. Skill Matching
-```python
-required_score = matched / required_total
-preferred_score = matched / preferred_total
-skill_score = (required * 0.7) + (preferred * 0.3)
-```
+3. **Integration & Automation**
+   - HR system integration (SAP, Workday)
+   - Real-time profile updates
+   - Automated role posting notifications
+   - Slack/Teams chatbot integration
 
-### 4. Combined Score
-```python
-final_score = (cosine_sim * 0.6) + (skill_score * 0.4)
-```
+4. **Collaboration Features**
+   - Manager approval workflows
+   - Mentorship matching
+   - Peer review integration
+   - Learning & development tracking
 
-## 🎯 Demo Flow
+5. **Enterprise Features**
+   - Role-based access control
+   - Audit logging and compliance
+   - Multi-tenant architecture
+   - Advanced search with filters
 
-1. **Open App** → Search interface with 5 employees
-2. **Select Employee** → Profile loads on left sidebar
-3. **View Matches** → Top 5 roles with match scores
-4. **Read Narrative** → AI-generated career story
-5. **Explore Details** → Expand to see skill gaps, responsibilities
+## 📊 Sample Data
 
-## 🐛 Troubleshooting
+The application includes realistic data for:
 
-### Backend Issues
+- 5 employee profiles with comprehensive backgrounds
+- 5 roles across different departments and seniority levels
+- Skills database spanning technical and soft skills
+- Competency frameworks with proficiency levels
 
-**Error: "No module named 'flask'"**
-```powershell
-# Make sure virtual environment is activated
-.\venv\Scripts\Activate.ps1
-pip install -r requirements.txt
-```
+## 🤝 Contributing
 
-**Error: "OpenAI API key not found"**
-```powershell
-# Check .env file exists and contains key
-notepad .env
-```
+This project is built for PSA Code Sprint 2025. Feel free to fork and customize for your team's needs!
 
-**Database errors**
-```powershell
-# Delete and reload database
-Remove-Item compass.db
-python load_data.py
-```
+## 📝 License
 
-### Frontend Issues
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
-**Error: "npm: command not found"**
-- Install Node.js from https://nodejs.org/
+## 🏆 PSA Code Sprint 2025
 
-**Port 3000 already in use**
-```powershell
-# Kill process on port 3000
-netstat -ano | findstr :3000
-taskkill /PID <PID> /F
-```
+## � Contact
 
-**Module not found errors**
-```powershell
-# Reinstall dependencies
-Remove-Item -Recurse node_modules
-npm install
-```
+For questions or support, reach out to Team Tribyte:
 
-## 📈 Performance
+- GitHub: [@henrychooi](https://github.com/henrychooi)
 
-- **Embedding Generation**: ~500ms per profile
-- **Matching 5 Roles**: ~2-3 seconds
-- **Narrative Generation**: ~3-5 seconds (GPT-4)
-- **Total Flow**: ~5-8 seconds end-to-end
+## 🙏 Acknowledgments
 
-## 🔒 Security Notes
-
-- Never commit `.env` file
-- API keys stored in environment variables
-- CORS enabled for localhost development
-- For production: Add authentication, rate limiting, HTTPS
-
-## 🚧 Future Enhancements (Post-Hackathon)
-
-- [ ] Cache embeddings to reduce API calls
-- [ ] Batch processing for multiple employees
-- [ ] Role recommendation explanations (SHAP values)
-- [ ] Career path visualization (graph)
-- [ ] Export narratives as PDF
-- [ ] Integration with HR systems
-
-## 👥 Team
-
-Built for PSA Code Sprint 2025 - Team Tribyte
-
-## 📄 License
-
-See LICENSE file
+- PSA International for organizing the Code Sprint
+- Azure OpenAI for AI capabilities
+- Open-source community for amazing tools and libraries
 
 ---
 
-**Ready to demo! 🎉**
-
-For questions or issues during the hackathon, refer to this README or check the inline code comments.
+**Built with 💙 by Team Tribyte for PSA Code Sprint Singapore 2025**
