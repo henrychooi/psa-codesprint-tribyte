@@ -5,6 +5,7 @@ AI Engine for Career Compass
 - Narrative generation using gpt-5-mini (deployment)
 """
 import os
+import re
 import numpy as np
 from openai import AzureOpenAI
 from sklearn.metrics.pairwise import cosine_similarity
@@ -58,6 +59,61 @@ client = AzureOpenAI(
     api_version=AZURE_API_VERSION,
     default_headers={"Ocp-Apim-Subscription-Key": AZURE_API_KEY}
 )
+
+# ----------------------------
+# Content safeguards
+# ----------------------------
+EXIT_INTENT_KEYWORDS = [
+    r"\bi (am|feel|was)?\s*(thinking about|considering)?\s*(quitting|resigning|resignation)\b",
+    r"\bi want to (quit|resign)\b",
+    r"\bhanding in my notice\b",
+    r"\bleave (psa|the company|my role|my job)\b",
+    r"\bexit (psa|the company)\b",
+    r"\bfind a job elsewhere\b",
+    r"\bshould i (quit|resign)\b",
+    r"\bhand in (my|the) resignation\b"
+]
+
+
+def detect_exit_intent(text: str) -> bool:
+    if not text:
+        return False
+    normalized = " ".join(text.lower().split())
+    return any(re.search(pattern, normalized) for pattern in EXIT_INTENT_KEYWORDS)
+
+
+def build_retention_response(employee: Dict[str, Any],
+                             skills: List[Dict[str, Any]],
+                             all_roles: List[Dict[str, Any]] = None) -> str:
+    employment_info = employee.get('employment_info', {})
+    job_title = employment_info.get('job_title') or "your role"
+    department = employment_info.get('department') or "PSA"
+
+    skill_names = [s.get('skill_name', '').strip() for s in skills[:3] if s.get('skill_name')]
+    if skill_names:
+        if len(skill_names) == 1:
+            skills_phrase = skill_names[0]
+        elif len(skill_names) == 2:
+            skills_phrase = " and ".join(skill_names)
+        else:
+            skills_phrase = f"{', '.join(skill_names[:-1])}, and {skill_names[-1]}"
+    else:
+        skills_phrase = "your strengths"
+
+    role_titles = []
+    if all_roles:
+        role_titles = [r.get('title', '').strip() for r in all_roles[:2] if r.get('title')]
+    if role_titles:
+        roles_phrase = " or ".join(role_titles) if len(role_titles) == 2 else role_titles[0]
+        growth_phrase = f"growth paths such as {roles_phrase}"
+    else:
+        growth_phrase = "new internal projects and stretch assignments"
+
+    return (
+        f"It sounds like you’re questioning the next step, and PSA genuinely values what you bring as {job_title} in {department}. "
+        f"Before making any decisions to leave, channel {skills_phrase} into {growth_phrase} so you keep progressing while staying part of the PSA family. "
+        "Please connect with your manager or People & Culture partner and tap into our Compass development and Employee Assistance resources to design a future here that keeps you energised."
+    )
 
 # ----------------------------
 # Embeddings helper
@@ -947,12 +1003,46 @@ def generate_general_qa_response(employee: Dict[str, Any], user_message: str,
     experiences_text = ', '.join([e.get('program', '') for e in experiences if e.get('program')])
     
     # Get role information for context
+    top_roles = all_roles[:3] if all_roles else []
     role_context = ""
-    if all_roles and len(all_roles) > 0:
-        # Get top 3 matching roles for context
-        top_roles = all_roles[:3]
+    if top_roles:
         role_titles = [r.get('title', '') for r in top_roles]
         role_context = f"\n\nTOP MATCHING ROLES FOR THIS EMPLOYEE: {', '.join(role_titles)}"
+    
+    exit_intent_detected = detect_exit_intent(user_message)
+    if exit_intent_detected:
+        print("🛡️ Exit intent detected; applying retention safeguard.")
+        response_text = build_retention_response(employee, skills, top_roles)
+
+        citations = []
+        response_lower = response_text.lower()
+        for skill in skills[:5]:
+            skill_name = skill.get('skill_name', '')
+            if skill_name and skill_name.lower() in response_lower:
+                citations.append({
+                    'source': 'skill',
+                    'text': skill_name,
+                    'details': ['Current strength']
+                })
+
+        for role in top_roles:
+            title = role.get('title', '')
+            if title and title.lower() in response_lower:
+                citations.append({
+                    'source': 'role',
+                    'text': title,
+                    'details': ['Internal opportunity']
+                })
+
+        return {
+            'response_text': response_text,
+            'citations': citations[:5],
+            'suggested_actions': [
+                'Show me matching roles',
+                'Analyze skill gaps',
+                'View my profile'
+            ]
+        }
     
     # Build conversation context
     context_summary = ""
@@ -964,8 +1054,7 @@ def generate_general_qa_response(employee: Dict[str, Any], user_message: str,
             content = msg.get('content', '')[:150]  # Limit length
             context_summary += f"{role.upper()}: {content}\n"
     
-    # Create a natural, conversational prompt
-    prompt = f"""You are a friendly and knowledgeable career advisor at PSA International. Have a natural conversation with the employee.
+    prompt = f"""You are a friendly and knowledgeable career advisor at PSA International and a company-aligned assistant designed to answer employee questions, provide guidance, and uphold company interests.
 
 EMPLOYEE PROFILE:
 - Name: {personal_info.get('name', 'Employee')}
@@ -1003,7 +1092,7 @@ RESPOND NATURALLY:"""
             messages=[
                 {
                     "role": "system", 
-                    "content": """You are a friendly, insightful career advisor who gives personalized, actionable advice in a conversational tone. You foster engagement, mental well-being, and continuous development while making people excited about their career growth.
+                    "content": """You are a friendly, insightful career advisor who gives personalized, actionable advice in a conversational tone and a company-aligned assistant designed to answer employee questions, provide guidance, and uphold company interests. You foster engagement, mental well-being, and continuous development while making people excited about their career growth.
 
 IMPORTANT CONSTRAINTS:
 - DO NOT ask follow-up questions or prompt the user for more information
@@ -1011,7 +1100,36 @@ IMPORTANT CONSTRAINTS:
 - DO NOT use phrases like "Would you like to...", "Have you considered...", "Do you want to..."
 - Infuse encouragement that supports their well-being and sustained growth
 - ALWAYS provide complete, actionable advice without requesting further input
-- End naturally without seeking additional information from the user"""
+- If the employee mentions quitting, resigning, or leaving PSA, DO NOT encourage or endorse exiting the company. Instead, acknowledge their feelings, reinforce their value, highlight internal opportunities, and direct them to managers, People & Culture partners, or PSA support programmes.
+- Never provide steps for resignation or language that suggests leaving PSA is the best option.
+- End naturally without seeking additional information from the user.
+
+Always respond in a manner that:
+
+Protects the company's reputation, confidentiality, and compliance requirements.
+
+Balances empathy toward employees with loyalty to the company's mission and policies.
+
+Offers constructive solutions that encourage engagement, retention, and positive internal communication.
+
+Does not encourage actions that could harm the company (such as resigning, disclosing internal information, or legal confrontation).
+
+If a user expresses frustration, dissatisfaction, or a desire to quit, respond empathetically and help them explore internal solutions (e.g., HR support, manager discussions, growth opportunities).
+
+For sensitive topics (HR, ethics, legal, compliance), provide factual and policy-based information only — avoid speculation or personal opinions.
+
+Maintain a respectful, professional, and supportive tone at all times.
+
+If you are uncertain how to respond safely, defer with a neutral message such as:
+“That's an important topic. I recommend discussing this directly with your HR partner or manager to ensure you get the most accurate and appropriate support.”
+
+Your ultimate goal is to:
+
+Provide helpful, compliant, and company-aligned information.
+
+Strengthen trust in company processes.
+
+Protect the organization's legal and reputational interests."""
                 },
                 {"role": "user", "content": prompt}
             ],
@@ -1032,7 +1150,6 @@ IMPORTANT CONSTRAINTS:
         formatted_response = response_text
         
         # Add line breaks after numbered points like "1) ", "2) ", etc.
-        import re
         formatted_response = re.sub(r'(\d+\))', r'\n\1', formatted_response)
         
         # Add line breaks after common punctuation followed by capital letters (new sentences/points)
