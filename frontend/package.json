@@ -2,39 +2,24 @@
   "name": "career-compass-frontend",
   "version": "1.0.0",
   "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint"
+  },
   "dependencies": {
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
-    "react-scripts": "5.0.1",
+    "next": "^14.0.0",
     "axios": "^1.6.0",
     "lucide-react": "^0.292.0"
-  },
-  "scripts": {
-    "start": "react-scripts start",
-    "build": "react-scripts build",
-    "test": "react-scripts test",
-    "eject": "react-scripts eject"
-  },
-  "eslintConfig": {
-    "extends": [
-      "react-app"
-    ]
-  },
-  "browserslist": {
-    "production": [
-      ">0.2%",
-      "not dead",
-      "not op_mini all"
-    ],
-    "development": [
-      "last 1 chrome version",
-      "last 1 firefox version",
-      "last 1 safari version"
-    ]
   },
   "devDependencies": {
     "tailwindcss": "^3.3.5",
     "autoprefixer": "^10.4.16",
-    "postcss": "^8.4.31"
+    "postcss": "^8.4.31",
+    "eslint": "^8.54.0",
+    "eslint-config-next": "^14.0.0"
   }
 }
