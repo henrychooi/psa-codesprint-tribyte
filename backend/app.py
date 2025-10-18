@@ -19,6 +19,7 @@ from ai_engine import (
     generate_profile_summary,
     format_role_recommendations,
     generate_skill_gap_analysis,
+    generate_wellbeing_support,
     generate_general_qa_response
 )
 from leadership_potential import (
@@ -751,6 +752,18 @@ def chat():
                 all_roles=roles_dict,
                 user_message=user_message
             )
+        
+        elif intent == "wellbeing_support":
+            # Handle wellbeing, mental health, work-life balance support
+            print(f"💚 Calling generate_wellbeing_support for personal well-being")
+            
+            result = generate_wellbeing_support(
+                employee_dict,
+                user_message,
+                conversation_history=conversation_history
+            )
+            
+            print(f"💚 Wellbeing support result: {result}")
         
         elif intent == "general_qa":
             # NEW: Handle general career questions with GPT

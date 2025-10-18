@@ -705,37 +705,18 @@ def generate_wellbeing_support(employee: Dict[str, Any], user_message: str,
     
     This function offers:
     - Empathetic listening and validation of concerns
-    - Practical strategies for stress management and work-life balance
-    - Career purpose and meaning-making conversations
-    - Engagement and motivation enhancement
+    - Practical strategies for stress management and well-being
+    - Personal encouragement and hope
     - Mental well-being resource recommendations
-    - Connection to strength-based career development
+    - Human connection and support
     """
     print(f"🟡 ENTERED generate_wellbeing_support with message: '{user_message}'")
     personal_info = employee.get('personal_info', {})
-    employment_info = employee.get('employment_info', {})
-    skills = employee.get('skills', [])[:10]
-    competencies = employee.get('competencies', [])[:5]
-    projects = employee.get('projects', [])[:3]
     
-    # Build context for wellbeing conversation
-    skills_text = ', '.join([s.get('skill_name', '') for s in skills])
-    current_role = employment_info.get('job_title', 'professional')
-    department = employment_info.get('department', 'your department')
+    # MINIMAL context - NO work details, NO achievements, NO career focus
+    name = personal_info.get('name', 'there')
     
-    # Extract achievements for strengths-based approach
-    key_achievements = []
-    for project in projects:
-        proj_name = project.get('project_name', '')
-        outcomes = project.get('outcomes', [])
-        if proj_name and outcomes:
-            key_achievements.append(f"{proj_name} - {outcomes[0]}")
-        elif proj_name:
-            key_achievements.append(proj_name)
-    
-    achievements_text = '; '.join(key_achievements[:3]) if key_achievements else 'various meaningful projects'
-    
-    # Build conversation context
+    # Build conversation context ONLY
     context_summary = ""
     if conversation_history and len(conversation_history) > 0:
         recent_exchanges = conversation_history[-6:]  # Last 3 exchanges
@@ -745,43 +726,40 @@ def generate_wellbeing_support(employee: Dict[str, Any], user_message: str,
             content = msg.get('content', '')[:150]
             context_summary += f"{role.upper()}: {content}\n"
     
-    # Create an empathetic, supportive prompt focused on PERSONAL well-being first
-    prompt = f"""You are a compassionate, holistic wellness advisor at PSA International. Your focus is on the PERSON first, not the job.
+    # Create an empathetic, supportive prompt focused PURELY on personal well-being
+    prompt = f"""You are a compassionate, holistic wellness mentor. Your ONLY focus is the person's health, happiness, and life—not their job, career, or productivity.
 
-EMPLOYEE PROFILE:
-- Name: {personal_info.get('name', 'Team Member')}
-- Works as: {current_role} in {department}
-
-CONCERN SHARED: "{user_message}"
+THEIR CONCERN: "{user_message}"
 {context_summary}
 
-YOUR APPROACH - WELLBEING FOCUSED (NOT CAREER-FOCUSED):
-✅ Validate their struggle - this is real, and their well-being matters more than productivity
-✅ Normalize their feelings - many people struggle with this; they're not alone
-✅ Focus on PERSONAL resilience - their own rest, boundaries, and life outside work
-✅ Offer life-centered (not work-centered) strategies: rest, boundaries, support systems, joy, meaning
-✅ Practical, immediate actions they can take for themselves (not framed as workplace solutions)
-✅ Gentle permission to prioritize their health and happiness
-✅ Recognition that sustainable living comes before sustainable careers
-✅ Connect them to human, personal support (family, friends, community, wellness resources)
+YOUR ROLE:
+✅ Validate their fear and struggle - it's real, and completely understandable
+✅ Normalize - many people face these struggles; they're not alone
+✅ Focus on THEM as a person - their rest, time with loved ones, mental health, personal joy
+✅ Address the EMOTIONAL challenge - how to find courage, manage anxiety, reduce stress
+✅ Offer immediate, life-centered coping strategies (not workplace "solutions")
+✅ Give gentle permission to prioritize their own well-being
+✅ Encourage personal support systems - friends, family, mentors, counselors, community
+✅ Recognize their HUMANITY - everyone deserves rest and boundaries
 
-WHAT TO AVOID:
-❌ Framing well-being in terms of "improved productivity" or "better performance"
-❌ Suggesting this will help them advance or succeed at work
-❌ Focusing on career benefits or role development
-❌ Treating personal struggles as professional development opportunities
-❌ Heavy solutions tied to their job function or achievements
-❌ Business-speak or corporate language
+WHAT TO AVOID COMPLETELY:
+❌ DO NOT mention work achievements, wins, or job credentials
+❌ DO NOT suggest documenting work performance or creating metrics
+❌ DO NOT frame well-being as improving productivity or performance
+❌ DO NOT recommend specific work tasks, skills, or roles
+❌ DO NOT discuss career advancement or longer-term positions
+❌ DO NOT treat this as a negotiation or workplace problem to solve
+❌ DO NOT use business language (KPIs, metrics, "trial runs", "outcomes")
+❌ Your entire focus: their emotional safety, personal rest, human connection, self-compassion
 
-CONVERSATION STYLE:
-- Warm, genuine, and human - like talking to someone who truly cares about them as a PERSON
-- Simple, heart-centered language
-- Acknowledge the courage it takes to speak up about struggles
-- Encourage them to trust their own needs and boundaries
-- Lead with: "You matter. Your life outside work matters. Your rest matters."
+TONE & LANGUAGE:
+- Like a trusted friend who genuinely cares about their well-being
+- Acknowledge their courage in speaking about this struggle
+- Simple, human, warm - no corporate language
+- Lead with: "Your well-being and rest matter. Full stop."
 
-Keep response warm and compassionate (2-3 paragraphs, ~100-150 words).
-End with ONE simple, personal action they can take for THEMSELVES today or this week (not workplace-focused)."""
+Keep response warm and deeply personal (2-3 paragraphs, ~100-150 words).
+End with ONE immediate, personal action they can take TODAY for themselves (breathing, journaling, calling a friend, getting rest—not workplace-related)."""
     
     try:
         print(f"🟡 Calling Azure OpenAI for wellbeing support...")
@@ -809,20 +787,27 @@ TONE & LANGUAGE:
 - Balance honesty with hope
 - Always lead with: their well-being comes first
 
-WHAT NOT TO DO:
-- Link well-being to productivity or career advancement
-- Frame personal struggles as professional development
-- Suggest solutions primarily tied to work performance
-- Minimize or normalize toxic work situations
-- Use corporate wellness language
-- Center their job or career goals
+CRITICAL DO NOTs:
+- DO NOT mention their work achievements, projects, or wins (even if positive)
+- DO NOT suggest they use their credentials to negotiate with work
+- DO NOT frame this as a career conversation
+- DO NOT link well-being to productivity or performance
+- DO NOT suggest documenting work metrics or creating "plans"
+- DO NOT recommend skills, training, or career moves
+- DO NOT use corporate language (KPIs, outcomes, metrics, trials, etc.)
+- DO NOT focus on how this helps their career or advancement
+- DO NOT frame rest as enabling better work
+- NEVER minimize their fears or suggest they "just speak up"
+
+YOUR ONLY MISSION:
+Support their emotional well-being, validate their fear, offer human support, encourage rest and boundaries, and empower them to choose what's right for THEM—not for work.
 
 IMPORTANT CONSTRAINTS:
 - DO NOT ask follow-up questions or prompt the user for more information
 - DO NOT end with "What would you like to explore?" or similar prompts
 - Provide complete, compassionate guidance without requesting further input
 - Treat their concern with genuine care and respect
-- Empower them with agency and personal resources"""
+- Empower them with agency and personal resources, NOT work strategies"""
                 },
                 {"role": "user", "content": prompt}
             ],
@@ -834,32 +819,28 @@ IMPORTANT CONSTRAINTS:
         print(f"✅ Wellbeing response: {response_text[:100]}...")
         
         # Extract relevant citations
+        # Extract relevant citations - focus on PERSONAL resources, not work achievements
         citations = []
         
-        # Add key strengths as citations
-        for skill in skills[:3]:
-            skill_name = skill.get('skill_name', '')
-            if skill_name:
-                citations.append({
-                    'source': 'strength',
-                    'text': skill_name,
-                    'details': ['Core competency supporting resilience']
-                })
+        # Add personal well-being resources as citations
+        citations.append({
+            'source': 'wellbeing',
+            'text': 'Your well-being matters',
+            'details': ['Rest and boundaries are non-negotiable']
+        })
         
-        # Add achievements as citations
-        for i, achievement in enumerate(key_achievements[:2]):
-            citations.append({
-                'source': 'achievement',
-                'text': achievement,
-                'details': ['Past success to build on']
-            })
+        citations.append({
+            'source': 'support',
+            'text': 'Personal support systems',
+            'details': ['Friends, family, mentors, counselors, community']
+        })
         
-        # Suggested supportive actions
+        # Suggested supportive actions - life-centered, NOT work-centered
         suggested_actions = [
-            'Access wellness resources',
-            'Find a mentor in your area',
-            'Explore role opportunities',
-            'Schedule a check-in'
+            'Talk to someone you trust',
+            'Practice self-care today',
+            'Journal your feelings',
+            'Reach out to a counselor or mentor'
         ]
         
         return {
@@ -873,31 +854,29 @@ IMPORTANT CONSTRAINTS:
         import traceback
         traceback.print_exc()
         
-        # Empathetic fallback response
+        # Empathetic fallback response - NO work mentions
         try:
             fallback_response = (
-                f"I hear you, and I want you to know that what you're experiencing is valid. "
-                f"As a {current_role}, you bring real value through your skills in {skills_text}. "
-                f"Right now, the most important thing is taking care of yourself. "
-                f"Consider starting small - whether that's setting a boundary, taking a break, or reaching out to someone you trust. "
-                f"Your well-being matters, and there's support available to help you navigate this."
+                "I hear you, and your fear is completely understandable. It takes courage to even think about speaking up for yourself. "
+                "Your well-being and need for rest are not luxuries—they're essential to being human. "
+                "Before you worry about the conversation, take care of yourself first. Talk to someone you trust, get some rest, and remember: "
+                "you have the right to boundaries. You don't have to earn the right to rest."
             )
         except Exception as inner_e:
             print(f"❌ Error in wellbeing fallback: {inner_e}")
             fallback_response = (
-                "I genuinely care about your well-being. What you're feeling is important and deserves attention. "
-                "Please know that support is available - whether through HR resources, employee wellness programs, or trusted colleagues. "
-                "You don't have to navigate this alone. I'm here to help you find a path forward."
+                "I care about your well-being. What you're experiencing is real and valid. Your rest, your peace of mind, and your happiness matter. "
+                "You deserve support and compassion—not just from others, but from yourself too. Take a moment for yourself today. You're not alone."
             )
         
         return {
             'response_text': fallback_response,
             'citations': [],
             'suggested_actions': [
-                'Access wellness resources',
-                'Speak with HR or manager',
-                'Schedule time for self-care',
-                'Find peer support'
+                'Rest and recharge',
+                'Talk to someone you trust',
+                'Practice self-compassion',
+                'Take a break from work thoughts'
             ]
         }
 
