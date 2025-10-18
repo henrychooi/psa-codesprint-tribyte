@@ -39,115 +39,107 @@ const EvidenceModal = ({ isOpen, onClose, componentKey, componentData, evidence 
   const Icon = info.icon;
 
   return (
-    <div 
-      className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4"
+    <div
+      className="fixed inset-0 bg-slate-900/45 backdrop-blur-sm z-50 flex items-center justify-center p-4"
       onClick={onClose}
       role="dialog"
       aria-modal="true"
       aria-labelledby="modal-title"
     >
-      <div 
-        className="bg-white rounded-xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto"
+      <div
+        className="glass-card border border-white/55 max-w-2xl w-full max-h-[90vh] overflow-y-auto"
         onClick={(e) => e.stopPropagation()}
       >
-        {/* Header */}
-        <div className="sticky top-0 bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between z-10">
-          <div className="flex items-center space-x-3">
-            <div className={`w-12 h-12 rounded-lg ${info.color} flex items-center justify-center`}>
+        <div className="sticky top-0 bg-white/80 backdrop-blur-md border-b border-white/60 px-6 py-4 flex items-center justify-between z-10">
+          <div className="flex items-center gap-3">
+            <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${info.color}`}>
               <Icon className="w-6 h-6" />
             </div>
             <div>
-              <h2 id="modal-title" className="text-xl font-bold text-gray-900">{info.title}</h2>
-              <p className="text-sm text-gray-600">Weight: {info.weight} of overall score</p>
+              <h2 id="modal-title" className="text-xl font-semibold text-slate-900">{info.title}</h2>
+              <p className="text-xs uppercase tracking-[0.28em] text-slate-400">Weight {info.weight}</p>
             </div>
           </div>
           <button
             onClick={onClose}
-            className="p-2 hover:bg-gray-100 rounded-lg transition"
+            className="glass-chip px-3 py-2 text-xs font-semibold text-slate-500 hover:text-indigo-500 transition-colors"
             aria-label="Close modal"
           >
-            <X className="w-6 h-6 text-gray-500" />
+            Close
           </button>
         </div>
 
-        {/* Content */}
-        <div className="px-6 py-6 space-y-6">
-          {/* Score */}
-          <div className="bg-gradient-to-r from-blue-50 to-purple-50 rounded-lg p-6">
-            <div className="text-center">
-              <div className="text-5xl font-bold text-psa-blue mb-2">
-                {componentData}%
-              </div>
-              <p className="text-gray-700">{info.description}</p>
+        <div className="px-6 py-6 space-y-6 bg-white/70">
+          <div className="glass-panel border border-white/60 px-6 py-6 text-center">
+            <div className="text-5xl font-semibold text-indigo-500 mb-2">
+              {componentData}%
             </div>
+            <p className="text-sm text-slate-600">{info.description}</p>
           </div>
 
-          {/* Evidence */}
           <div>
-            <h3 className="text-lg font-semibold text-gray-900 mb-3">Supporting Evidence</h3>
+            <h3 className="text-lg font-semibold text-slate-900 mb-3">Supporting Evidence</h3>
             <div className="space-y-3">
               {Array.isArray(evidence) ? (
                 evidence.length > 0 ? (
                   evidence.map((item, index) => (
-                    <div key={index} className="p-4 bg-gray-50 rounded-lg border border-gray-200">
-                      <div className="flex items-start space-x-3">
-                        <div className="w-2 h-2 bg-psa-blue rounded-full mt-2"></div>
-                        <p className="text-sm text-gray-700 flex-1">{item}</p>
+                    <div key={index} className="glass-panel border border-white/60 px-4 py-3">
+                      <div className="flex items-start gap-3 text-sm text-slate-600">
+                        <div className="w-2 h-2 rounded-full bg-indigo-400 mt-2" />
+                        <p className="flex-1">{item}</p>
                       </div>
                     </div>
                   ))
                 ) : (
-                  <p className="text-sm text-gray-500 italic">No specific evidence documented</p>
+                  <p className="text-sm text-slate-400 italic">No specific evidence documented.</p>
                 )
               ) : (
-                <div className="p-4 bg-gray-50 rounded-lg border border-gray-200">
-                  <p className="text-sm text-gray-700">{evidence}</p>
+                <div className="glass-panel border border-white/60 px-4 py-3 text-sm text-slate-600">
+                  {evidence}
                 </div>
               )}
             </div>
           </div>
 
-          {/* How to Improve */}
-          <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
-            <h4 className="font-semibold text-gray-900 mb-2">💡 How to Improve This Score</h4>
-            <ul className="text-sm text-gray-700 space-y-2">
+          <div className="glass-panel border border-amber-200/80 bg-amber-50/80 px-4 py-4">
+            <h4 className="font-semibold text-slate-900 mb-2">💡 How to improve this score</h4>
+            <ul className="text-sm text-slate-600 space-y-2">
               {componentKey === 'outcome_impact' && (
                 <>
-                  <li>• Quantify your project outcomes with specific metrics (e.g., "30% cost reduction")</li>
-                  <li>• Document measurable business impact in project reports</li>
-                  <li>• Focus on high-impact initiatives with clear ROI</li>
+                  <li>• Quantify project outcomes with clear metrics.</li>
+                  <li>• Document impact in retrospectives and reports.</li>
+                  <li>• Prioritize initiatives with measurable ROI.</li>
                 </>
               )}
               {componentKey === 'stakeholder_complexity' && (
                 <>
-                  <li>• Lead cross-functional projects involving multiple departments</li>
-                  <li>• Engage with senior management and executive stakeholders</li>
-                  <li>• Work with external partners, vendors, or customers</li>
+                  <li>• Lead cross-functional initiatives with diverse groups.</li>
+                  <li>• Engage senior stakeholders and executive sponsors.</li>
+                  <li>• Partner with external vendors or customers.</li>
                 </>
               )}
               {componentKey === 'change_management' && (
                 <>
-                  <li>• Take on transformation or migration projects</li>
-                  <li>• Document your change management approach and lessons learned</li>
-                  <li>• Pursue change management training or certifications</li>
+                  <li>• Take ownership of transformation programmes.</li>
+                  <li>• Capture change playbooks and lessons learned.</li>
+                  <li>• Pursue change management accreditation.</li>
                 </>
               )}
               {componentKey === 'progression_velocity' && (
                 <>
-                  <li>• Discuss career advancement goals with your manager</li>
-                  <li>• Identify and close skill gaps for the next level</li>
-                  <li>• Seek stretch assignments and leadership opportunities</li>
+                  <li>• Align advancement goals with your manager.</li>
+                  <li>• Target key skill gaps for the next level.</li>
+                  <li>• Take on stretch roles and leadership rotations.</li>
                 </>
               )}
             </ul>
           </div>
         </div>
 
-        {/* Footer */}
-        <div className="border-t border-gray-200 px-6 py-4 bg-gray-50">
+        <div className="border-t border-white/60 bg-white/70 px-6 py-4">
           <button
             onClick={onClose}
-            className="w-full px-4 py-2 bg-psa-blue text-white rounded-lg hover:bg-blue-700 transition font-medium"
+            className="glass-button w-full py-2 text-sm font-semibold"
           >
             Close
           </button>

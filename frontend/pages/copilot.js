@@ -36,69 +36,84 @@ export default function CopilotPage() {
         <meta name="description" content="AI-Powered Career Guidance Assistant" />
       </Head>
 
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50">
-        {/* Header */}
-        <header className="bg-gradient-to-r from-purple-600 to-blue-600 text-white shadow-2xl">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center space-x-3">
-                <div className="w-12 h-12 bg-white/20 backdrop-blur-sm rounded-xl flex items-center justify-center">
-                  <Sparkles className="w-7 h-7" />
+      <div className="relative min-h-screen overflow-x-hidden px-4 pb-12 sm:px-6 lg:px-10">
+        <div
+          className="floating-orb absolute -top-24 -left-20 w-72 h-72"
+          style={{ background: 'rgba(99, 102, 241, 0.38)' }}
+        />
+        <div
+          className="floating-orb absolute bottom-[-150px] right-[-110px] w-96 h-96"
+          style={{ background: 'rgba(45, 212, 191, 0.28)' }}
+        />
+        <div
+          className="floating-orb absolute top-1/2 right-20 w-64 h-64"
+          style={{ background: 'rgba(236, 72, 153, 0.25)' }}
+        />
+
+        <div className="relative max-w-6xl mx-auto space-y-10 pt-10 lg:pt-16">
+          <header className="glass-card px-6 py-6 sm:px-8 sm:py-8">
+            <div className="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
+              <div className="flex items-start sm:items-center gap-4">
+                <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-3xl bg-gradient-to-br from-indigo-500 to-blue-500 text-white flex items-center justify-center shadow-lg shadow-indigo-500/30">
+                  <Sparkles className="w-6 h-6 sm:w-7 sm:h-7" />
                 </div>
                 <div>
-                  <h1 className="text-3xl font-bold">Compass Copilot</h1>
-                  <p className="text-purple-200 text-sm">Your AI Career Assistant</p>
+                  <p className="text-xs uppercase tracking-[0.32em] text-indigo-500 font-semibold">
+                    Employee Copilot
+                  </p>
+                  <h1 className="text-3xl font-semibold text-slate-900">Compass Copilot</h1>
+                  <p className="text-sm text-slate-500 max-w-md">
+                    A conversational workspace tuned to your PSA profile, ready with evidence-backed guidance.
+                  </p>
                 </div>
               </div>
-              <div className="flex items-center space-x-4">
-                {/* User Badge */}
+
+              <div className="flex flex-wrap items-center gap-3 justify-start lg:justify-end">
                 {currentUser && (
-                  <div className="flex items-center space-x-2 bg-white/10 backdrop-blur-sm px-4 py-2 rounded-full">
-                    <User className="w-5 h-5" />
-                    <span className="text-sm font-medium">{currentUser.name}</span>
+                  <div className="glass-chip px-4 py-2 flex items-center gap-2 text-sm font-medium text-slate-700">
+                    <User className="w-4 h-4 text-indigo-500" />
+                    {currentUser.name}
                   </div>
                 )}
-                {/* Settings Button */}
                 <button
                   onClick={handleSettings}
-                  className="flex items-center space-x-2 bg-white/10 hover:bg-white/20 backdrop-blur-sm px-4 py-2 rounded-full transition-colors"
+                  className="glass-button px-4 py-2 text-sm font-semibold flex items-center gap-2"
                   title="Settings"
                 >
-                  <Settings className="w-5 h-5" />
-                  <span className="text-sm font-medium">Settings</span>
+                  <Settings className="w-4 h-4" />
+                  Settings
                 </button>
-                {/* Logout Button */}
                 <button
                   onClick={handleLogout}
-                  className="flex items-center space-x-2 bg-white/10 hover:bg-white/20 backdrop-blur-sm px-4 py-2 rounded-full transition-colors"
+                  className="glass-button px-4 py-2 bg-gradient-to-r from-rose-500/90 to-orange-500/90 hover:from-rose-500 hover:to-orange-500 text-sm font-semibold flex items-center gap-2"
                   title="Logout"
                 >
-                  <LogOut className="w-5 h-5" />
-                  <span className="text-sm font-medium">Logout</span>
+                  <LogOut className="w-4 h-4" />
+                  Logout
                 </button>
               </div>
             </div>
-          </div>
-        </header>
+          </header>
 
-        {/* Main Content - Chat Interface */}
-        <main className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          {currentUser && currentUser.employee_id ? (
-            <div style={{ height: 'calc(100vh - 200px)', minHeight: '500px' }}>
-              <ChatCopilot
-                employeeId={currentUser.employee_id}
-                employeeName={currentUser.name}
-              />
-            </div>
-          ) : (
-            <div className="text-center py-16">
-              <div className="animate-spin rounded-full h-16 w-16 border-b-4 border-purple-600 mx-auto mb-4"></div>
-              <p className="text-gray-600 text-lg">Loading your profile...</p>
-            </div>
-          )}
-        </main>
+          <main>
+            {currentUser && currentUser.employee_id ? (
+              <div className="glass-card px-4 py-4 sm:px-6 sm:py-6 border border-white/55 shadow-2xl">
+                <div className="flex flex-col h-[calc(100vh-260px)] min-h-[540px]">
+                  <ChatCopilot
+                    employeeId={currentUser.employee_id}
+                    employeeName={currentUser.name}
+                  />
+                </div>
+              </div>
+            ) : (
+              <div className="glass-panel border border-white/55 px-6 py-16 text-center">
+                <div className="mx-auto mb-4 h-16 w-16 animate-spin rounded-full border-4 border-indigo-200 border-t-transparent" />
+                <p className="text-slate-600 text-lg">Loading your profile...</p>
+              </div>
+            )}
+          </main>
+        </div>
       </div>
     </ProtectedRoute>
   );
 }
-

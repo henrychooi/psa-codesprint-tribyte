@@ -36,18 +36,18 @@ const ComponentBreakdown = ({ components, evidence, onComponentClick }) => {
   ];
 
   const getScoreColor = (score) => {
-    if (score >= 80) return 'text-green-600 bg-green-100';
-    if (score >= 60) return 'text-blue-600 bg-blue-100';
-    if (score >= 40) return 'text-yellow-600 bg-yellow-100';
-    return 'text-orange-600 bg-orange-100';
+    if (score >= 80) return 'border-emerald-200/80 bg-emerald-50/80 text-emerald-600';
+    if (score >= 60) return 'border-indigo-200/80 bg-indigo-50/80 text-indigo-600';
+    if (score >= 40) return 'border-amber-200/80 bg-amber-50/80 text-amber-600';
+    return 'border-orange-200/80 bg-orange-50/80 text-orange-600';
   };
 
   const CustomTooltip = ({ active, payload }) => {
     if (active && payload && payload.length) {
       return (
-        <div className="bg-white p-3 shadow-lg rounded-lg border border-gray-200">
-          <p className="font-semibold">{payload[0].payload.name}</p>
-          <p className="text-sm text-gray-600">{payload[0].payload.description}</p>
+        <div className="glass-panel border border-white/60 px-4 py-3 shadow-lg">
+          <p className="font-semibold text-slate-800">{payload[0].payload.name}</p>
+          <p className="text-sm text-slate-500">{payload[0].payload.description}</p>
           <p className="text-lg font-bold" style={{ color: payload[0].payload.color }}>
             {payload[0].value}%
           </p>
@@ -58,17 +58,17 @@ const ComponentBreakdown = ({ components, evidence, onComponentClick }) => {
   };
 
   return (
-    <div className="bg-white rounded-xl shadow-lg p-6">
+    <div className="glass-panel border border-white/55 px-6 py-6">
       <div className="flex items-center justify-between mb-6">
-        <h3 className="text-xl font-bold text-gray-900">Component Breakdown</h3>
-        <div className="flex items-center space-x-1 text-sm text-gray-600">
+        <h3 className="text-xl font-semibold text-slate-900">Component Breakdown</h3>
+        <div className="flex items-center gap-2 text-xs uppercase tracking-[0.28em] text-slate-400">
           <Info className="w-4 h-4" />
           <span>Click bars for details</span>
         </div>
       </div>
 
       {/* Chart */}
-      <div className="mb-6">
+      <div className="mb-6 glass-panel border border-white/60 px-4 py-4 bg-white/70">
         <ResponsiveContainer width="100%" height={300}>
           <BarChart data={chartData} layout="vertical" margin={{ top: 5, right: 30, left: 120, bottom: 5 }}>
             <CartesianGrid strokeDasharray="3 3" />
@@ -95,7 +95,7 @@ const ComponentBreakdown = ({ components, evidence, onComponentClick }) => {
           <div
             key={component.key}
             onClick={() => onComponentClick && onComponentClick(component.key)}
-            className="p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition cursor-pointer border border-gray-200"
+            className="glass-panel border border-white/60 px-4 py-4 hover:border-indigo-200/70 transition cursor-pointer"
             role="button"
             tabIndex={0}
             onKeyPress={(e) => {
@@ -105,17 +105,17 @@ const ComponentBreakdown = ({ components, evidence, onComponentClick }) => {
           >
             <div className="flex items-center justify-between">
               <div className="flex-1">
-                <div className="flex items-center space-x-3 mb-2">
-                  <h4 className="font-semibold text-gray-900">{component.name}</h4>
-                  <span className={`px-2 py-1 rounded-full text-xs font-bold ${getScoreColor(component.score)}`}>
+                <div className="flex items-center gap-3 mb-2">
+                  <h4 className="font-semibold text-slate-900">{component.name}</h4>
+                  <span className={`px-2.5 py-1 rounded-full text-xs font-semibold border ${getScoreColor(component.score)}`}>
                     {component.score}%
                   </span>
                 </div>
-                <p className="text-sm text-gray-600 mb-2">{component.description}</p>
+                <p className="text-sm text-slate-500 mb-2">{component.description}</p>
                 
                 {/* Evidence preview */}
                 {evidence[component.key] && (
-                  <div className="text-xs text-gray-500 italic">
+                  <div className="text-xs text-slate-400 italic">
                     {Array.isArray(evidence[component.key]) 
                       ? evidence[component.key][0]
                       : evidence[component.key]
@@ -123,19 +123,19 @@ const ComponentBreakdown = ({ components, evidence, onComponentClick }) => {
                   </div>
                 )}
               </div>
-              <ChevronRight className="w-5 h-5 text-gray-400" />
+              <ChevronRight className="w-5 h-5 text-slate-300" />
             </div>
           </div>
         ))}
       </div>
 
       {/* Methodology Section */}
-      <details className="mt-6 p-4 bg-blue-50 rounded-lg border border-blue-200">
-        <summary className="font-semibold text-psa-blue cursor-pointer flex items-center space-x-2">
+      <details className="mt-6 glass-panel border border-white/60 px-4 py-4">
+        <summary className="font-semibold text-indigo-600 cursor-pointer flex items-center gap-2">
           <Info className="w-4 h-4" />
           <span>How is this calculated?</span>
         </summary>
-        <div className="mt-3 text-sm text-gray-700 space-y-2">
+        <div className="mt-3 text-sm text-slate-600 space-y-2">
           <p><strong>Overall Score:</strong> Weighted average of 4 components</p>
           <ul className="list-disc list-inside ml-4 space-y-1">
             <li><strong>Outcome Impact (25%):</strong> Measured by quantified project results</li>
@@ -143,7 +143,7 @@ const ComponentBreakdown = ({ components, evidence, onComponentClick }) => {
             <li><strong>Change Management (20%):</strong> Demonstrated change leadership competency</li>
             <li><strong>Progression Velocity (30%):</strong> Career levels advanced per year of tenure</li>
           </ul>
-          <p className="text-xs text-gray-600 mt-2">
+          <p className="text-xs text-slate-400 mt-2">
             All scores are normalized across the organization to ensure fair comparison.
           </p>
         </div>

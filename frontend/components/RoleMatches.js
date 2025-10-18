@@ -6,29 +6,29 @@ const RoleMatches = ({ matches }) => {
 
   if (!matches || matches.length === 0) {
     return (
-      <div className="bg-white rounded-xl shadow-lg p-8 text-center">
-        <Briefcase className="w-12 h-12 mx-auto text-gray-400 mb-4" />
-        <p className="text-gray-600">No role matches found.</p>
+      <div className="glass-panel border border-white/55 px-8 py-10 text-center">
+        <Briefcase className="w-12 h-12 mx-auto text-slate-300 mb-4" />
+        <p className="text-slate-500">No role matches found.</p>
       </div>
     );
   }
 
   const getScoreColor = (score) => {
-    if (score >= 85) return 'text-green-600 bg-green-50 border-green-200';
-    if (score >= 70) return 'text-blue-600 bg-blue-50 border-blue-200';
-    if (score >= 55) return 'text-yellow-600 bg-yellow-50 border-yellow-200';
-    return 'text-orange-600 bg-orange-50 border-orange-200';
+    if (score >= 85) return 'border-emerald-200/80 bg-emerald-50/80 text-emerald-600';
+    if (score >= 70) return 'border-indigo-200/80 bg-indigo-50/80 text-indigo-600';
+    if (score >= 55) return 'border-amber-200/80 bg-amber-50/80 text-amber-600';
+    return 'border-orange-200/80 bg-orange-50/80 text-orange-600';
   };
 
   const getStrengthBadge = (strength) => {
     const colors = {
-      'Excellent Match': 'bg-green-100 text-green-800',
-      'Strong Match': 'bg-blue-100 text-blue-800',
-      'Good Match': 'bg-yellow-100 text-yellow-800',
-      'Potential Match': 'bg-orange-100 text-orange-800',
-      'Stretch Opportunity': 'bg-purple-100 text-purple-800',
+      'Excellent Match': 'border-emerald-200/80 bg-emerald-50/80 text-emerald-600',
+      'Strong Match': 'border-indigo-200/80 bg-indigo-50/80 text-indigo-600',
+      'Good Match': 'border-amber-200/80 bg-amber-50/80 text-amber-600',
+      'Potential Match': 'border-orange-200/80 bg-orange-50/80 text-orange-600',
+      'Stretch Opportunity': 'border-purple-200/80 bg-purple-50/80 text-purple-600',
     };
-    return colors[strength] || 'bg-gray-100 text-gray-800';
+    return colors[strength] || 'border-slate-200/80 bg-slate-50/80 text-slate-600';
   };
 
   const toggleRole = (idx) => {
@@ -36,103 +36,99 @@ const RoleMatches = ({ matches }) => {
   };
 
   return (
-    <div className="bg-white rounded-xl shadow-lg overflow-hidden">
-      <div className="bg-gradient-to-r from-psa-blue to-psa-lightblue p-6 text-white">
-        <div className="flex items-center space-x-3">
+    <div className="glass-panel border border-white/55 overflow-hidden">
+      <div className="bg-gradient-to-r from-indigo-500 to-blue-500 px-6 py-6 text-white">
+        <div className="flex items-center gap-3">
           <TrendingUp className="w-6 h-6" />
-          <h2 className="text-xl font-bold">Role Recommendations</h2>
+          <h2 className="text-xl font-semibold">Role Recommendations</h2>
         </div>
-        <p className="text-blue-100 text-sm mt-2">
-          AI-matched career opportunities based on skills and experience
+        <p className="text-indigo-100 text-sm mt-2">
+          AI-matched opportunities aligned to the employee’s strengths and aspirations.
         </p>
       </div>
 
-      <div className="divide-y divide-gray-200">
+      <div className="divide-y divide-white/50">
         {matches.map((match, idx) => {
           const isExpanded = expandedRole === idx;
           const { role, match_score, skill_match, recommendation_strength } = match;
 
           return (
-            <div key={idx} className="p-6 hover:bg-gray-50 transition">
-              {/* Role Header */}
-              <div className="flex items-start justify-between mb-4">
-                <div className="flex-1">
-                  <div className="flex items-center space-x-3 mb-2">
-                    <h3 className="text-lg font-semibold text-gray-900">{role.title}</h3>
-                    <span className={`px-3 py-1 rounded-full text-xs font-medium ${getStrengthBadge(recommendation_strength)}`}>
+            <div key={idx} className="px-6 py-6 bg-white/65 hover:bg-white/75 transition-colors">
+              <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
+                <div>
+                  <div className="flex flex-wrap items-center gap-3 mb-3">
+                    <h3 className="text-lg font-semibold text-slate-900">{role.title}</h3>
+                    <span className={`px-3 py-1 rounded-full text-xs font-semibold border ${getStrengthBadge(recommendation_strength)}`}>
                       {recommendation_strength}
                     </span>
                   </div>
-                  <div className="flex items-center space-x-4 text-sm text-gray-600">
-                    <span className="flex items-center">
-                      <Briefcase className="w-4 h-4 mr-1" />
+                  <div className="flex flex-wrap items-center gap-4 text-sm text-slate-500">
+                    <span className="flex items-center gap-1.5">
+                      <Briefcase className="w-4 h-4 text-indigo-500" />
                       {role.department}
                     </span>
-                    <span className="flex items-center">
-                      <MapPin className="w-4 h-4 mr-1" />
+                    <span className="flex items-center gap-1.5">
+                      <MapPin className="w-4 h-4 text-emerald-500" />
                       {role.location}
                     </span>
                   </div>
                 </div>
-                <div className={`ml-4 px-4 py-2 rounded-lg border-2 ${getScoreColor(match_score)}`}>
-                  <div className="text-2xl font-bold">{match_score}%</div>
-                  <div className="text-xs">Match Score</div>
+                <div className={`px-4 py-2 text-center rounded-xl border ${getScoreColor(match_score)}`}>
+                  <div className="text-2xl font-semibold">{match_score}%</div>
+                  <div className="text-[10px] uppercase tracking-[0.25em] text-slate-500">
+                    Match score
+                  </div>
                 </div>
               </div>
 
-              {/* Description */}
               {role.description && (
-                <p className="text-gray-600 text-sm mb-4">{role.description}</p>
+                <p className="text-sm text-slate-500 mt-4">
+                  {role.description}
+                </p>
               )}
 
-              {/* Skill Match Summary */}
-              <div className="grid grid-cols-2 gap-4 mb-4">
-                <div className="bg-green-50 border border-green-200 rounded-lg p-3">
-                  <div className="flex items-center text-green-700 mb-1">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-4">
+                <div className="glass-panel border border-emerald-200/70 bg-emerald-50/70 px-4 py-3">
+                  <div className="flex items-center text-emerald-600 mb-1">
                     <CheckCircle className="w-4 h-4 mr-2" />
-                    <span className="font-semibold text-sm">Skills Matched</span>
+                    <span className="font-semibold text-sm">Skills matched</span>
                   </div>
-                  <div className="text-2xl font-bold text-green-800">
+                  <div className="text-2xl font-semibold text-emerald-700">
                     {skill_match.required_match_count}/{skill_match.required_total}
                   </div>
                 </div>
-                <div className="bg-orange-50 border border-orange-200 rounded-lg p-3">
-                  <div className="flex items-center text-orange-700 mb-1">
+                <div className="glass-panel border border-amber-200/70 bg-amber-50/70 px-4 py-3">
+                  <div className="flex items-center text-amber-600 mb-1">
                     <XCircle className="w-4 h-4 mr-2" />
-                    <span className="font-semibold text-sm">Skills to Develop</span>
+                    <span className="font-semibold text-sm">Skills to develop</span>
                   </div>
-                  <div className="text-2xl font-bold text-orange-800">
+                  <div className="text-2xl font-semibold text-amber-700">
                     {skill_match.required_missing?.length || 0}
                   </div>
                 </div>
               </div>
 
-              {/* Toggle Details Button */}
               <button
                 onClick={() => toggleRole(idx)}
-                className="w-full flex items-center justify-center space-x-2 text-psa-blue hover:bg-blue-50 py-2 rounded-lg transition"
+                className="mt-5 w-full glass-panel border border-white/60 px-4 py-2 text-sm font-semibold text-indigo-600 hover:text-indigo-700 transition-colors flex items-center justify-center gap-2"
               >
-                <span className="text-sm font-medium">
-                  {isExpanded ? 'Hide Details' : 'Show Details'}
-                </span>
+                {isExpanded ? 'Hide details' : 'Show details'}
                 {isExpanded ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
               </button>
 
-              {/* Expanded Details */}
               {isExpanded && (
-                <div className="mt-4 pt-4 border-t border-gray-200 space-y-4">
-                  {/* Matched Skills */}
+                <div className="mt-4 pt-4 border-t border-white/60 space-y-4">
                   {skill_match.required_matched && skill_match.required_matched.length > 0 && (
                     <div>
-                      <h4 className="text-sm font-semibold text-gray-900 mb-2 flex items-center">
-                        <CheckCircle className="w-4 h-4 mr-2 text-green-600" />
-                        Your Matching Skills
+                      <h4 className="text-sm font-semibold text-slate-900 mb-2 flex items-center gap-2">
+                        <CheckCircle className="w-4 h-4 text-emerald-500" />
+                        Your matching skills
                       </h4>
                       <div className="flex flex-wrap gap-2">
                         {skill_match.required_matched.map((skill, skillIdx) => (
                           <span
                             key={skillIdx}
-                            className="px-3 py-1 bg-green-100 text-green-800 text-xs rounded-full"
+                            className="glass-chip px-3 py-1 text-xs font-semibold text-emerald-600"
                           >
                             {skill}
                           </span>
@@ -141,18 +137,17 @@ const RoleMatches = ({ matches }) => {
                     </div>
                   )}
 
-                  {/* Missing Skills */}
                   {skill_match.required_missing && skill_match.required_missing.length > 0 && (
                     <div>
-                      <h4 className="text-sm font-semibold text-gray-900 mb-2 flex items-center">
-                        <XCircle className="w-4 h-4 mr-2 text-orange-600" />
-                        Skills to Develop
+                      <h4 className="text-sm font-semibold text-slate-900 mb-2 flex items-center gap-2">
+                        <XCircle className="w-4 h-4 text-amber-500" />
+                        Skills to develop
                       </h4>
                       <div className="flex flex-wrap gap-2">
                         {skill_match.required_missing.map((skill, skillIdx) => (
                           <span
                             key={skillIdx}
-                            className="px-3 py-1 bg-orange-100 text-orange-800 text-xs rounded-full"
+                            className="glass-chip px-3 py-1 text-xs font-semibold text-amber-600"
                           >
                             {skill}
                           </span>
@@ -161,27 +156,28 @@ const RoleMatches = ({ matches }) => {
                     </div>
                   )}
 
-                  {/* Responsibilities */}
                   {role.responsibilities && role.responsibilities.length > 0 && (
                     <div>
-                      <h4 className="text-sm font-semibold text-gray-900 mb-2">Key Responsibilities</h4>
-                      <ul className="list-disc list-inside space-y-1 text-sm text-gray-600">
+                      <h4 className="text-sm font-semibold text-slate-900 mb-2">Key responsibilities</h4>
+                      <ul className="space-y-1 text-sm text-slate-600">
                         {role.responsibilities.map((resp, respIdx) => (
-                          <li key={respIdx}>{resp}</li>
+                          <li key={respIdx} className="flex items-start gap-2">
+                            <span className="text-indigo-500">•</span>
+                            <span>{resp}</span>
+                          </li>
                         ))}
                       </ul>
                     </div>
                   )}
 
-                  {/* Required Competencies */}
                   {role.required_competencies && role.required_competencies.length > 0 && (
                     <div>
-                      <h4 className="text-sm font-semibold text-gray-900 mb-2">Required Competencies</h4>
+                      <h4 className="text-sm font-semibold text-slate-900 mb-2">Required competencies</h4>
                       <div className="space-y-2">
                         {role.required_competencies.map((comp, compIdx) => (
-                          <div key={compIdx} className="flex items-center justify-between text-sm">
-                            <span className="text-gray-700">{comp.name}</span>
-                            <span className="px-2 py-1 bg-gray-100 text-gray-700 rounded text-xs">
+                          <div key={compIdx} className="flex items-center justify-between text-sm text-slate-600">
+                            <span>{comp.name}</span>
+                            <span className="glass-chip px-2 py-0.5 text-xs font-semibold text-indigo-600">
                               {comp.min_level}+
                             </span>
                           </div>

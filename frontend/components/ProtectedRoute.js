@@ -50,10 +50,10 @@ export default function ProtectedRoute({ children, requireRole = null }) {
   // Show loading state while checking auth
   if (isChecking) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-16 w-16 border-b-4 border-purple-600 mx-auto mb-4"></div>
-          <p className="text-gray-600 text-lg">Verifying access...</p>
+      <div className="relative min-h-screen flex items-center justify-center px-4">
+        <div className="glass-panel border border-white/55 px-10 py-12 text-center space-y-4">
+          <div className="mx-auto h-16 w-16 border-4 border-indigo-200 border-t-transparent rounded-full animate-spin" />
+          <p className="text-slate-600 text-lg font-medium">Verifying access…</p>
         </div>
       </div>
     );

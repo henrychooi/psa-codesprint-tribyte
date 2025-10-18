@@ -5,73 +5,71 @@ const CareerNarrative = ({ narrative, role, matchScore, developmentPlan }) => {
   if (!narrative) return null;
 
   return (
-    <div className="bg-gradient-to-br from-purple-50 to-pink-50 rounded-xl shadow-lg overflow-hidden border-2 border-purple-200">
-      {/* Header */}
-      <div className="bg-gradient-to-r from-purple-600 to-pink-600 p-6 text-white">
-        <div className="flex items-center space-x-3 mb-2">
+    <div className="glass-panel border border-white/55 overflow-hidden">
+      <div className="bg-gradient-to-r from-purple-500 to-pink-500 px-6 py-6 text-white">
+        <div className="flex items-center gap-3 mb-2">
           <Sparkles className="w-6 h-6" />
-          <h2 className="text-xl font-bold">Your Career Story</h2>
+          <h2 className="text-xl font-semibold">Your Career Story</h2>
         </div>
         <p className="text-purple-100 text-sm">
-          AI-generated personalized narrative for: <span className="font-semibold">{role?.title}</span>
+          Generated for <span className="font-semibold">{role?.title}</span> to explain the opportunity and pathway clearly.
         </p>
       </div>
 
-      <div className="p-6 space-y-6">
-        {/* Match Score Badge */}
-        <div className="flex items-center justify-between">
-          <div className="flex items-center space-x-2">
-            <Target className="w-5 h-5 text-purple-600" />
-            <span className="font-semibold text-gray-900">Match Score</span>
+      <div className="px-6 py-6 space-y-6 bg-white/70">
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <div className="flex items-center gap-2 text-slate-700">
+            <Target className="w-5 h-5 text-purple-500" />
+            <span className="font-semibold uppercase tracking-[0.28em] text-xs text-purple-500">
+              Match score
+            </span>
           </div>
-          <div className="px-4 py-2 bg-purple-100 text-purple-800 rounded-lg font-bold text-xl">
+          <div className="px-4 py-2 rounded-xl bg-white/80 border border-purple-200/70 text-purple-600 font-semibold text-xl">
             {matchScore}%
           </div>
         </div>
 
-        {/* Narrative Text */}
-        <div className="bg-white rounded-lg p-6 border border-purple-200">
-          <div className="prose prose-sm max-w-none">
-            <p className="text-gray-700 leading-relaxed whitespace-pre-line">{narrative}</p>
-          </div>
+        <div className="glass-card border border-white/60 bg-white/85 px-6 py-6">
+          <p className="text-sm text-slate-600 leading-relaxed whitespace-pre-line">{narrative}</p>
         </div>
 
-        {/* Development Plan */}
         {developmentPlan && developmentPlan.length > 0 && (
           <div>
-            <div className="flex items-center space-x-2 mb-4">
-              <TrendingUp className="w-5 h-5 text-purple-600" />
-              <h3 className="font-semibold text-gray-900">Your Development Roadmap</h3>
+            <div className="flex items-center gap-2 mb-4">
+              <TrendingUp className="w-5 h-5 text-purple-500" />
+              <h3 className="font-semibold text-slate-900">Your development roadmap</h3>
             </div>
             
             <div className="space-y-3">
               {developmentPlan.map((item, idx) => (
                 <div
                   key={idx}
-                  className="bg-white rounded-lg p-4 border border-purple-200 hover:border-purple-400 transition"
+                  className="glass-panel border border-white/60 px-4 py-4 hover:border-purple-200/80 transition-colors"
                 >
-                  <div className="flex items-start justify-between mb-2">
-                    <div className="flex items-center space-x-2">
-                      <BookOpen className="w-4 h-4 text-purple-600" />
-                      <h4 className="font-medium text-gray-900">{item.skill}</h4>
+                  <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+                    <div className="flex items-center gap-2">
+                      <BookOpen className="w-4 h-4 text-purple-500" />
+                      <h4 className="font-medium text-slate-900">{item.skill}</h4>
                     </div>
                     <span
-                      className={`px-2 py-1 rounded text-xs font-medium ${
+                      className={`px-2 py-1 rounded-full text-xs font-semibold ${
                         item.priority === 'High'
-                          ? 'bg-red-100 text-red-800'
-                          : 'bg-yellow-100 text-yellow-800'
+                          ? 'bg-rose-50/80 border border-rose-200/80 text-rose-600'
+                          : 'bg-amber-50/80 border border-amber-200/80 text-amber-600'
                       }`}
                     >
-                      {item.priority} Priority
+                      {item.priority} priority
                     </span>
                   </div>
                   
-                  <div className="space-y-1 mt-3">
-                    <p className="text-xs font-semibold text-gray-600 mb-1">Suggested Actions:</p>
-                    <ul className="space-y-1">
+                  <div className="mt-3 space-y-2">
+                    <p className="text-xs font-semibold uppercase tracking-[0.28em] text-slate-400">
+                      Suggested actions
+                    </p>
+                    <ul className="space-y-2">
                       {item.suggested_actions.map((action, actionIdx) => (
-                        <li key={actionIdx} className="text-sm text-gray-600 flex items-start">
-                          <span className="text-purple-600 mr-2">•</span>
+                        <li key={actionIdx} className="text-sm text-slate-600 flex items-start gap-2">
+                          <span className="text-purple-500">•</span>
                           <span>{action}</span>
                         </li>
                       ))}
@@ -79,10 +77,8 @@ const CareerNarrative = ({ narrative, role, matchScore, developmentPlan }) => {
                   </div>
                   
                   {item.estimated_timeline && (
-                    <div className="mt-3 pt-3 border-t border-gray-100">
-                      <span className="text-xs text-gray-500">
-                        ⏱️ Estimated timeline: <span className="font-medium">{item.estimated_timeline}</span>
-                      </span>
+                    <div className="mt-4 pt-3 border-t border-white/60 text-xs text-slate-500">
+                      ⏱️ Estimated timeline: <span className="font-medium text-slate-600">{item.estimated_timeline}</span>
                     </div>
                   )}
                 </div>
@@ -91,11 +87,9 @@ const CareerNarrative = ({ narrative, role, matchScore, developmentPlan }) => {
           </div>
         )}
 
-        {/* Call to Action */}
-        <div className="bg-purple-100 rounded-lg p-4 border border-purple-300">
-          <p className="text-sm text-purple-900">
-            <span className="font-semibold">💡 Next Step:</span> Schedule a conversation with your line manager
-            to discuss this opportunity and create your personalized development plan.
+        <div className="glass-panel border border-purple-200/80 bg-purple-50/80 px-4 py-4">
+          <p className="text-sm text-purple-700">
+            <span className="font-semibold">💡 Next step:</span> Schedule a conversation with your line manager to align on this path and embed the development actions into your plan.
           </p>
         </div>
       </div>

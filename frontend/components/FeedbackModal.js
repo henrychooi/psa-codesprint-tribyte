@@ -43,54 +43,48 @@ const FeedbackModal = ({ isOpen, onClose, onSubmit, employeeId }) => {
   };
 
   return (
-    <div 
-      className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4"
+    <div
+      className="fixed inset-0 bg-slate-900/45 backdrop-blur-sm z-50 flex items-center justify-center p-4"
       onClick={handleClose}
       role="dialog"
       aria-modal="true"
       aria-labelledby="feedback-modal-title"
     >
-      <div 
-        className="bg-white rounded-xl shadow-2xl max-w-lg w-full"
+      <div
+        className="glass-card border border-white/55 max-w-lg w-full overflow-hidden"
         onClick={(e) => e.stopPropagation()}
       >
         {!submitted ? (
           <>
-            {/* Header */}
-            <div className="border-b border-gray-200 px-6 py-4 flex items-center justify-between">
-              <div className="flex items-center space-x-3">
-                <div className="w-10 h-10 bg-orange-100 rounded-lg flex items-center justify-center">
-                  <AlertCircle className="w-6 h-6 text-orange-600" />
+            <div className="flex items-center justify-between px-6 py-4 border-b border-white/60 bg-white/80 backdrop-blur-md">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-amber-400 to-orange-500 text-white flex items-center justify-center shadow-lg shadow-orange-500/30">
+                  <AlertCircle className="w-6 h-6" />
                 </div>
-                <h2 id="feedback-modal-title" className="text-xl font-bold text-gray-900">
+                <h2 id="feedback-modal-title" className="text-lg font-semibold text-slate-900">
                   Disagree with this score?
                 </h2>
               </div>
               <button
                 onClick={handleClose}
-                className="p-2 hover:bg-gray-100 rounded-lg transition"
+                className="glass-chip px-3 py-2 text-xs font-semibold text-slate-500 hover:text-indigo-500 transition-colors"
                 aria-label="Close feedback modal"
               >
-                <X className="w-6 h-6 text-gray-500" />
+                Close
               </button>
             </div>
 
-            {/* Content */}
-            <div className="px-6 py-6 space-y-4">
-              <p className="text-sm text-gray-600">
-                Your feedback helps us improve the leadership assessment system for everyone. 
-                Please select the issue you're experiencing:
+            <div className="px-6 py-6 space-y-5 bg-white/70">
+              <p className="text-sm text-slate-500">
+                Your input refines the leadership model for everyone. Tell us what feels off:
               </p>
 
-              {/* Feedback Options */}
-              <div className="space-y-2">
+              <div className="space-y-3">
                 {feedbackOptions.map((option) => (
                   <label
                     key={option.value}
-                    className={`flex items-center p-4 border-2 rounded-lg cursor-pointer transition ${
-                      feedbackType === option.value
-                        ? 'border-psa-blue bg-blue-50'
-                        : 'border-gray-200 hover:border-gray-300'
+                    className={`glass-panel border px-4 py-3 rounded-2xl flex items-center gap-3 cursor-pointer transition ${
+                      feedbackType === option.value ? 'border-indigo-300/80 ring-2 ring-indigo-200/60' : 'border-white/60 hover:border-indigo-200/60'
                     }`}
                   >
                     <input
@@ -99,59 +93,52 @@ const FeedbackModal = ({ isOpen, onClose, onSubmit, employeeId }) => {
                       value={option.value}
                       checked={feedbackType === option.value}
                       onChange={(e) => setFeedbackType(e.target.value)}
-                      className="mr-3 w-4 h-4 text-psa-blue"
+                      className="w-4 h-4 text-indigo-500 focus:ring-indigo-400"
                     />
-                    <span className="text-sm font-medium text-gray-900">{option.label}</span>
+                    <span className="text-sm font-medium text-slate-800">{option.label}</span>
                   </label>
                 ))}
               </div>
 
-              {/* Comments */}
               <div>
-                <label htmlFor="comments" className="block text-sm font-medium text-gray-700 mb-2">
-                  Additional Comments (Optional)
+                <label htmlFor="comments" className="block text-xs font-semibold uppercase tracking-[0.28em] text-slate-400 mb-2">
+                  Additional comments (optional)
                 </label>
                 <textarea
                   id="comments"
                   value={comments}
                   onChange={(e) => setComments(e.target.value)}
                   rows={4}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-psa-blue focus:border-transparent resize-none"
-                  placeholder="Tell us more about your concerns..."
+                  className="w-full rounded-xl border border-slate-200 bg-white/90 px-3 py-3 text-sm text-slate-600 focus:border-indigo-300 focus:ring-2 focus:ring-indigo-200 resize-none"
+                  placeholder="Share context or evidence we should take into account..."
                 />
               </div>
             </div>
 
-            {/* Footer */}
-            <div className="border-t border-gray-200 px-6 py-4 flex items-center justify-end space-x-3">
+            <div className="border-t border-white/60 bg-white/70 px-6 py-4 flex items-center justify-end gap-3">
               <button
                 onClick={handleClose}
-                className="px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-lg transition font-medium"
+                className="glass-panel border border-white/60 px-4 py-2 text-sm font-semibold text-slate-600 hover:text-indigo-500 transition-colors"
               >
                 Cancel
               </button>
               <button
                 onClick={handleSubmit}
                 disabled={!feedbackType || submitting}
-                className={`px-6 py-2 rounded-lg font-medium transition ${
-                  !feedbackType || submitting
-                    ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
-                    : 'bg-psa-blue text-white hover:bg-blue-700'
-                }`}
+                className="glass-button px-6 py-2 text-sm font-semibold disabled:opacity-60 disabled:cursor-not-allowed"
               >
-                {submitting ? 'Submitting...' : 'Submit Feedback'}
+                {submitting ? 'Submitting…' : 'Submit Feedback'}
               </button>
             </div>
           </>
         ) : (
-          /* Success State */
-          <div className="px-6 py-12 text-center">
-            <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-              <CheckCircle className="w-10 h-10 text-green-600" />
+          <div className="px-6 py-12 text-center bg-white/70">
+            <div className="w-16 h-16 bg-emerald-50 border border-emerald-200 rounded-full flex items-center justify-center mx-auto mb-4">
+              <CheckCircle className="w-10 h-10 text-emerald-500" />
             </div>
-            <h3 className="text-2xl font-bold text-gray-900 mb-2">Thank You!</h3>
-            <p className="text-gray-600">
-              Your feedback helps us improve leadership assessment for everyone.
+            <h3 className="text-2xl font-semibold text-slate-900 mb-2">Thank you!</h3>
+            <p className="text-sm text-slate-500">
+              Your perspective helps us make the leadership assessment sharper and more equitable.
             </p>
           </div>
         )}

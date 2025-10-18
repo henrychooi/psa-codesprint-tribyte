@@ -151,32 +151,32 @@ export default function ChatCopilot({ employeeId, employeeName }) {
   };
 
   return (
-    <div className="flex flex-col h-full bg-gradient-to-br from-blue-50/50 via-purple-50/50 to-pink-50/50 rounded-2xl shadow-2xl overflow-hidden">
+    <div className="flex flex-col h-full glass-panel border border-white/55 rounded-3xl overflow-hidden">
       {/* Header */}
-      <div className="bg-gradient-to-r from-purple-600 to-blue-600 text-white px-6 py-4 flex items-center justify-between">
-        <div className="flex items-center space-x-3">
-          <div className="w-10 h-10 bg-white/20 backdrop-blur-sm rounded-xl flex items-center justify-center">
+      <div className="bg-gradient-to-r from-indigo-500 to-blue-500 text-white px-6 py-5 flex items-center justify-between shadow-lg shadow-indigo-500/30">
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 rounded-2xl bg-white/15 backdrop-blur-lg flex items-center justify-center">
             <Sparkles className="w-6 h-6" />
           </div>
           <div>
-            <h3 className="text-lg font-bold">Compass Copilot</h3>
-            <p className="text-xs text-purple-200">Your AI Career Assistant</p>
+            <h3 className="text-lg font-semibold">Compass Copilot</h3>
+            <p className="text-xs text-indigo-100 tracking-[0.32em] uppercase">Career guidance</p>
           </div>
         </div>
         {messages.length > 1 && (
           <button
             onClick={handleClearConversation}
-            className="p-2 hover:bg-white/10 rounded-lg transition-colors"
+            className="px-3 py-2 rounded-xl bg-white/10 hover:bg-white/20 transition-colors text-xs font-semibold tracking-[0.25em] uppercase"
             aria-label="Clear conversation"
             title="Clear conversation"
           >
-            <X className="w-5 h-5" />
+            Clear
           </button>
         )}
       </div>
 
       {/* Messages Container */}
-      <div className="flex-1 overflow-y-auto p-6 space-y-4 scroll-smooth">
+      <div className="flex-1 overflow-y-auto bg-white/60 p-6 space-y-4 scroll-smooth">
         {messages.map((message, index) => (
           <div
             key={index}
@@ -185,8 +185,8 @@ export default function ChatCopilot({ employeeId, employeeName }) {
             <div
               className={`max-w-[80%] rounded-2xl px-4 py-3 ${
                 message.role === 'user'
-                  ? 'bg-gradient-to-r from-blue-600 to-purple-600 text-white shadow-lg'
-                  : 'bg-white/80 backdrop-blur-sm text-gray-800 shadow-md border border-gray-200'
+                  ? 'bg-gradient-to-r from-indigo-500 to-purple-500 text-white shadow-lg shadow-indigo-500/30'
+                  : 'glass-panel border border-white/60 bg-white/85 text-slate-700 shadow-lg'
               }`}
             >
               {/* Message Content */}
@@ -204,11 +204,11 @@ export default function ChatCopilot({ employeeId, employeeName }) {
                     {message.citations.map((citation, idx) => (
                       <div
                         key={idx}
-                        className="flex items-center space-x-1 bg-purple-100/50 text-purple-800 px-2 py-1 rounded-lg text-xs"
+                        className="glass-chip px-2.5 py-1 text-xs font-medium text-purple-600 flex items-center gap-1"
                         title={citation.details?.join(', ') || citation.text}
                       >
                         {getCitationIcon(citation.source)}
-                        <span className="font-medium">{citation.text}</span>
+                        <span>{citation.text}</span>
                       </div>
                     ))}
                   </div>
@@ -224,7 +224,7 @@ export default function ChatCopilot({ employeeId, employeeName }) {
                       <button
                         key={idx}
                         onClick={() => handleSuggestedActionClick(action)}
-                        className="bg-blue-100/50 hover:bg-blue-200/50 text-blue-800 px-3 py-1 rounded-lg text-xs font-medium transition-colors"
+                        className="glass-chip px-3 py-1 text-xs font-semibold text-indigo-600 hover:shadow-lg transition-shadow"
                       >
                         {action}
                       </button>
@@ -258,14 +258,14 @@ export default function ChatCopilot({ employeeId, employeeName }) {
 
       {/* Error Display */}
       {error && (
-        <div className="mx-6 mb-2 bg-red-100 border border-red-300 text-red-800 px-4 py-2 rounded-lg text-sm">
+        <div className="mx-6 mb-2 glass-panel border border-rose-200/70 bg-rose-50/80 text-rose-700 px-4 py-2 text-sm">
           ⚠️ {error}
         </div>
       )}
 
       {/* Input Area */}
-      <div className="bg-white/80 backdrop-blur-sm border-t border-gray-200 px-6 py-4">
-        <div className="flex items-end space-x-3">
+      <div className="glass-panel border-t border-white/60 bg-white/75 px-6 py-4">
+        <div className="flex items-end gap-3">
           <div className="flex-1 relative">
             <textarea
               ref={inputRef}
@@ -273,7 +273,7 @@ export default function ChatCopilot({ employeeId, employeeName }) {
               onChange={(e) => setInputValue(e.target.value)}
               onKeyDown={handleKeyPress}
               placeholder="Ask about your career path, roles, or skills..."
-              className="w-full px-4 py-3 rounded-xl border border-gray-300 focus:border-purple-500 focus:ring-2 focus:ring-purple-200 resize-none transition-all bg-white/90"
+              className="w-full px-4 py-3 rounded-xl border border-slate-200 bg-white/90 focus:border-indigo-400 focus:ring-2 focus:ring-indigo-200 resize-none transition-all text-slate-700"
               rows={1}
               disabled={isLoading}
               aria-label="Chat message input"
@@ -286,7 +286,7 @@ export default function ChatCopilot({ employeeId, employeeName }) {
           <button
             onClick={handleSendMessage}
             disabled={!inputValue.trim() || isLoading}
-            className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 disabled:from-gray-400 disabled:to-gray-400 text-white p-3 rounded-xl transition-all shadow-lg hover:shadow-xl disabled:cursor-not-allowed flex items-center justify-center"
+            className="glass-button p-3 rounded-xl disabled:opacity-60 disabled:cursor-not-allowed flex items-center justify-center"
             aria-label="Send message"
             title="Send message"
           >
@@ -297,9 +297,9 @@ export default function ChatCopilot({ employeeId, employeeName }) {
             )}
           </button>
         </div>
-        <p className="text-xs text-gray-500 mt-2 text-center">
-          Press <kbd className="px-1.5 py-0.5 bg-gray-200 rounded text-xs">Enter</kbd> to send • 
-          <kbd className="px-1.5 py-0.5 bg-gray-200 rounded text-xs ml-1">Esc</kbd> to clear
+        <p className="text-xs text-slate-400 mt-2 text-center">
+          Press <kbd className="px-1.5 py-0.5 bg-slate-200 rounded text-xs">Enter</kbd> to send • 
+          <kbd className="px-1.5 py-0.5 bg-slate-200 rounded text-xs ml-1">Esc</kbd> to clear
         </p>
       </div>
     </div>

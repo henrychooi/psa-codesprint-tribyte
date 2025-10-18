@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
-import { Settings as SettingsIcon, User, Save, X, Check, AlertCircle, Shield, Briefcase, Mail, Building, ArrowLeft } from 'lucide-react';
+import { Settings as SettingsIcon, User, Save, X, Check, AlertCircle, Shield, Briefcase, Mail, Building, ArrowLeft, LogOut } from 'lucide-react';
 import ProtectedRoute from '../components/ProtectedRoute';
 import { getUser, logout, updateUser } from '../utils/auth';
 import { updateUsername } from '../services/api';
@@ -109,193 +109,208 @@ export default function SettingsPage() {
         <meta name="viewport" content="width=device-width, initial-scale=1" />
       </Head>
 
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50">
-        {/* Header */}
-        <header className="bg-gradient-to-r from-purple-600 to-blue-600 text-white shadow-2xl">
-          <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center space-x-3">
+      <div className="relative min-h-screen overflow-x-hidden px-4 pb-16 sm:px-6 lg:px-10">
+        <div
+          className="floating-orb absolute -top-20 -left-16 w-64 h-64"
+          style={{ background: 'rgba(99, 102, 241, 0.35)' }}
+        />
+        <div
+          className="floating-orb absolute bottom-[-150px] right-[-100px] w-80 h-80"
+          style={{ background: 'rgba(236, 72, 153, 0.32)' }}
+        />
+        <div
+          className="floating-orb absolute top-1/3 right-16 w-60 h-60"
+          style={{ background: 'rgba(59, 130, 246, 0.28)' }}
+        />
+
+        <div className="relative max-w-5xl mx-auto space-y-10 pt-10 sm:pt-14">
+          <header className="glass-card px-6 py-6 sm:px-8 sm:py-8">
+            <div className="flex flex-col gap-6 md:flex-row md:items-center md:justify-between">
+              <div className="flex items-start sm:items-center gap-4">
                 <button
                   onClick={handleBack}
-                  className="w-10 h-10 bg-white/20 backdrop-blur-sm rounded-lg flex items-center justify-center hover:bg-white/30 transition-all"
+                  className="group rounded-2xl border border-white/50 bg-white/60 px-3 py-2 text-slate-600 hover:text-indigo-600 hover:border-indigo-200 transition-all flex items-center gap-2"
                 >
-                  <ArrowLeft className="w-5 h-5" />
+                  <ArrowLeft className="w-5 h-5 transition-transform group-hover:-translate-x-1" />
+                  <span className="text-sm font-semibold">Back</span>
                 </button>
-                <div className="w-12 h-12 bg-white/20 backdrop-blur-sm rounded-xl flex items-center justify-center">
-                  <SettingsIcon className="w-7 h-7" />
-                </div>
-                <div>
-                  <h1 className="text-3xl font-bold">Account Settings</h1>
-                  <p className="text-purple-200 text-sm">Manage your profile</p>
+                <div className="flex items-center gap-3">
+                  <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-indigo-500 to-purple-500 text-white flex items-center justify-center shadow-lg shadow-indigo-500/30">
+                    <SettingsIcon className="w-6 h-6" />
+                  </div>
+                  <div>
+                    <p className="text-xs uppercase tracking-[0.3em] text-indigo-500 font-semibold">
+                      Account workspace
+                    </p>
+                    <h1 className="text-3xl font-semibold text-slate-900">Account Settings</h1>
+                    <p className="text-sm text-slate-500">Manage your identity, contact details, and login credentials.</p>
+                  </div>
                 </div>
               </div>
-              <button
-                onClick={handleLogout}
-                className="px-4 py-2 bg-red-500/80 hover:bg-red-600 backdrop-blur-sm rounded-lg transition-all flex items-center space-x-2"
+
+              <div className="flex flex-wrap gap-3 items-center">
+                <div className="glass-chip px-4 py-2 flex items-center gap-2 text-sm font-medium text-slate-700">
+                  <User className="w-4 h-4 text-indigo-500" />
+                  {currentUser.name}
+                </div>
+                <button
+                  onClick={handleLogout}
+                  className="glass-button px-4 py-2 bg-gradient-to-r from-rose-500/90 to-orange-500/90 hover:from-rose-500 hover:to-orange-500 text-sm font-semibold flex items-center gap-2"
+                >
+                  <LogOut className="w-4 h-4" />
+                  Logout
+                </button>
+              </div>
+            </div>
+          </header>
+
+          <main className="space-y-8">
+            {message.text && (
+              <div
+                className={`glass-panel px-5 py-4 border ${
+                  message.type === 'success'
+                    ? 'border-emerald-200/70 bg-emerald-50/80 text-emerald-700'
+                    : 'border-rose-200/70 bg-rose-50/80 text-rose-700'
+                } flex items-start gap-3`}
               >
-                <span>Logout</span>
-              </button>
-            </div>
-          </div>
-        </header>
-
-        {/* Main Content */}
-        <main className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          {/* Success/Error Message */}
-          {message.text && (
-            <div className={`mb-6 p-4 rounded-lg flex items-center space-x-3 ${
-              message.type === 'success' 
-                ? 'bg-green-50 border border-green-200 text-green-800'
-                : 'bg-red-50 border border-red-200 text-red-800'
-            }`}>
-              {message.type === 'success' ? (
-                <Check className="w-5 h-5 flex-shrink-0" />
-              ) : (
-                <AlertCircle className="w-5 h-5 flex-shrink-0" />
-              )}
-              <span>{message.text}</span>
-            </div>
-          )}
-
-          {/* User Info Card */}
-          <div className="bg-white rounded-2xl shadow-xl p-8 mb-6">
-            <div className="flex items-center space-x-4 mb-6 pb-6 border-b">
-              <div className="w-16 h-16 bg-gradient-to-br from-purple-500 to-blue-500 rounded-full flex items-center justify-center text-white text-2xl font-bold">
-                {currentUser.name?.charAt(0) || 'U'}
+                {message.type === 'success' ? (
+                  <Check className="w-5 h-5 flex-shrink-0 mt-0.5" />
+                ) : (
+                  <AlertCircle className="w-5 h-5 flex-shrink-0 mt-0.5" />
+                )}
+                <span>{message.text}</span>
               </div>
-              <div>
-                <h2 className="text-2xl font-bold text-gray-800">{currentUser.name}</h2>
-                <div className="flex items-center space-x-2 mt-1">
-                  {currentUser.role === 'admin' ? (
-                    <span className="px-3 py-1 bg-gradient-to-r from-purple-500 to-blue-500 text-white text-xs font-semibold rounded-full flex items-center space-x-1">
-                      <Shield className="w-3 h-3" />
-                      <span>Administrator</span>
-                    </span>
-                  ) : (
-                    <span className="px-3 py-1 bg-gradient-to-r from-green-500 to-teal-500 text-white text-xs font-semibold rounded-full flex items-center space-x-1">
-                      <User className="w-3 h-3" />
-                      <span>Employee</span>
-                    </span>
-                  )}
-                </div>
-              </div>
-            </div>
+            )}
 
-            {/* Profile Information */}
-            <div className="space-y-4">
-              <div className="flex items-start space-x-3">
-                <Mail className="w-5 h-5 text-gray-400 mt-0.5" />
-                <div>
-                  <div className="text-sm text-gray-500">Email</div>
-                  <div className="text-gray-800 font-medium">{currentUser.email || 'Not set'}</div>
+            <section className="glass-panel px-6 py-8 sm:px-8 border border-white/55">
+              <div className="flex flex-col gap-6 sm:flex-row sm:items-center sm:justify-between pb-6 border-b border-white/50">
+                <div className="flex items-center gap-4">
+                  <div className="w-16 h-16 rounded-full bg-gradient-to-br from-indigo-500 to-purple-500 text-white flex items-center justify-center text-2xl font-semibold shadow-lg shadow-indigo-500/30">
+                    {currentUser.name?.charAt(0) || 'U'}
+                  </div>
+                  <div>
+                    <h2 className="text-2xl font-semibold text-slate-900">{currentUser.name}</h2>
+                    <div className="flex items-center gap-2 mt-2">
+                      {currentUser.role === 'admin' ? (
+                        <span className="glass-chip px-3 py-1 text-xs font-semibold text-rose-600">
+                          <Shield className="w-3.5 h-3.5" />
+                          Administrator
+                        </span>
+                      ) : (
+                        <span className="glass-chip px-3 py-1 text-xs font-semibold text-emerald-600">
+                          <User className="w-3.5 h-3.5" />
+                          Employee
+                        </span>
+                      )}
+                    </div>
+                  </div>
                 </div>
               </div>
 
-              {currentUser.job_title && (
-                <div className="flex items-start space-x-3">
-                  <Briefcase className="w-5 h-5 text-gray-400 mt-0.5" />
+              <div className="mt-6 grid gap-5 sm:grid-cols-2">
+                <div className="flex items-start gap-3">
+                  <Mail className="w-5 h-5 text-slate-400 mt-1" />
                   <div>
-                    <div className="text-sm text-gray-500">Job Title</div>
-                    <div className="text-gray-800 font-medium">{currentUser.job_title}</div>
+                    <p className="text-xs uppercase tracking-[0.28em] text-slate-400">Email</p>
+                    <p className="text-sm font-medium text-slate-700">{currentUser.email || 'Not set'}</p>
                   </div>
                 </div>
-              )}
-
-              {currentUser.department && (
-                <div className="flex items-start space-x-3">
-                  <Building className="w-5 h-5 text-gray-400 mt-0.5" />
-                  <div>
-                    <div className="text-sm text-gray-500">Department</div>
-                    <div className="text-gray-800 font-medium">{currentUser.department}</div>
+                {currentUser.employee_id && (
+                  <div className="flex items-start gap-3">
+                    <User className="w-5 h-5 text-slate-400 mt-1" />
+                    <div>
+                      <p className="text-xs uppercase tracking-[0.28em] text-slate-400">Employee ID</p>
+                      <p className="text-sm font-medium text-slate-700">{currentUser.employee_id}</p>
+                    </div>
                   </div>
-                </div>
-              )}
-
-              {currentUser.employee_id && (
-                <div className="flex items-start space-x-3">
-                  <User className="w-5 h-5 text-gray-400 mt-0.5" />
-                  <div>
-                    <div className="text-sm text-gray-500">Employee ID</div>
-                    <div className="text-gray-800 font-medium">{currentUser.employee_id}</div>
+                )}
+                {currentUser.job_title && (
+                  <div className="flex items-start gap-3">
+                    <Briefcase className="w-5 h-5 text-slate-400 mt-1" />
+                    <div>
+                      <p className="text-xs uppercase tracking-[0.28em] text-slate-400">Job Title</p>
+                      <p className="text-sm font-medium text-slate-700">{currentUser.job_title}</p>
+                    </div>
                   </div>
-                </div>
-              )}
-            </div>
-          </div>
+                )}
+                {currentUser.department && (
+                  <div className="flex items-start gap-3">
+                    <Building className="w-5 h-5 text-slate-400 mt-1" />
+                    <div>
+                      <p className="text-xs uppercase tracking-[0.28em] text-slate-400">Department</p>
+                      <p className="text-sm font-medium text-slate-700">{currentUser.department}</p>
+                    </div>
+                  </div>
+                )}
+              </div>
+            </section>
 
-          {/* Username Update Form */}
-          <div className="bg-white rounded-2xl shadow-xl p-8">
-            <h3 className="text-xl font-bold text-gray-800 mb-6">Account Credentials</h3>
-            
-            <form onSubmit={handleUpdateUsername}>
-              <div className="space-y-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+            <section className="glass-panel px-6 py-8 sm:px-8 border border-white/55">
+              <h3 className="text-xl font-semibold text-slate-900 mb-6">Account Credentials</h3>
+              <form onSubmit={handleUpdateUsername}>
+                <div className="space-y-4">
+                  <label className="block text-xs uppercase tracking-[0.32em] text-slate-400">
                     Username
                   </label>
                   {!isEditing ? (
-                    <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
-                      <span className="text-gray-800 font-medium">{currentUser.username}</span>
+                    <div className="glass-panel border border-white/60 px-4 py-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                      <span className="text-slate-800 font-medium">{currentUser.username}</span>
                       <button
                         type="button"
                         onClick={() => setIsEditing(true)}
-                        className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors text-sm font-medium"
+                        className="glass-button px-4 py-2 text-sm font-semibold"
                       >
                         Change Username
                       </button>
                     </div>
                   ) : (
-                    <div className="space-y-3">
+                    <div className="space-y-4">
                       <input
                         type="text"
                         value={newUsername}
                         onChange={(e) => setNewUsername(e.target.value)}
-                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        className="w-full rounded-xl border border-slate-200 bg-white/85 px-4 py-3 focus:border-indigo-400 focus:ring-2 focus:ring-indigo-200 text-slate-700 transition-all"
                         placeholder="Enter new username"
                         required
                         minLength={3}
                         disabled={loading}
                       />
-                      <div className="text-sm text-gray-500">
-                        Username must be at least 3 characters and can only contain letters, numbers, dots, and underscores.
-                      </div>
-                      <div className="flex space-x-3">
+                      <p className="text-sm text-slate-500">
+                        Username must be at least 3 characters and can contain letters, numbers, dots, and underscores.
+                      </p>
+                      <div className="flex flex-col sm:flex-row gap-3">
                         <button
                           type="submit"
                           disabled={loading || newUsername === currentUser.username}
-                          className="flex-1 px-6 py-3 bg-gradient-to-r from-green-500 to-teal-500 hover:from-green-600 hover:to-teal-600 text-white rounded-lg transition-all font-semibold disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center space-x-2"
+                          className="glass-button flex-1 py-3 flex items-center justify-center gap-2 disabled:opacity-60 disabled:cursor-not-allowed"
                         >
                           <Save className="w-4 h-4" />
-                          <span>{loading ? 'Updating...' : 'Save Changes'}</span>
+                          <span>{loading ? 'Updating…' : 'Save Changes'}</span>
                         </button>
                         <button
                           type="button"
                           onClick={handleCancel}
                           disabled={loading}
-                          className="px-6 py-3 bg-gray-200 hover:bg-gray-300 text-gray-700 rounded-lg transition-colors font-semibold disabled:opacity-50 disabled:cursor-not-allowed flex items-center space-x-2"
+                          className="glass-panel border border-white/60 px-4 py-3 text-sm font-semibold text-slate-600 hover:text-indigo-600 transition-colors disabled:opacity-60 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                         >
                           <X className="w-4 h-4" />
-                          <span>Cancel</span>
+                          Cancel
                         </button>
                       </div>
                     </div>
                   )}
                 </div>
-              </div>
-            </form>
+              </form>
 
-            {/* Info Box */}
-            <div className="mt-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
-              <div className="flex items-start space-x-3">
-                <AlertCircle className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
-                <div className="text-sm text-blue-800">
-                  <strong>Note:</strong> Changing your username will update your login credentials. 
-                  You'll need to use your new username the next time you log in. Your password will remain the same.
-                </div>
+              <div className="mt-6 glass-panel border border-indigo-100/70 bg-indigo-50/80 px-4 py-4 text-sm text-indigo-700 flex items-start gap-3">
+                <AlertCircle className="w-5 h-5 flex-shrink-0 mt-0.5" />
+                <p>
+                  <strong>Note:</strong> Changing your username updates your login credentials immediately. Use the new username next time you sign in. Your password remains unchanged.
+                </p>
               </div>
-            </div>
-          </div>
-        </main>
+            </section>
+          </main>
+        </div>
       </div>
     </ProtectedRoute>
   );
