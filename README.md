@@ -6,55 +6,101 @@
 ![Python](https://img.shields.io/badge/Python-3.8+-blue)
 ![License](https://img.shields.io/badge/License-MIT-green)
 
-An AI-powered career development platform that matches employees to ideal roles using advanced machine learning and generates personalized career narratives. Built for **PSA Code Sprint Singapore 2025**.
+A comprehensive AI-powered career development platform featuring conversational AI guidance, predictive career roadmaps, and leadership potential assessment with explainable scoring. Built for **PSA Code Sprint Singapore 2025**.
 
 ## 🎯 Team Tribyte
 
 Built with ❤️ for PSA Code Sprint 2025 hackathon.
 
-## ✨ Features
+## ✨ Core Features
 
-### 🔍 Employee Search & Selection
+### 🤖 Compass Copilot - Conversational AI Career Assistant
 
-- **Smart Search Interface**: Real-time filtering by name, email, job title, or department
-- **Employee Profiles**: Comprehensive view of skills, competencies, and experience
-- **Visual Skill Badges**: Quick overview of employee capabilities
-- **Profile Details**:
-  - Personal information and contact details
-  - Current role and department
-  - Skills and competencies with proficiency levels
-  - Experience history and completed projects
-  - Education background
+**Employee-only feature** providing personalized, context-aware career guidance through natural conversation.
 
-### 🤖 AI-Powered Role Matching
+- **Intent-Driven Responses**: Intelligent classification of user queries (profile summary, role recommendations, skill gaps, wellbeing support, general Q&A)
+- **Profile-Aware Conversations**: Automatically accesses authenticated employee's data for personalized responses
+- **Evidence-Based Citations**: Links responses to specific projects, skills, and achievements from employee profile
+- **Multi-Intent Support**: Handles diverse career questions from role matching to work-life balance support
+- **Contextual Suggestions**: Provides actionable next steps based on conversation flow
+- **Azure OpenAI Integration**: Leverages GPT-5-mini for human-like, empathetic career counseling
+
+[📖 View Compass Copilot Documentation](./docs/COMPASS_COPILOT.md)
+
+### 🗺️ Career Roadmap - Predictive Career Path Simulation
+
+**Role-based access**: Current roadmap for employees, predictive simulations for admins only.
+
+- **Current Roadmap (All Users)**:
+  - Next 2-3 year progression based on current trajectory
+  - Logical next roles with skill match scores
+  - Skills gap identification with prioritization
+  - Career anchor analysis
+  - Timeline visualization with estimated milestones
+
+- **Predicted Roadmap with Simulations (Admin Only)**:
+  - 10-year career projections across multiple scenarios
+  - **Scenario Types**:
+    - `steady_growth`: Normal career progression
+    - `aggressive_growth`: Fast-track advancement
+    - `lateral_mobility`: Cross-functional moves
+    - `specialization`: Deep domain expertise
+  - Risk factor analysis and retention insights
+  - Optimal path recommendation based on employee profile
+  - Comparative scenario analysis
+
+[📖 View Career Roadmap Documentation](./docs/CAREER_ROADMAP.md)
+
+### 📊 Leadership Potential - Explainable Scoring with AI Augmentation
+
+**Evidence-based leadership assessment** combining heuristic analysis with Azure OpenAI sentiment analysis.
+
+- **4-Component Scoring Model**:
+  - **Outcome Impact (25%)**: Quantified project outcomes with sentiment analysis
+  - **Stakeholder Complexity (25%)**: Cross-functional engagement and diversity detection
+  - **Change Management (20%)**: Transformation competencies and change leadership
+  - **Progression Velocity (30%)**: Career advancement rate and trajectory
+
+- **Azure OpenAI Augmentations**:
+  - Sentiment analysis of project outcomes (positive/neutral/negative with confidence scoring)
+  - Quantitative metrics extraction (percentages, ratios, absolute values)
+  - Stakeholder type classification (internal, cross-functional, external, senior)
+  - Engagement quality grading (low/medium/high)
+  - 60/40 merge strategy (60% base heuristics + 40% AI-derived insights)
+
+- **Explainability Features**:
+  - Component breakdown with evidence linking
+  - Interactive visualizations (bar charts, score cards)
+  - Evidence modal with project outcomes and stakeholder examples
+  - Percentile ranking estimation
+  - Personalized improvement suggestions
+
+[📖 View Leadership Potential Documentation](./docs/LEADERSHIP_POTENTIAL.md)
+
+### 🔍 AI-Powered Role Matching
 
 - **Intelligent Matching Algorithm**: Combines semantic similarity and skill analysis
-- **Top 5 Recommendations**: Best-fit roles ranked by match score
 - **Dual-Weight Scoring System**:
   - 60% Semantic similarity using embeddings
   - 40% Skill gap analysis
-- **Match Visualization**:
-  - Color-coded scores (Excellent/Strong/Good/Potential matches)
-  - Skill match breakdown (required vs. preferred)
-  - Missing skills identification
+- **Career Narrative Generation**: AI-generated personalized career stories using Azure OpenAI
+- **Development Plans**: Prioritized action plans with timelines
 
-### 📖 Career Narrative Generation
+### 🔐 Authentication & Role-Based Access Control
 
-- **AI-Generated Stories**: Personalized career narratives using Azure OpenAI
-- **Development Roadmap**: Prioritized action plans for skill development
-- **Actionable Insights**: Specific steps with estimated timelines
-- **Narrative Features**:
-  - Context-aware content based on employee profile and target role
-  - Skill gap bridging strategies
-  - Career progression guidance
-  - Next steps and recommendations
+- **Demo Authentication System**: Username/password login with role-based permissions
+- **User Roles**:
+  - `employee`: Access to Compass Copilot, own career roadmap, leadership assessment
+  - `admin`: Full access including predicted roadmaps, all employee data, user management
+- **Protected Routes**: Frontend and backend enforcement of role-based access
+- **Session Management**: Token-based authentication with user context
 
 ### 🎨 Modern User Interface
 
-- **Responsive Design**: Seamless experience across all devices
-- **PSA Branding**: Custom color scheme with PSA blue theme
-- **Interactive Components**: Expandable role details and smooth transitions
-- **Visual Feedback**: Loading states, success indicators, and error handling
+- **Responsive Design**: Optimized for desktop, tablet, and mobile
+- **Glass Morphism UI**: Modern frosted glass aesthetic with floating orbs
+- **PSA Branding**: Custom color scheme with indigo/blue gradients
+- **Interactive Components**: Smooth transitions, loading states, and error handling
 
 ## 🚀 Tech Stack
 
@@ -62,22 +108,27 @@ Built with ❤️ for PSA Code Sprint 2025 hackathon.
 - **Framework**: [Flask 3.0](https://flask.palletsprojects.com/)
 - **Database**: SQLite with [SQLAlchemy 2.0](https://www.sqlalchemy.org/)
 - **AI/ML**: 
-  - [Azure OpenAI](https://azure.microsoft.com/en-us/products/ai-services/openai-service) (via APIM)
-  - Local fallback: [Sentence Transformers](https://www.sbert.net/)
+  - [Azure OpenAI](https://azure.microsoft.com/en-us/products/ai-services/openai-service) via APIM
+    - `gpt-5-mini`: Chat completions for narratives and copilot
+    - `text-embedding-3-small`: Semantic embeddings
+  - Local fallback: [Sentence Transformers](https://www.sbert.net/) (all-MiniLM-L6-v2)
   - [scikit-learn](https://scikit-learn.org/) for cosine similarity
+  - [python-dateutil](https://dateutil.readthedocs.io/) for career timeline calculations
 - **API**: RESTful endpoints with Flask-CORS
+- **Authentication**: Simple token-based auth with role-based access control
 
 ### Frontend
 - **Framework**: [Next.js 14](https://nextjs.org/) with React 18
 - **Styling**: [Tailwind CSS 3](https://tailwindcss.com/)
 - **HTTP Client**: [Axios](https://axios-http.com/)
 - **Icons**: [Lucide React](https://lucide.dev/)
+- **Charts**: [Recharts 2](https://recharts.org/) for leadership visualizations
 
 ## 📋 Prerequisites
 
 - Python 3.8 or higher
 - Node.js 18+ and npm
-- Azure OpenAI API access (or local embeddings fallback)
+- Azure OpenAI API access via APIM (or local embeddings fallback)
 
 ## 🛠️ Installation & Setup
 
@@ -116,9 +167,17 @@ notepad .env
 
 **Update `.env` with your credentials:**
 ```env
+# Azure OpenAI Configuration (via APIM)
 AZURE_OPENAI_API_KEY=your-apim-subscription-key
 AZURE_OPENAI_ENDPOINT=https://psacodesprint2025.azure-api.net/
 AZURE_EMBED_DEPLOYMENT=text-embedding-3-small
+
+# Embedding Model Selection
+# Set to 'true' to use local sentence-transformers first (fast, free, offline)
+# Set to 'false' or omit to use Azure OpenAI embeddings first (higher quality, requires API)
+USE_LOCAL_EMBEDDINGS=false
+
+# Flask Configuration
 FLASK_ENV=development
 DATABASE_URL=sqlite:///compass.db
 ```
@@ -161,6 +220,29 @@ npm run dev
 ```
 
 Frontend will open at `http://localhost:3000`
+
+## 🔑 Demo Users & Access
+
+The system includes demo accounts for testing:
+
+### Employees (Employee Access)
+```
+Username: samantha.lee    Password: password123
+Username: aisyah.rahman   Password: password123
+Username: rohan.mehta     Password: password123
+Username: emily.wong      Password: password123
+Username: david.tan       Password: password123
+```
+
+### Administrators (Full Access)
+```
+Username: admin           Password: admin123
+Username: hr.admin        Password: admin123
+```
+
+**Employee Access**: Compass Copilot, own career roadmap (current), leadership assessment, role matching
+
+**Admin Access**: All employee features + predicted roadmaps with simulations, all employee data, user management
 
 ## � Project Structure
 
@@ -263,6 +345,8 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 For questions or support, reach out to Team Tribyte:
 
 - GitHub: [@henrychooi](https://github.com/henrychooi)
+- GitHub: [@natsirt04](https://github.com/natsirt04)
+- GitHub: [@cadzchua](https://github.com/cadzchua)
 
 ## 🙏 Acknowledgments
 
