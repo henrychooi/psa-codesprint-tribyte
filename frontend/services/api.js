@@ -13,21 +13,41 @@ const api = axios.create({
   },
 });
 
+// Request interceptor to add authentication token
+api.interceptors.request.use(
+  (config) => {
+    // Add auth token if available
+    if (typeof window !== 'undefined') {
+      const token = localStorage.getItem('auth_token');
+      if (token) {
+        config.headers.Authorization = `Bearer ${token}`;
+      }
+    }
+    return config;
+  },
+  (error) => {
+    return Promise.reject(error);
+  }
+);
+
 // Response interceptor for error handling
 api.interceptors.response.use(
   (response) => response,
   (error) => {
     console.error('API Error:', error);
-    if (error.response) {
-      // Server responded with error
-      throw new Error(error.response.data.error || 'An error occurred');
-    } else if (error.request) {
-      // Request made but no response
-      throw new Error('No response from server. Please check your connection.');
-    } else {
-      // Something else happened
-      throw new Error(error.message || 'An unexpected error occurred');
+    
+    // Handle authentication errors
+    if (error.response && error.response.status === 401) {
+      // Redirect to login if unauthorized
+      if (typeof window !== 'undefined') {
+        localStorage.removeItem('auth_token');
+        localStorage.removeItem('user');
+        window.location.href = '/login';
+      }
     }
+    
+    // Re-throw the original error to preserve error.response structure
+    return Promise.reject(error);
   }
 );
 
@@ -101,6 +121,47 @@ export const careerCompassAPI = {
     });
     return response.data;
   },
+
+  // Chat/Copilot endpoints
+  sendChatMessage: async (employeeId, message, conversationHistory = []) => {
+    const response = await api.post('/chat', {
+      message: message,  // employee_id now comes from auth token
+      conversation_history: conversationHistory,
+    });
+    return response.data;
+  },
+
+  // Authentication endpoints
+  login: async (username, password) => {
+    const response = await api.post('/auth/login', {
+      username,
+      password,
+    });
+    return response.data;
+  },
+
+  verifyToken: async () => {
+    const response = await api.get('/auth/verify');
+    return response.data;
+  },
+
+  getDemoUsers: async () => {
+    const response = await api.get('/auth/demo-users');
+    return response.data;
+  },
+};
+
+// Standalone auth functions for easier import
+export const login = careerCompassAPI.login;
+export const verifyToken = careerCompassAPI.verifyToken;
+export const getDemoUsers = careerCompassAPI.getDemoUsers;
+
+// User settings functions
+export const updateUsername = async (newUsername) => {
+  const response = await api.put('/user/update-username', {
+    new_username: newUsername,
+  });
+  return response.data;
 };
 
 export default api;

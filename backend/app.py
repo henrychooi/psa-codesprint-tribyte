@@ -14,7 +14,12 @@ from ai_engine import (
     generate_career_narrative,
     generate_development_plan,
     generate_embedding,
-    create_profile_text
+    create_profile_text,
+    classify_intent,
+    generate_profile_summary,
+    format_role_recommendations,
+    generate_skill_gap_analysis,
+    generate_general_qa_response
 )
 from leadership_potential import (
     compute_leadership_potential,
@@ -22,6 +27,7 @@ from leadership_potential import (
     calculate_percentile_rank,
     generate_improvement_suggestions
 )
+from auth import authenticate_user, require_auth, require_admin, require_employee, get_all_users, update_username, get_user_data
 
 # Load environment variables
 load_dotenv()
@@ -41,6 +47,250 @@ def health_check():
         'status': 'healthy',
         'message': 'Career Compass API is running'
     })
+
+
+# ============================================================================
+# AUTHENTICATION ENDPOINTS
+# ============================================================================
+
+@app.route('/api/auth/login', methods=['POST'])
+def login():
+    """
+    User login endpoint
+    
+    Request body:
+        {
+            "username": "samantha.lee" or "admin",
+            "password": "employee123" or "admin123"
+        }
+    
+    Response:
+        {
+            "success": true,
+            "user": {
+                "username": "samantha.lee",
+                "role": "employee",
+                "name": "Samantha Lee",
+                "employee_id": "EMP-20001",
+                "email": "samantha.lee@psa.com"
+            },
+            "token": "samantha.lee"  # In production, use JWT
+        }
+    """
+    data = request.get_json()
+    username = data.get('username', '').strip()
+    password = data.get('password', '').strip()
+    
+    if not username or not password:
+        return jsonify({
+            'success': False,
+            'error': 'Username and password required'
+        }), 400
+    
+    user = authenticate_user(username, password)
+    
+    if not user:
+        return jsonify({
+            'success': False,
+            'error': 'Invalid username or password'
+        }), 401
+    
+    # In production, generate proper JWT token
+    # For demo, we'll use username as token
+    return jsonify({
+        'success': True,
+        'user': user,
+        'token': user['username']  # Simple token for demo
+    })
+
+
+@app.route('/api/auth/verify', methods=['GET'])
+@require_auth
+def verify_token():
+    """
+    Verify authentication token and return user data
+    Expects Authorization header: Bearer <token>
+    """
+    return jsonify({
+        'success': True,
+        'user': request.user
+    })
+
+
+@app.route('/api/auth/demo-users', methods=['GET'])
+def get_demo_users():
+    """
+    Get list of demo users for login page (development only)
+    """
+    return jsonify({
+        'success': True,
+        'users': [
+            {
+                'username': 'samantha.lee',
+                'role': 'employee',
+                'name': 'Samantha Lee',
+                'job_title': 'Cloud Solutions Architect',
+                'password_hint': 'password123'
+            },
+            {
+                'username': 'aisyah.rahman',
+                'role': 'employee',
+                'name': 'Nur Aisyah Binte Rahman',
+                'job_title': 'Cybersecurity Analyst',
+                'password_hint': 'password123'
+            },
+            {
+                'username': 'rohan.mehta',
+                'role': 'employee',
+                'name': 'Rohan Mehta',
+                'job_title': 'Finance Manager (FP&A)',
+                'password_hint': 'password123'
+            },
+            {
+                'username': 'admin',
+                'role': 'admin',
+                'name': 'System Administrator',
+                'job_title': 'System Administrator',
+                'password_hint': 'admin123'
+            }
+        ]
+    })
+
+
+@app.route('/api/users', methods=['GET'])
+@require_auth
+def list_users():
+    """
+    Get list of all users with their accounts
+    Available to all authenticated users
+    
+    Response:
+        {
+            "success": true,
+            "users": [
+                {
+                    "username": "samantha.lee",
+                    "role": "employee",
+                    "name": "Samantha Lee",
+                    "employee_id": "EMP-20001",
+                    "email": "samantha.lee@globalpsa.com",
+                    "job_title": "Cloud Solutions Architect",
+                    "department": "Information Technology"
+                }
+            ]
+        }
+    """
+    users = get_all_users(include_passwords=False)
+    
+    return jsonify({
+        'success': True,
+        'count': len(users),
+        'users': users
+    })
+
+
+@app.route('/api/users/credentials', methods=['GET'])
+def get_user_credentials():
+    """
+    Get list of all users WITH passwords (development/demo only!)
+    WARNING: In production, this endpoint should be removed or heavily restricted
+    
+    Response:
+        {
+            "success": true,
+            "users": [
+                {
+                    "username": "samantha.lee",
+                    "password": "password123",
+                    "role": "employee",
+                    "name": "Samantha Lee",
+                    "employee_id": "EMP-20001"
+                }
+            ]
+        }
+    """
+    users = get_all_users(include_passwords=True)
+    
+    return jsonify({
+        'success': True,
+        'count': len(users),
+        'users': users,
+        'warning': 'This endpoint exposes passwords and should only be used in development'
+    })
+
+
+@app.route('/api/user/update-username', methods=['PUT'])
+@require_auth
+def update_user_username():
+    """
+    Update the current user's username
+    Requires authentication
+    
+    Request Body:
+        {
+            "new_username": "new.username"
+        }
+    
+    Response:
+        {
+            "success": true,
+            "message": "Username updated successfully",
+            "new_username": "new.username",
+            "user": { updated user data }
+        }
+    """
+    try:
+        data = request.get_json()
+        
+        if not data:
+            return jsonify({
+                'success': False,
+                'message': 'Request body is required'
+            }), 400
+        
+        new_username = data.get('new_username')
+        
+        if not new_username:
+            return jsonify({
+                'success': False,
+                'message': 'New username is required'
+            }), 400
+        
+        # Get current username from auth token
+        current_username = request.user['username']
+        
+        print(f"Updating username from '{current_username}' to '{new_username}'")
+        
+        # Update username
+        result = update_username(current_username, new_username)
+        
+        if result['success']:
+            # Get updated user data
+            updated_user = get_user_data(result['new_username'])
+            
+            print(f"Username update successful: {result['new_username']}")
+            
+            return jsonify({
+                'success': True,
+                'message': result['message'],
+                'new_username': result['new_username'],
+                'user': updated_user
+            })
+        else:
+            print(f"Username update failed: {result['message']}")
+            return jsonify({
+                'success': False,
+                'message': result['message']
+            }), 400
+            
+    except Exception as e:
+        print(f"ERROR in update_user_username: {str(e)}")
+        import traceback
+        traceback.print_exc()
+        return jsonify({
+            'success': False,
+            'message': f'Server error: {str(e)}'
+        }), 500
 
 
 @app.route('/api/employees', methods=['GET'])
@@ -404,6 +654,174 @@ def submit_leadership_feedback():
         'success': True,
         'message': 'Thank you. Your feedback helps us improve leadership assessment for everyone.'
     })
+
+
+@app.route('/api/chat', methods=['POST'])
+@require_employee
+def chat():
+    """
+    COMPASS COPILOT: Conversational AI Interface
+    EMPLOYEE ACCESS ONLY
+    
+    Request body:
+        {
+            "message": "What roles fit me?",
+            "conversation_history": [
+                {"role": "user", "content": "..."},
+                {"role": "assistant", "content": "..."}
+            ]
+        }
+    
+    Note: employee_id is obtained from authenticated user's token
+    
+    Response:
+        {
+            "success": true,
+            "response_text": "Based on your background...",
+            "citations": [
+                {"source": "project", "text": "Hybrid Cloud Migration", "details": [...]},
+                {"source": "skill", "text": "Architecture Design", "details": [...]}
+            ],
+            "suggested_actions": ["View Enterprise Architect path", "Find mentor"],
+            "intent": "role_recommendations"
+        }
+    """
+    data = request.get_json()
+    user_message = data.get('message', '').strip()
+    conversation_history = data.get('conversation_history', [])
+    
+    # Get employee_id from authenticated user
+    employee_id = request.user.get('employee_id')
+    
+    if not employee_id:
+        return jsonify({
+            'success': False,
+            'error': 'No employee profile associated with this account'
+        }), 400
+    
+    if not user_message:
+        return jsonify({
+            'success': False,
+            'error': 'message is required'
+        }), 400
+        return jsonify({
+            'success': False,
+            'error': 'message is required'
+        }), 400
+    
+    session = Session(engine)
+    try:
+        # Get employee data
+        employee = session.query(Employee).filter_by(employee_id=employee_id).first()
+        if not employee:
+            return jsonify({
+                'success': False,
+                'error': 'Employee not found'
+            }), 404
+        
+        employee_dict = employee.to_dict()
+        
+        # Classify intent with conversation context
+        intent = classify_intent(user_message, conversation_history)
+        print(f"🤖 Chat intent classified as: {intent}")
+        
+        # Route to appropriate handler based on intent
+        if intent == "profile_summary":
+            result = generate_profile_summary(employee_dict)
+            print(f"📋 Profile summary result: {result}")
+            print(f"📋 Response text: {result.get('response_text', 'MISSING')}")
+            
+        elif intent == "role_recommendations":
+            # Get all roles for matching
+            roles = session.query(Role).all()
+            roles_dict = [role.to_dict() for role in roles]
+            
+            # Perform matching
+            matches = match_employee_to_roles(employee_dict, roles_dict, top_k=5)
+            result = format_role_recommendations(matches, employee_dict)
+            
+        elif intent == "skill_gap":
+            # Get all roles for target extraction
+            roles = session.query(Role).all()
+            roles_dict = [role.to_dict() for role in roles]
+            
+            result = generate_skill_gap_analysis(
+                employee_dict,
+                target_role=None,  # Will be extracted from message
+                all_roles=roles_dict,
+                user_message=user_message
+            )
+        
+        elif intent == "general_qa":
+            # NEW: Handle general career questions with GPT
+            roles = session.query(Role).all()
+            roles_dict = [role.to_dict() for role in roles]
+            
+            print(f"📊 Calling generate_general_qa_response with {len(roles_dict)} roles")
+            
+            result = generate_general_qa_response(
+                employee_dict,
+                user_message,
+                all_roles=roles_dict,
+                conversation_history=conversation_history
+            )
+            
+            print(f"📦 Result object: {result}")
+            print(f"📦 Result type: {type(result)}")
+            print(f"📦 Response text field: {result.get('response_text', 'MISSING')}")
+            print(f"✅ Generated response: {len(result.get('response_text', ''))} chars")
+            
+        else:  # fallback - but try to be helpful with GPT
+            print(f"⚠️  Intent classified as '{intent}' - using fallback")
+            # Instead of static fallback, try general Q&A
+            roles = session.query(Role).all()
+            roles_dict = [role.to_dict() for role in roles]
+            
+            try:
+                result = generate_general_qa_response(
+                    employee_dict,
+                    user_message,
+                    all_roles=roles_dict,
+                    conversation_history=conversation_history
+                )
+            except Exception as e:
+                print(f"⚠️ Fallback Q&A failed: {e}")
+                import traceback
+                traceback.print_exc()
+                result = {
+                    'response_text': (
+                        "I'm here to help you with your career at PSA International! "
+                        "I can assist you with:\n\n"
+                        "📋 **Profile Summary** - Tell me about your background and strengths\n"
+                        "🎯 **Role Recommendations** - Discover career opportunities that fit your skills\n"
+                        "📚 **Skill Development** - Learn what skills you need for your target role\n\n"
+                        "What would you like to explore?"
+                    ),
+                    'citations': [],
+                    'suggested_actions': [
+                        'Show my profile',
+                        'What roles fit me?',
+                        'How do I become a [role]?'
+                    ]
+                }
+        
+        # Add intent to response
+        result['intent'] = intent
+        result['success'] = True
+        
+        return jsonify(result)
+        
+    except Exception as e:
+        print(f"❌ Chat error: {e}")
+        import traceback
+        traceback.print_exc()
+        return jsonify({
+            'success': False,
+            'error': str(e),
+            'response_text': 'I encountered an error processing your request. Please try again or rephrase your question.'
+        }), 500
+    finally:
+        session.close()
 
 
 @app.errorhandler(404)

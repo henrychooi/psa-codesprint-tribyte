@@ -33,6 +33,18 @@ code {
   animation: fadeIn 0.5s ease-out;
 }
 
+.animate-fade-in {
+  animation: fadeIn 0.3s ease-out;
+}
+
+/* Glassmorphism effect */
+.glass {
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+}
+
 /* Custom scrollbar */
 ::-webkit-scrollbar {
   width: 8px;

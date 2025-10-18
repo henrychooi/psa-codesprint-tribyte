@@ -1,16 +1,20 @@
 import React, { useState, useEffect } from 'react';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
-import { TrendingUp, Briefcase, Award, ArrowRight, Activity } from 'lucide-react';
+import { TrendingUp, Briefcase, Award, ArrowRight, Activity, LogOut, Shield, Settings } from 'lucide-react';
 import { careerCompassAPI } from '../services/api';
+import ProtectedRoute from '../components/ProtectedRoute';
+import { getUser, logout } from '../utils/auth';
 
 function Home() {
   const router = useRouter();
   const [apiHealth, setApiHealth] = useState(false);
+  const [currentUser, setCurrentUser] = useState(null);
 
-  // Check API health on mount
+  // Check API health and get user on mount
   useEffect(() => {
     checkAPIHealth();
+    setCurrentUser(getUser());
   }, []);
 
   const checkAPIHealth = async () => {
@@ -22,8 +26,16 @@ function Home() {
     }
   };
 
+  const handleLogout = () => {
+    logout();
+  };
+
+  const handleSettings = () => {
+    router.push('/settings');
+  };
+
   return (
-    <>
+    <ProtectedRoute requireRole="admin">
       <Head>
         <title>Career Compass - PSA International</title>
         <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -44,11 +56,39 @@ function Home() {
                   <p className="text-purple-200 text-lg">AI-Powered Career Development Platform</p>
                 </div>
               </div>
-              <div className="flex items-center space-x-3 bg-white/10 backdrop-blur-sm px-4 py-2 rounded-full">
-                <Activity className={`w-5 h-5 ${apiHealth ? 'text-green-400' : 'text-red-400'}`} />
-                <span className="text-sm font-medium">
-                  {apiHealth ? 'System Online' : 'System Offline'}
-                </span>
+              <div className="flex items-center space-x-4">
+                {/* User Badge */}
+                {currentUser && (
+                  <div className="flex items-center space-x-2 bg-white/10 backdrop-blur-sm px-4 py-2 rounded-full">
+                    <Shield className="w-5 h-5 text-orange-300" />
+                    <span className="text-sm font-medium">{currentUser.name}</span>
+                  </div>
+                )}
+                {/* System Status */}
+                <div className="flex items-center space-x-2 bg-white/10 backdrop-blur-sm px-4 py-2 rounded-full">
+                  <Activity className={`w-5 h-5 ${apiHealth ? 'text-green-400' : 'text-red-400'}`} />
+                  <span className="text-sm font-medium">
+                    {apiHealth ? 'System Online' : 'System Offline'}
+                  </span>
+                </div>
+                {/* Settings Button */}
+                <button
+                  onClick={handleSettings}
+                  className="flex items-center space-x-2 bg-white/10 hover:bg-white/20 backdrop-blur-sm px-4 py-2 rounded-full transition-colors"
+                  title="Settings"
+                >
+                  <Settings className="w-5 h-5" />
+                  <span className="text-sm font-medium">Settings</span>
+                </button>
+                {/* Logout Button */}
+                <button
+                  onClick={handleLogout}
+                  className="flex items-center space-x-2 bg-white/10 hover:bg-white/20 backdrop-blur-sm px-4 py-2 rounded-full transition-colors"
+                  title="Logout"
+                >
+                  <LogOut className="w-5 h-5" />
+                  <span className="text-sm font-medium">Logout</span>
+                </button>
               </div>
             </div>
           </div>
@@ -68,7 +108,7 @@ function Home() {
           </div>
 
           {/* Module Cards */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-5xl mx-auto mb-16">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-6xl mx-auto mb-16">
             {/* Career Matching Module */}
             <div 
               onClick={() => router.push('/career-matching')}
@@ -242,7 +282,7 @@ function Home() {
           </div>
         </footer>
       </div>
-    </>
+    </ProtectedRoute>
   );
 }
 
