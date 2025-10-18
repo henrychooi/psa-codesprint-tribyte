@@ -1,10 +1,10 @@
-import React, { useState, useEffect } from 'react';
-import Head from 'next/head';
-import { useRouter } from 'next/router';
-import { Sparkles, ArrowLeft, LogOut, User, Settings } from 'lucide-react';
-import ChatCopilot from '../components/ChatCopilot';
-import ProtectedRoute from '../components/ProtectedRoute';
-import { getUser, logout } from '../utils/auth';
+import React, { useState, useEffect } from "react";
+import Head from "next/head";
+import { useRouter } from "next/router";
+import { Sparkles, ArrowLeft, LogOut, User, Settings } from "lucide-react";
+import ChatCopilot from "../components/ChatCopilot";
+import ProtectedRoute from "../components/ProtectedRoute";
+import { getUser, logout } from "../utils/auth";
 
 /**
  * Compass Copilot Page
@@ -25,7 +25,7 @@ export default function CopilotPage() {
   };
 
   const handleSettings = () => {
-    router.push('/settings');
+    router.push("/settings");
   };
 
   return (
@@ -33,21 +33,24 @@ export default function CopilotPage() {
       <Head>
         <title>Compass Copilot - Career Compass</title>
         <meta name="viewport" content="width=device-width, initial-scale=1" />
-        <meta name="description" content="AI-Powered Career Guidance Assistant" />
+        <meta
+          name="description"
+          content="AI-Powered Career Guidance Assistant"
+        />
       </Head>
 
       <div className="relative min-h-screen overflow-x-hidden px-4 pb-12 sm:px-6 lg:px-10">
         <div
           className="floating-orb absolute -top-24 -left-20 w-72 h-72"
-          style={{ background: 'rgba(99, 102, 241, 0.38)' }}
+          style={{ background: "rgba(99, 102, 241, 0.38)" }}
         />
         <div
           className="floating-orb absolute bottom-[-150px] right-[-110px] w-96 h-96"
-          style={{ background: 'rgba(45, 212, 191, 0.28)' }}
+          style={{ background: "rgba(45, 212, 191, 0.28)" }}
         />
         <div
           className="floating-orb absolute top-1/2 right-20 w-64 h-64"
-          style={{ background: 'rgba(236, 72, 153, 0.25)' }}
+          style={{ background: "rgba(236, 72, 153, 0.25)" }}
         />
 
         <div className="relative max-w-6xl mx-auto space-y-10 pt-10 lg:pt-16">
@@ -61,35 +64,38 @@ export default function CopilotPage() {
                   <p className="text-xs uppercase tracking-[0.32em] text-indigo-500 font-semibold">
                     Employee Copilot
                   </p>
-                  <h1 className="text-3xl font-semibold text-slate-900">Compass Copilot</h1>
+                  <h1 className="text-3xl font-semibold text-slate-900">
+                    Compass Copilot
+                  </h1>
                   <p className="text-sm text-slate-500 max-w-md">
-                    A conversational workspace tuned to your PSA profile, ready with evidence-backed guidance.
+                    A conversational workspace tuned to your PSA profile, ready
+                    with evidence-backed guidance.
                   </p>
                 </div>
               </div>
 
               <div className="flex flex-wrap items-center gap-3 justify-start lg:justify-end">
                 {currentUser && (
-                  <div className="glass-chip px-4 py-2 flex items-center gap-2 text-sm font-medium text-slate-700">
-                    <User className="w-4 h-4 text-indigo-500" />
-                    {currentUser.name}
+                  <div className="glass-chip px-4 py-2.5 flex items-center gap-2 text-sm font-medium text-slate-700 whitespace-nowrap">
+                    <User className="w-4 h-4 text-indigo-500 flex-shrink-0" />
+                    <span className="truncate">{currentUser.name}</span>
                   </div>
                 )}
                 <button
                   onClick={handleSettings}
-                  className="glass-button px-4 py-2 text-sm font-semibold flex items-center gap-2"
+                  className="glass-button px-5 py-2.5 text-sm font-semibold flex items-center gap-2 whitespace-nowrap"
                   title="Settings"
                 >
-                  <Settings className="w-4 h-4" />
-                  Settings
+                  <Settings className="w-4 h-4 flex-shrink-0" />
+                  <span>Settings</span>
                 </button>
                 <button
                   onClick={handleLogout}
-                  className="glass-button px-4 py-2 bg-gradient-to-r from-rose-500/90 to-orange-500/90 hover:from-rose-500 hover:to-orange-500 text-sm font-semibold flex items-center gap-2"
+                  className="glass-button px-5 py-2.5 bg-gradient-to-r from-rose-500/90 to-orange-500/90 hover:from-rose-500 hover:to-orange-500 text-sm font-semibold flex items-center gap-2 whitespace-nowrap"
                   title="Logout"
                 >
-                  <LogOut className="w-4 h-4" />
-                  Logout
+                  <LogOut className="w-4 h-4 flex-shrink-0" />
+                  <span>Logout</span>
                 </button>
               </div>
             </div>
@@ -108,7 +114,9 @@ export default function CopilotPage() {
             ) : (
               <div className="glass-panel border border-white/55 px-6 py-16 text-center">
                 <div className="mx-auto mb-4 h-16 w-16 animate-spin rounded-full border-4 border-indigo-200 border-t-transparent" />
-                <p className="text-slate-600 text-lg">Loading your profile...</p>
+                <p className="text-slate-600 text-lg">
+                  Loading your profile...
+                </p>
               </div>
             )}
           </main>

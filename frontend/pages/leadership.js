@@ -1,14 +1,21 @@
-import React, { useState, useEffect } from 'react';
-import Head from 'next/head';
-import { useRouter } from 'next/router';
-import { Award, Loader2, ArrowLeft, Lightbulb, Activity, AlertCircle } from 'lucide-react';
-import { careerCompassAPI } from '../services/api';
-import EmployeeSearch from '../components/EmployeeSearch';
-import EmployeeProfile from '../components/EmployeeProfile';
-import ScoreCard from '../components/ScoreCard';
-import ComponentBreakdown from '../components/ComponentBreakdown';
-import EvidenceModal from '../components/EvidenceModal';
-import FeedbackModal from '../components/FeedbackModal';
+import React, { useState, useEffect } from "react";
+import Head from "next/head";
+import { useRouter } from "next/router";
+import {
+  Award,
+  Loader2,
+  ArrowLeft,
+  Lightbulb,
+  Activity,
+  AlertCircle,
+} from "lucide-react";
+import { careerCompassAPI } from "../services/api";
+import EmployeeSearch from "../components/EmployeeSearch";
+import EmployeeProfile from "../components/EmployeeProfile";
+import ScoreCard from "../components/ScoreCard";
+import ComponentBreakdown from "../components/ComponentBreakdown";
+import EvidenceModal from "../components/EvidenceModal";
+import FeedbackModal from "../components/FeedbackModal";
 
 function LeadershipPotential() {
   const router = useRouter();
@@ -17,7 +24,7 @@ function LeadershipPotential() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [apiHealth, setApiHealth] = useState(false);
-  
+
   // Modal states
   const [evidenceModalOpen, setEvidenceModalOpen] = useState(false);
   const [selectedComponent, setSelectedComponent] = useState(null);
@@ -34,7 +41,9 @@ function LeadershipPotential() {
       setApiHealth(true);
     } catch (err) {
       setApiHealth(false);
-      setError('Cannot connect to API. Please ensure the backend is running on http://localhost:5000');
+      setError(
+        "Cannot connect to API. Please ensure the backend is running on http://localhost:5000"
+      );
     }
   };
 
@@ -45,10 +54,12 @@ function LeadershipPotential() {
     setLoading(true);
 
     try {
-      const result = await careerCompassAPI.getLeadershipPotential(employee.employee_id);
+      const result = await careerCompassAPI.getLeadershipPotential(
+        employee.employee_id
+      );
       setLeadershipData(result);
     } catch (err) {
-      setError(err.message || 'Failed to load leadership potential data');
+      setError(err.message || "Failed to load leadership potential data");
     } finally {
       setLoading(false);
     }
@@ -67,9 +78,13 @@ function LeadershipPotential() {
 
   const handleFeedbackSubmit = async (employeeId, feedbackType, comments) => {
     try {
-      await careerCompassAPI.submitLeadershipFeedback(employeeId, feedbackType, comments);
+      await careerCompassAPI.submitLeadershipFeedback(
+        employeeId,
+        feedbackType,
+        comments
+      );
     } catch (err) {
-      console.error('Error submitting feedback:', err);
+      console.error("Error submitting feedback:", err);
     }
   };
 
@@ -83,47 +98,54 @@ function LeadershipPotential() {
       <div className="relative min-h-screen overflow-x-hidden px-4 pb-16 sm:px-6 lg:px-10">
         <div
           className="floating-orb absolute -top-24 -left-20 w-72 h-72"
-          style={{ background: 'rgba(168, 85, 247, 0.35)' }}
+          style={{ background: "rgba(168, 85, 247, 0.35)" }}
         />
         <div
           className="floating-orb absolute bottom-[-160px] right-[-110px] w-96 h-96"
-          style={{ background: 'rgba(56, 189, 248, 0.28)' }}
+          style={{ background: "rgba(56, 189, 248, 0.28)" }}
         />
         <div
           className="floating-orb absolute top-1/2 right-20 w-64 h-64"
-          style={{ background: 'rgba(248, 113, 113, 0.22)' }}
+          style={{ background: "rgba(248, 113, 113, 0.22)" }}
         />
 
         <div className="relative max-w-6xl mx-auto space-y-10 pt-10 sm:pt-14">
           <header className="glass-card px-6 py-6 sm:px-8 sm:py-8">
             <div className="flex flex-col gap-6 md:flex-row md:items-center md:justify-between">
-              <div className="flex items-start sm:items-center gap-4">
+              <div className="flex items-start sm:items-center gap-4 flex-1 min-w-0">
                 <button
-                  onClick={() => router.push('/')}
-                  className="group rounded-2xl border border-white/50 bg-white/60 px-3 py-2 text-slate-600 hover:text-indigo-600 hover:border-indigo-200 transition-all flex items-center gap-2"
+                  onClick={() => router.push("/")}
+                  className="group rounded-2xl border border-white/50 bg-white/60 px-3 py-2.5 text-slate-600 hover:text-indigo-600 hover:border-indigo-200 transition-all flex items-center gap-2 flex-shrink-0"
                   aria-label="Back to home"
                 >
                   <ArrowLeft className="w-5 h-5 transition-transform group-hover:-translate-x-1" />
                   <span className="text-sm font-semibold">Back</span>
                 </button>
-                <div className="flex items-center gap-3">
-                  <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-purple-500 to-pink-500 text-white flex items-center justify-center shadow-lg shadow-purple-500/30">
+                <div className="flex items-center gap-3 min-w-0">
+                  <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-purple-500 to-pink-500 text-white flex items-center justify-center shadow-lg shadow-purple-500/30 flex-shrink-0">
                     <Award className="w-6 h-6" />
                   </div>
-                  <div>
+                  <div className="min-w-0">
                     <p className="text-xs uppercase tracking-[0.32em] text-purple-500 font-semibold">
                       Leadership intelligence
                     </p>
-                    <h1 className="text-3xl font-semibold text-slate-900">Leadership Potential</h1>
+                    <h1 className="text-2xl sm:text-3xl font-semibold text-slate-900 truncate">
+                      Leadership Potential
+                    </h1>
                     <p className="text-sm text-slate-500 max-w-xl">
-                      Explainable AI scoring with evidence trails, component deep-dives, and feedback loops for every leader.
+                      Explainable AI scoring with evidence trails, component
+                      deep-dives, and feedback loops for every leader.
                     </p>
                   </div>
                 </div>
               </div>
-              <div className="glass-chip px-4 py-2 flex items-center gap-2 text-sm font-semibold text-slate-700">
-                <Activity className={`w-4 h-4 ${apiHealth ? 'text-emerald-500' : 'text-rose-500'}`} />
-                {apiHealth ? 'API Connected' : 'API Offline'}
+              <div className="glass-chip px-4 py-2.5 flex items-center gap-2 text-sm font-semibold text-slate-700 flex-shrink-0 w-fit whitespace-nowrap">
+                <Activity
+                  className={`w-4 h-4 flex-shrink-0 ${
+                    apiHealth ? "text-emerald-500" : "text-rose-500"
+                  }`}
+                />
+                <span>{apiHealth ? "API Connected" : "API Offline"}</span>
               </div>
             </div>
           </header>
@@ -150,7 +172,9 @@ function LeadershipPotential() {
                       Assess leadership potential with evidence
                     </h2>
                     <p className="text-sm sm:text-base text-slate-500 max-w-2xl mx-auto">
-                      Select an employee to unpack their leadership readiness, drill into component scores, and collect feedback instantly.
+                      Select an employee to unpack their leadership readiness,
+                      drill into component scores, and collect feedback
+                      instantly.
                     </p>
                   </div>
                   <EmployeeSearch onEmployeeSelect={handleEmployeeSelect} />
@@ -158,17 +182,43 @@ function LeadershipPotential() {
 
                 <section className="grid grid-cols-1 md:grid-cols-4 gap-6">
                   {[
-                    { title: 'Outcome Impact', description: 'Quantified business results and achievements', colors: 'from-blue-500/85 to-indigo-500/85' },
-                    { title: 'Stakeholder Complexity', description: 'Influence across diverse groups & forums', colors: 'from-purple-500/85 to-pink-500/85' },
-                    { title: 'Change Management', description: 'Transformation leadership and adoption', colors: 'from-emerald-400/85 to-teal-500/85' },
-                    { title: 'Progression Velocity', description: 'Career trajectory vs tenure peers', colors: 'from-rose-500/85 to-orange-500/85' },
+                    {
+                      title: "Outcome Impact",
+                      description:
+                        "Quantified business results and achievements",
+                      colors: "from-blue-500/85 to-indigo-500/85",
+                    },
+                    {
+                      title: "Stakeholder Complexity",
+                      description: "Influence across diverse groups & forums",
+                      colors: "from-purple-500/85 to-pink-500/85",
+                    },
+                    {
+                      title: "Change Management",
+                      description: "Transformation leadership and adoption",
+                      colors: "from-emerald-400/85 to-teal-500/85",
+                    },
+                    {
+                      title: "Progression Velocity",
+                      description: "Career trajectory vs tenure peers",
+                      colors: "from-rose-500/85 to-orange-500/85",
+                    },
                   ].map((card) => (
-                    <div key={card.title} className="glass-panel border border-white/55 p-6">
-                      <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${card.colors} text-white flex items-center justify-center shadow-lg shadow-slate-900/20 mb-4`}>
+                    <div
+                      key={card.title}
+                      className="glass-panel border border-white/55 p-6"
+                    >
+                      <div
+                        className={`w-12 h-12 rounded-xl bg-gradient-to-br ${card.colors} text-white flex items-center justify-center shadow-lg shadow-slate-900/20 mb-4`}
+                      >
                         <Award className="w-6 h-6" />
                       </div>
-                      <h3 className="text-lg font-semibold text-slate-900 mb-2">{card.title}</h3>
-                      <p className="text-sm text-slate-500 leading-relaxed">{card.description}</p>
+                      <h3 className="text-lg font-semibold text-slate-900 mb-2">
+                        {card.title}
+                      </h3>
+                      <p className="text-sm text-slate-500 leading-relaxed">
+                        {card.description}
+                      </p>
                     </div>
                   ))}
                 </section>
@@ -191,7 +241,9 @@ function LeadershipPotential() {
                     {loading ? (
                       <div className="glass-panel border border-white/55 px-8 py-16 text-center">
                         <Loader2 className="w-12 h-12 mx-auto text-purple-500 animate-spin mb-4" />
-                        <p className="text-slate-500">Calculating leadership potential…</p>
+                        <p className="text-slate-500">
+                          Calculating leadership potential…
+                        </p>
                       </div>
                     ) : leadershipData ? (
                       <>
@@ -207,26 +259,34 @@ function LeadershipPotential() {
                           onComponentClick={handleComponentClick}
                         />
 
-                        {leadershipData.improvement_suggestions && leadershipData.improvement_suggestions.length > 0 && (
-                          <div className="glass-panel border border-white/55 px-6 py-6">
-                            <div className="flex items-center gap-3 mb-4">
-                              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-amber-400 to-yellow-500 text-white flex items-center justify-center shadow-lg shadow-amber-500/30">
-                                <Lightbulb className="w-6 h-6" />
+                        {leadershipData.improvement_suggestions &&
+                          leadershipData.improvement_suggestions.length > 0 && (
+                            <div className="glass-panel border border-white/55 px-6 py-6">
+                              <div className="flex items-center gap-3 mb-4">
+                                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-amber-400 to-yellow-500 text-white flex items-center justify-center shadow-lg shadow-amber-500/30">
+                                  <Lightbulb className="w-6 h-6" />
+                                </div>
+                                <h3 className="text-xl font-semibold text-slate-900">
+                                  Development opportunities
+                                </h3>
                               </div>
-                              <h3 className="text-xl font-semibold text-slate-900">
-                                Development opportunities
-                              </h3>
+                              <ul className="space-y-3">
+                                {leadershipData.improvement_suggestions.map(
+                                  (suggestion, index) => (
+                                    <li
+                                      key={index}
+                                      className="flex items-start gap-3 text-slate-600"
+                                    >
+                                      <span className="text-amber-500 font-semibold">
+                                        •
+                                      </span>
+                                      <span>{suggestion}</span>
+                                    </li>
+                                  )
+                                )}
+                              </ul>
                             </div>
-                            <ul className="space-y-3">
-                              {leadershipData.improvement_suggestions.map((suggestion, index) => (
-                                <li key={index} className="flex items-start gap-3 text-slate-600">
-                                  <span className="text-amber-500 font-semibold">•</span>
-                                  <span>{suggestion}</span>
-                                </li>
-                              ))}
-                            </ul>
-                          </div>
-                        )}
+                          )}
 
                         <div className="glass-panel border border-white/55 px-6 py-6 text-center">
                           <button
