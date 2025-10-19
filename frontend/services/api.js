@@ -155,6 +155,28 @@ export const careerCompassAPI = {
     const response = await api.get('/employee/career-timeline');
     return response.data;
   },
+
+  // Career Roadmap endpoints
+  getCurrentRoadmap: async (employeeId, limit = 50) => {
+    const response = await api.get(`/career-roadmap/current/${employeeId}`, {
+      params: { limit },
+    });
+    return response.data;
+  },
+
+  getPredictedRoadmap: async (employeeId, scenarios = 'steady_growth,aggressive_growth', limit = 40) => {
+    const response = await api.get(`/career-roadmap/predicted/${employeeId}`, {
+      params: { scenarios, limit },
+    });
+    return response.data;
+  },
+
+  getRoadmapComparison: async (employeeId, limit = 40) => {
+    const response = await api.get(`/career-roadmap/comparison/${employeeId}`, {
+      params: { limit },
+    });
+    return response.data;
+  },
 };
 
 // Standalone auth functions for easier import

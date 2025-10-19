@@ -18,6 +18,7 @@ load_dotenv()
 AZURE_API_KEY = os.getenv("AZURE_OPENAI_API_KEY")
 AZURE_ENDPOINT = os.getenv("AZURE_OPENAI_ENDPOINT")
 AZURE_API_VERSION = "2025-01-01-preview"
+AZURE_CHAT_DEPLOYMENT = os.getenv("AZURE_CHAT_DEPLOYMENT", "gpt-5-mini")
 
 # Initialize Azure OpenAI client
 azure_client = None
@@ -28,6 +29,8 @@ if AZURE_API_KEY and AZURE_ENDPOINT:
         api_version=AZURE_API_VERSION,
         default_headers={"Ocp-Apim-Subscription-Key": AZURE_API_KEY}
     )
+    print(f"✅ Azure OpenAI client initialized for career roadmap with deployment: {AZURE_CHAT_DEPLOYMENT}")
+    print(f"   Note: {AZURE_CHAT_DEPLOYMENT} is a reasoning model using max_completion_tokens parameter")
 
 def calculate_current_roadmap(employee: Dict[str, Any], all_roles: List[Dict[str, Any]]) -> Dict[str, Any]:
     """
@@ -126,16 +129,39 @@ def simulate_career_path_with_ai(
     # First, get base simulation
     base_simulation = simulate_career_path(employee, all_roles, scenario_type, years)
     
+    # Check if Azure client is available
+    if not azure_client:
+        print("⚠️ Azure OpenAI client not initialized - using rule-based simulation only")
+        print("   Please check AZURE_OPENAI_API_KEY and AZURE_OPENAI_ENDPOINT environment variables")
+        return base_simulation
+    
     # Prepare employee context for AI
     employee_context = {
         'current_role': employee['employment_info']['job_title'],
         'department': employee['employment_info']['department'],
+        'unit': employee['employment_info'].get('unit', 'N/A'),
         'tenure_years': calculate_tenure(employee['employment_info']['in_role_since']),
         'skills_count': len(employee['skills']),
         'top_skills': [s['skill_name'] for s in employee['skills'][:5]],
+        'all_skills': [s['skill_name'] for s in employee['skills']],
         'competencies': employee.get('competencies', {}),
         'projects_count': len(employee.get('projects', []))
     }
+    
+    # Extract skill taxonomy and functional areas
+    skill_functions = set()
+    skill_areas = set()
+    skill_specializations = set()
+    for skill in employee['skills']:
+        if 'function_area' in skill:
+            skill_functions.add(skill['function_area'])
+        if 'specialization' in skill:
+            skill_specializations.add(skill['specialization'])
+        # Legacy support for older data format
+        if 'function' in skill:
+            skill_functions.add(skill['function'])
+        if 'area' in skill:
+            skill_areas.add(skill['area'])
     
     # Get available next roles
     next_roles = find_next_roles(employee, all_roles, years=5)
@@ -143,104 +169,218 @@ def simulate_career_path_with_ai(
     
     # Prepare prompt for AI
     scenario_descriptions = {
-        'aggressive_growth': 'fast promotions every 1-2 years, targeting leadership roles, high visibility projects',
-        'steady_growth': 'stable progression every 2-3 years, balanced growth, gradual advancement',
-        'lateral_mobility': 'cross-functional moves, diverse experience, exploring different departments',
-        'specialization': 'deep technical expertise, becoming domain expert, principal/architect level'
+        'aggressive_growth': 'fast promotions every 1-2 years, targeting leadership roles within the same functional domain, high visibility projects',
+        'steady_growth': 'stable progression every 2-3 years within current functional area, balanced growth, gradual advancement',
+        'lateral_mobility': 'cross-functional moves within related business areas (e.g., Finance to Commercial, Operations to Engineering), diverse experience',
+        'specialization': 'deep domain expertise, becoming subject matter expert, principal/specialist level within current function'
     }
     
-    prompt = f"""You are a career trajectory analyst. Generate a precise 10-year career roadmap for graphical visualization.
+    # Extract past positions for context
+    past_positions = []
+    if 'employment_history' in employee:
+        past_positions = [pos.get('job_title', '') for pos in employee['employment_history'][:3]]
+    
+    # Extract position history to identify career domain
+    position_history_context = []
+    if 'positions_history' in employee and employee['positions_history']:
+        for pos in employee.get('positions_history', [])[:3]:
+            role_title = pos.get('role_title', pos.get('job_title', ''))
+            if role_title:
+                position_history_context.append(role_title)
+    elif 'employment_history' in employee and employee['employment_history']:
+        for pos in employee.get('employment_history', [])[:3]:
+            role_title = pos.get('role_title', pos.get('job_title', ''))
+            if role_title:
+                position_history_context.append(role_title)
+    
+    # Fallback: use current role if no history available
+    if not position_history_context:
+        position_history_context = [employee_context['current_role']]
+    
+    prompt = f"""You are a professional career trajectory analyst for PSA International, a global port operator and logistics company.
 
-EMPLOYEE PROFILE:
-- Current Role: {employee_context['current_role']}
-- Department: {employee_context['department']}
-- Years in Role: {employee_context['tenure_years']}
-- Core Skills: {', '.join(employee_context['top_skills'][:3])}
-- Projects Delivered: {employee_context['projects_count']}
+CRITICAL INSTRUCTION: You MUST generate a career roadmap that STRICTLY maintains a continuous flow within the employee's CURRENT FUNCTIONAL DOMAIN across ALL 10 years. Domain deviation is ONLY permitted when the employee explicitly demonstrates skills acquired OUTSIDE of their current position history domain (through certifications, projects, or documented cross-functional experience). With this single exception, ALL roles must remain within the established career domain.
 
-AVAILABLE CAREER PATHS: {', '.join(next_role_titles[:3])}
+=== EMPLOYEE PROFILE ===
+Current Role: {employee_context['current_role']}
+Department: {employee_context['department']}
+Business Unit: {employee_context['unit']}
+Years in Current Role: {employee_context['tenure_years']}
+Position History (ALL roles held): {', '.join(position_history_context) if position_history_context else employee_context['current_role'] + ' (first role)'}
 
-SCENARIO: {scenario_descriptions.get(scenario_type, '')}
+=== SKILL TAXONOMY & FUNCTIONAL ALIGNMENT ===
+Primary Function(s): {', '.join(skill_functions) if skill_functions else 'Infer from current role'}
+Skill Specializations: {', '.join(skill_specializations) if skill_specializations else 'Infer from current role'}
+All Skills ({employee_context['skills_count']} total): {', '.join(employee_context['all_skills'][:10])}
+Competencies: {', '.join([c.get('name', c) if isinstance(c, dict) else str(c) for c in employee_context['competencies']]) if isinstance(employee_context['competencies'], list) else str(employee_context['competencies'])}
+Projects Delivered: {employee_context['projects_count']}
 
-INSTRUCTIONS:
-1. Create a 10-year progression showing DIFFERENT milestones each year
-2. Years 1-3: Skill building in current role
-3. Years 4-6: Mid-career advancement (promotions/lateral moves)
-4. Years 7-10: Senior leadership or specialization
-5. Each year MUST have unique role/skills/achievement
-6. Use null for role only if no promotion that year
+=== MANDATORY DOMAIN CONTINUITY CONSTRAINT (STRICT) ===
+ABSOLUTE RULE FOR ALL 10 YEARS:
+1. EVERY predicted role MUST belong to the SAME functional domain as the employee's position history.
+2. Domain deviation is PROHIBITED unless the employee's skills explicitly include competencies acquired OUTSIDE their position history domain AND that evidence is clearly documented in the provided profile.
+3. This constraint applies to Year 1 through Year 10, without exception unless the above documented external-skills condition is met.
+4. Before predicting ANY role in ANY year: verify it maintains domain continuity with position history. If you cannot verify domain continuity from the provided inputs, choose role = null for that year (no promotion).
+5. If suggesting a lateral move, ensure it's to a CLOSELY RELATED area within the same domain (e.g., Treasury → Financial Planning, NOT Treasury → IT).
+6. Only predict roles that directly build upon the employee's EXISTING skill taxonomy derived from their position history.
 
-OUTPUT FORMAT - Return ONLY this JSON structure (no markdown, no code blocks):
+HALLUCINATION PREVENTION (explicit):
+- Do NOT invent responsibilities, certifications, projects, or external experience that are not present in the provided employee data.
+- If the employee profile lacks explicit evidence that would justify a cross-domain shift, you MUST NOT suggest any cross-domain role.
+- If the employee's profile shows partial or ambiguous external skills (e.g., mentions "interest in cloud" but no certification/project), treat this as insufficient evidence for domain deviation and set role = null (or keep within domain).
+- If in doubt, prefer conservative domain-consistent progression (role = null or same-domain senior/ lateral) rather than inventing a cross-domain promotion.
+
+EXCEPTION CLAUSE (applies to ALL years):
+Domain deviation is ONLY permitted when:
+- The employee has documented skills/certifications/projects that were acquired OUTSIDE their position history domain, AND
+- These external skills are substantial enough to justify a domain shift (e.g., a Treasury Analyst with completed AWS certifications and documented software projects may shift to IT; an Operations Supervisor with no external technical skills may NOT).
+- Before applying the exception, enumerate (internally) the exact piece(s) of evidence from the profile that support the shift. If those exact evidentiary items are absent, do not shift domains.
+
+=== CAREER PATH CONSTRAINTS ===
+SCENARIO TYPE: {scenario_descriptions.get(scenario_type, 'balanced career growth')}
+
+Available Next Roles (validated against skills): {', '.join(next_role_titles[:3]) if next_role_titles else 'Progress within current domain'}
+
+PROHIBITED PREDICTIONS (APPLIES TO ALL 10 YEARS):
+- Do NOT suggest roles in Information Technology if the employee has no IT background OR no documented external IT skills.
+- Do NOT suggest roles in Operations if the employee is in Finance (unless external Operations experience exists).
+- Do NOT suggest roles in Engineering if the employee has no technical engineering background OR external engineering credentials.
+- Do NOT suggest cross-domain moves unless there is explicit evidence of skills acquired OUTSIDE position history.
+- CRITICAL: Do NOT default to "Data Governance Lead" or any IT/Technology role in Year 1–Year 10 for employees in niche operational domains (Terminal Ops, Treasury, Yard Ops, Vessel Ops, Port Engineering, Facilities) unless they possess documented external IT/Data skills.
+- For niche domain employees WITHOUT external cross-domain skills: ALL 10 years must progress WITHIN their specialized domain (e.g., Terminal Operations Supervisor → Senior Terminal Operations Supervisor → Terminal Operations Manager → Senior Terminal Operations Manager → Terminal Operations Director).
+
+=== DOMAIN-SPECIFIC CAREER LADDERS ===
+(unchanged — keep these ladders exactly as reference for each domain)
+
+FINANCE DOMAIN:
+- Analyst → Senior Analyst → Lead Analyst → Assistant Manager → Manager → Senior Manager → Director
+- Specialist roles: Treasury Analyst → Senior Treasury Analyst → Treasury Manager → Head of Treasury
+- Cross-functional (within Finance): Treasury → Financial Planning → Corporate Finance
+
+OPERATIONS DOMAIN:
+- Officer → Senior Officer → Assistant Manager → Manager → Senior Manager → Director
+- Specialist: Operations Analyst → Senior Operations Analyst → Operations Manager
+
+TECHNOLOGY DOMAIN:
+- Developer → Senior Developer → Tech Lead → Engineering Manager → Director
+- Specialist: Analyst → Senior Analyst → Principal Analyst → IT Manager
+
+COMMERCIAL DOMAIN:
+- Executive → Senior Executive → Assistant Manager → Manager → Senior Manager
+- Specialist: Commercial Analyst → Senior Analyst → Business Development Manager
+
+ENGINEERING DOMAIN:
+- Engineer → Senior Engineer → Lead Engineer → Principal Engineer → Engineering Manager
+
+=== TASK ===
+Generate a realistic 10-year career roadmap for this employee that STRICTLY maintains continuous domain alignment with their position history across ALL 10 years (unless external skills justify deviation).
+
+VERIFICATION & FALLBACK RULE (must run for each year, and act deterministically):
+Before finalizing the role for each year, perform these checks in order:
+A. Does the role belong to the same functional domain as the employee's position history? If YES, continue.
+B. If NO, does the profile contain explicit documented evidence (certification name + year, project name + description, or prior role) that demonstrates competency OUTSIDE the position history domain? If YES, allow deviation and cite that evidence internally. If NO, set role = null (no promotion) for that year.
+C. Do the employee's documented skills support the role's responsibilities? If not, downgrade to role = null or a same-domain lateral/senior role that is supported.
+D. For any lateral/senior promotion proposed, ensure at least one skill listed in the employee profile maps directly to the new role's core responsibilities.
+E. Do NOT propose a role that relies on an unstated certification or unlisted project. If a role would require such an item, choose role = null.
+
+PROGRESSION GUIDELINES (DOMAIN CONTINUITY MANDATORY):
+- Years 1–3: Consolidate current role, develop specialist skills IN THE SAME DOMAIN as position history (NOT in IT, NOT in Data Governance unless external IT skills exist).
+- Year 2 SPECIFICALLY: If promoting, use a senior version of current role within the SAME DOMAIN (e.g., "Senior Terminal Operations Supervisor") OR set role = null. NEVER switch to "Data Governance Lead" or any IT role unless explicit external IT skills are documented.
+- Years 3–5: First promotion or lateral move WITHIN THE SAME FUNCTIONAL AREA as position history.
+- Years 5–7: Mid-level leadership or senior specialist role IN THE SAME DOMAIN as position history.
+- Years 7–10: Senior leadership (Manager/Director) or Principal level IN THE SAME DOMAIN as position history.
+- Use "role": null for years with no promotion (staying in same position).
+- Skills and achievements must be domain-relevant and directly traceable to the employee's documented skill taxonomy and projects.
+
+SELF-VERIFICATION CHECKLIST (apply before finalizing EVERY year) — the model must ensure all are satisfied:
+✓ Does this role belong to the same functional domain as the employee's position history?
+✓ If this is a domain deviation, does the employee have documented skills acquired OUTSIDE their position history domain?
+✓ Do the employee's skills from their position history support this role?
+✓ Is this a logical progression from their current position within the same domain?
+✓ Are the achievements realistic for this specific department?
+✓ Have I maintained domain continuity from Year 1 through Year 10?
+
+OUTPUT FORMAT (STRICT):
+Return ONLY valid JSON (no markdown, no code blocks, no explanations). The JSON MUST include 10 year entries exactly named "year_1" through "year_10". Each year must follow this structure:
+
 {{
-  "year_1": {{
-    "role": "Senior Software Engineer",
-    "skills": ["Advanced Python", "System Design"],
-    "achievement": "Led migration project reducing costs by 30%"
-  }},
-  "year_2": {{
-    "role": null,
-    "skills": ["Machine Learning", "AWS Architecture"],
-    "achievement": "Implemented ML pipeline processing 1M records/day"
-  }},
-  "year_3": {{
-    "role": "Tech Lead",
-    "skills": ["Team Leadership", "Agile Coaching"],
-    "achievement": "Managed team of 5 engineers delivering 3 major releases"
-  }},
-  "year_4": {{
-    "role": null,
-    "skills": ["Strategic Planning", "Budget Management"],
-    "achievement": "Optimized development process, improving velocity 40%"
-  }},
-  "year_5": {{
-    "role": "Engineering Manager",
-    "skills": ["Cross-team Collaboration", "Hiring"],
-    "achievement": "Grew team from 5 to 15 engineers while maintaining quality"
-  }},
-  "year_6": {{
-    "role": null,
-    "skills": ["Product Strategy", "Stakeholder Management"],
-    "achievement": "Launched 2 new product lines generating $5M revenue"
-  }},
-  "year_7": {{
-    "role": "Senior Engineering Manager",
-    "skills": ["Organizational Design", "Mentorship"],
-    "achievement": "Established engineering practices adopted company-wide"
-  }},
-  "year_8": {{
-    "role": null,
-    "skills": ["Business Acumen", "Change Management"],
-    "achievement": "Led digital transformation initiative across 3 departments"
-  }},
-  "year_9": {{
-    "role": "Director of Engineering",
-    "skills": ["Executive Communication", "Vision Setting"],
-    "achievement": "Defined 3-year technical roadmap aligned with business goals"
-  }},
-  "year_10": {{
-    "role": null,
-    "skills": ["Board Presentations", "Industry Thought Leadership"],
-    "achievement": "Positioned company as innovation leader through conference talks"
+  "year_X": {{
+    "role": (string role title within domain or null),
+    "skills": ["Skill relevant to current domain", "Another domain-specific skill"],
+    "achievement": "Achievement realistic for this department and role level"
   }}
 }}
 
-CRITICAL: Each year must show clear progression and be completely different from others!
+ADDITIONAL ANTI-HALLUCINATION EXAMPLES (do not output these — follow them internally):
+- Bad (hallucination): Year 2 = "Data Governance Lead" for a Terminal Ops Supervisor with no IT skills — REJECT.
+- Good: Year 2 = "Senior Terminal Operations Supervisor" or role = null if insufficient evidence.
+
+EXAMPLES (unchanged; use as formatting and domain-guidance reference):
+
+FINANCE/TREASURY EXAMPLE:
+{{
+  "year_1": {{
+    "role": null,
+    "skills": ["Cash Flow Forecasting", "FX Risk Management"],
+    "achievement": "Automated daily liquidity reporting, reducing manual work by 40%"
+  }},
+  "year_2": {{
+    "role": "Senior Treasury Analyst",
+    "skills": ["Debt Management", "Working Capital Optimization"],
+    "achievement": "Led bank relationship review, securing $5M credit facility at 0.5% lower rate"
+  }},
+  "year_3": {{
+    "role": null,
+    "skills": ["Treasury Policy Development", "Compliance"],
+    "achievement": "Implemented new FX hedging policy reducing currency exposure by 25%"
+  }}
+}}
+
+TERMINAL OPERATIONS EXAMPLE:
+{{
+  "year_1": {{
+    "role": null,
+    "skills": ["Advanced Yard Planning", "Vessel Scheduling Optimization"],
+    "achievement": "Reduced vessel turnaround time by 12% through improved yard allocation strategies"
+  }},
+  "year_2": {{
+    "role": "Senior Terminal Operations Supervisor",
+    "skills": ["Multi-terminal Coordination", "Safety Protocol Management"],
+    "achievement": "Led cross-shift coordination initiative improving berth productivity by 15%"
+  }},
+  "year_3": {{
+    "role": null,
+    "skills": ["Resource Planning", "Operational KPI Management"],
+    "achievement": "Implemented real-time tracking system reducing equipment idle time by 20%"
+  }}
+}}
+
+CRITICAL REMINDER FOR ALL 10 YEARS (ESPECIALLY YEAR 2):
+- If employee's position history is Terminal Operations → ALL years including Year 2 should progress within Terminal Operations domain (e.g., "Senior Terminal Operations Supervisor") or null, NOT "Data Governance Lead" unless external IT skills documented.
+- If employee's position history is Treasury → ALL years including Year 2 should progress within Finance domain (e.g., "Senior Treasury Analyst") or null, NOT "Data Governance Lead" unless external IT skills documented.
+- If employee's position history is Yard Operations → ALL years including Year 2 should progress within Operations domain (e.g., "Senior Yard Operations Officer") or null, NOT "Data Governance Lead" unless external IT skills documented.
+- NEVER predict "Data Governance Lead", "Senior Cloud Architect", or any IT role in ANY of the 10 years unless employee's position history shows IT/Technology background OR they have documented skills acquired outside their position history domain.
+
+NOW GENERATE THE 10-YEAR ROADMAP. Remember: MAINTAIN STRICT DOMAIN CONTINUITY WITH POSITION HISTORY ACROSS ALL 10 YEARS. Domain deviation is ONLY allowed when external skills outside position history domain are documented.
 """
 
     try:
-        # Call Azure OpenAI with JSON mode for structured output
+        print(f"🤖 Calling Azure OpenAI for {scenario_type} career trajectory simulation...")
+        print(f"   Deployment: {AZURE_CHAT_DEPLOYMENT}")
+        print(f"   Employee: {employee_context['current_role']} in {employee_context['department']}")
+        
+        # Call Azure OpenAI - gpt-5-mini is a reasoning model with different parameters
+        # Reasoning models (o1-series) use max_completion_tokens instead of max_tokens
+        # and don't support temperature or response_format parameters
         response = azure_client.chat.completions.create(
-            model="gpt-4o-mini",  # Use the deployment name
+            model=AZURE_CHAT_DEPLOYMENT,
             messages=[
                 {
-                    "role": "system", 
-                    "content": "You are a career trajectory analyst. Always respond with valid JSON only, no markdown or explanations."
-                },
-                {"role": "user", "content": prompt}
+                    "role": "user", 
+                    "content": f"You are a career trajectory analyst. Generate a valid JSON response only (no markdown, no explanations).\n\n{prompt}"
+                }
             ],
-            temperature=0.7,
-            max_tokens=2500,
-            response_format={"type": "json_object"}  # Force JSON output
+            max_completion_tokens=4000  # Reasoning models use max_completion_tokens
         )
         
         ai_response = response.choices[0].message.content.strip()
@@ -323,7 +463,14 @@ CRITICAL: Each year must show clear progression and be completely different from
             print(f"Raw AI response: {ai_response[:500]}")
         
     except Exception as e:
-        print(f"⚠️ AI simulation error: {e}")
+        print(f"⚠️ AI simulation error: {type(e).__name__}: {e}")
+        if hasattr(e, 'response'):
+            print(f"   Error response: {e.response}")
+        if hasattr(e, 'status_code'):
+            print(f"   Status code: {e.status_code}")
+        print(f"   Deployment used: {AZURE_CHAT_DEPLOYMENT}")
+        print(f"   Endpoint: {AZURE_ENDPOINT}")
+        print("   Falling back to rule-based simulation...")
         # Fallback to base simulation
     
     return base_simulation

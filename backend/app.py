@@ -926,11 +926,18 @@ def get_predicted_career_roadmap(employee_id):
             scenarios = ["steady_growth", "aggressive_growth"]
         
         # Calculate predicted roadmap with simulations
+        print(f"📊 Generating predicted roadmap for {employee.name} ({employee_id})")
+        print(f"   Scenarios: {scenarios}")
+        print(f"   Years: {years_param}")
+        print(f"   Roles to analyze: {len(roles_dict)}")
+        
         predictions = calculate_predicted_roadmap_with_simulations(
             employee.to_dict(),
             roles_dict,
             scenarios=scenarios
         )
+        
+        print(f"✅ Predicted roadmap generated successfully with {len(predictions.get('scenarios', {}))} scenarios")
         
         return jsonify({
             'success': True,
@@ -943,6 +950,9 @@ def get_predicted_career_roadmap(employee_id):
         }), 200
     
     except Exception as e:
+        print(f"❌ Error generating predicted roadmap for {employee_id}: {type(e).__name__}: {e}")
+        import traceback
+        traceback.print_exc()
         return jsonify({
             'success': False,
             'error': str(e)
