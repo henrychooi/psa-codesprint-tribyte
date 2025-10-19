@@ -87,6 +87,7 @@ def authenticate_user(username: str, password: str) -> dict:
         user = DEMO_USERS[username_lower]
         if user["password"] == password:
             # Return user data without password
+            home_route = "/employee-home" if user["role"] == "employee" else "/"
             return {
                 "username": username_lower,
                 "role": user["role"],
@@ -94,7 +95,8 @@ def authenticate_user(username: str, password: str) -> dict:
                 "employee_id": user["employee_id"],
                 "email": user["email"],
                 "job_title": user.get("job_title"),
-                "department": user.get("department")
+                "department": user.get("department"),
+                "home_route": home_route
             }
     
     return None
@@ -106,6 +108,7 @@ def get_all_users(include_passwords: bool = False) -> list:
     """
     users = []
     for username, user in DEMO_USERS.items():
+        home_route = "/employee-home" if user["role"] == "employee" else "/"
         user_data = {
             "username": username,
             "role": user["role"],
@@ -113,7 +116,8 @@ def get_all_users(include_passwords: bool = False) -> list:
             "employee_id": user["employee_id"],
             "email": user["email"],
             "job_title": user.get("job_title"),
-            "department": user.get("department")
+            "department": user.get("department"),
+            "home_route": home_route
         }
         if include_passwords:
             user_data["password"] = user["password"]
@@ -191,6 +195,7 @@ def get_user_data(username: str) -> dict:
     
     if username in DEMO_USERS:
         user = DEMO_USERS[username]
+        home_route = "/employee-home" if user["role"] == "employee" else "/"
         return {
             "username": username,
             "role": user["role"],
@@ -198,7 +203,8 @@ def get_user_data(username: str) -> dict:
             "employee_id": user["employee_id"],
             "email": user["email"],
             "job_title": user.get("job_title"),
-            "department": user.get("department")
+            "department": user.get("department"),
+            "home_route": home_route
         }
     
     return None

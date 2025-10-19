@@ -108,8 +108,10 @@ export default function SettingsPage() {
   };
 
   const handleBack = () => {
-    if (currentUser?.role === "employee") {
-      router.push("/copilot");
+    if (currentUser?.home_route) {
+      router.push(currentUser.home_route);
+    } else if (currentUser?.role === "employee") {
+      router.push("/employee-home");
     } else {
       router.push("/");
     }
