@@ -56,7 +56,7 @@ const EmployeeProfile = ({ employee }) => {
             Key Skills
           </h3>
           <div className="flex flex-wrap gap-2">
-            {skills && skills.slice(0, 6).map((skill, idx) => (
+            {skills && skills.map((skill, idx) => (
               <span
                 key={idx}
                 className="glass-chip px-2.5 py-1 text-xs font-medium text-indigo-600"
@@ -64,11 +64,6 @@ const EmployeeProfile = ({ employee }) => {
                 {skill.skill_name}
               </span>
             ))}
-            {skills && skills.length > 6 && (
-              <span className="glass-chip px-2.5 py-1 text-xs font-medium text-slate-500">
-                +{skills.length - 6} more
-              </span>
-            )}
           </div>
         </div>
 
