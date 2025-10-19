@@ -8,6 +8,8 @@ Career Roadmap Generation and Simulation Engine
 from datetime import datetime, timedelta
 from typing import Dict, List, Any, Tuple, Optional, Set
 from collections import Counter
+import time
+import copy
 import json
 import random
 import os
@@ -35,6 +37,8 @@ if AZURE_API_KEY and AZURE_ENDPOINT:
 
 
 NO_DOMAIN_PROGRESSION_MESSAGE = "No suitable progression within domain—requires reskilling evidence."
+PREDICTIONS_CACHE: Dict[str, Dict[str, Any]] = {}
+CACHE_TTL_SECONDS = int(os.getenv("CAREER_ROADMAP_CACHE_TTL", "600"))
 
 _RAW_DOMAIN_ALIASES = {
     'information technology': 'information technology',
@@ -175,6 +179,156 @@ def role_domain_allowed(role: Dict[str, Any], domain_profile: Dict[str, Any], al
     role_domain = derive_role_domain(role)
     return bool(role_domain and role_domain in allowed_domains)
 
+
+def build_roles_signature(all_roles: List[Dict[str, Any]]) -> str:
+    """Produce a stable signature for the supplied role catalogue."""
+    signature_parts = []
+    for role in all_roles:
+        role_id = str(role.get('role_id') or role.get('title') or '').strip()
+        marker = str(role.get('updated_at') or role.get('min_experience_years') or '').strip()
+        signature_parts.append(f"{role_id}::{marker}")
+    signature_parts.sort()
+    signature_parts.append(str(len(all_roles)))
+    return '|'.join(signature_parts)
+
+
+def build_prediction_cache_key(
+    employee_id: str,
+    scenarios: Tuple[str, ...],
+    roles_signature: str,
+    use_ai: bool
+) -> str:
+    """Create a cache key that captures the employee, scenarios, roles set, and AI usage."""
+    scenario_part = '|'.join(scenarios)
+    return f"{employee_id}::{scenario_part}::{roles_signature}::ai={int(use_ai)}"
+
+
+def evaluate_path_metrics(
+    employee: Dict[str, Any],
+    path: Dict[str, Any],
+    domain_profile: Optional[Dict[str, Any]] = None
+) -> Dict[str, Any]:
+    """
+    Derive scenario-agnostic metrics from a simulated career path to support probability scoring.
+    """
+    domain_profile = domain_profile or extract_domain_profile(employee)
+    milestones = path.get('milestones', [])
+    total_years = len(milestones)
+    
+    if total_years == 0:
+        return {
+            'total_years': 0,
+            'valid_years': 0,
+            'blocked_years': 0,
+            'progression_ratio': 0.0,
+            'blocked_ratio': 1.0,
+            'domain_consistency': 0.0,
+            'skill_alignment': 0.0,
+            'max_level_gain': 0,
+            'forward_moves': 0,
+            'lateral_moves': 0,
+            'downward_moves': 0,
+            'distinct_roles': 0,
+            'domain_profile': domain_profile
+        }
+    
+    employee_skills = set(skill.get('skill_name', '') for skill in employee.get('skills', []))
+    employment = employee.get('employment_info', {})
+    default_department = employment.get('department')
+    current_role = employment.get('job_title', '')
+    baseline_level = get_role_level(current_role)
+    previous_level = baseline_level
+    
+    valid_years = 0
+    blocked_years = 0
+    domain_matches = 0
+    cumulative_skill_alignment = 0.0
+    max_level_gain = 0
+    forward_moves = 0
+    lateral_moves = 0
+    downward_moves = 0
+    distinct_roles: Set[str] = set()
+    
+    for milestone in milestones:
+        role_title = milestone.get('role')
+        if not role_title:
+            blocked_years += 1
+            continue
+        
+        if isinstance(role_title, str):
+            sanitized_role = role_title.strip()
+            if not sanitized_role or sanitized_role.lower() in {'none', 'null'}:
+                blocked_years += 1
+                continue
+            if sanitized_role == NO_DOMAIN_PROGRESSION_MESSAGE:
+                blocked_years += 1
+                continue
+        else:
+            blocked_years += 1
+            continue
+        
+        valid_years += 1
+        distinct_roles.add(role_title)
+        
+        candidate_role = {
+            'title': role_title,
+            'department': milestone.get('department') or default_department
+        }
+        if role_domain_allowed(
+            candidate_role,
+            domain_profile,
+            allow_external=domain_profile.get('has_external_evidence', False)
+        ):
+            domain_matches += 1
+        
+        milestone_skills = milestone.get('skills_acquired') or milestone.get('skills') or []
+        if isinstance(milestone_skills, list) and milestone_skills:
+            unique_skills = {str(skill).strip() for skill in milestone_skills if str(skill).strip()}
+            if unique_skills:
+                aligned_skills = {skill for skill in unique_skills if skill in employee_skills}
+                cumulative_skill_alignment += len(aligned_skills) / len(unique_skills)
+            else:
+                cumulative_skill_alignment += 0.5
+        else:
+            cumulative_skill_alignment += 0.5
+        
+        level = get_role_level(role_title)
+        level_gain = max(0, level - baseline_level)
+        max_level_gain = max(max_level_gain, level_gain)
+        
+        if level > previous_level:
+            forward_moves += 1
+        elif level == previous_level and role_title != current_role:
+            lateral_moves += 1
+        elif level < previous_level:
+            downward_moves += 1
+        
+        previous_level = level
+        current_role = role_title
+    
+    progression_ratio = valid_years / total_years
+    blocked_ratio = blocked_years / total_years
+    domain_consistency = (domain_matches / valid_years) if valid_years else 0.0
+    skill_alignment = (
+        cumulative_skill_alignment / valid_years if valid_years else 0.0
+    )
+    
+    return {
+        'total_years': total_years,
+        'valid_years': valid_years,
+        'blocked_years': blocked_years,
+        'progression_ratio': progression_ratio,
+        'blocked_ratio': blocked_ratio,
+        'domain_consistency': domain_consistency,
+        'skill_alignment': min(skill_alignment, 1.0),
+        'max_level_gain': max_level_gain,
+        'forward_moves': forward_moves,
+        'lateral_moves': lateral_moves,
+        'downward_moves': downward_moves,
+        'distinct_roles': len(distinct_roles),
+        'domain_profile': domain_profile
+    }
+
 def calculate_current_roadmap(employee: Dict[str, Any], all_roles: List[Dict[str, Any]]) -> Dict[str, Any]:
     """
     Calculate current career roadmap based on:
@@ -237,6 +391,30 @@ def calculate_predicted_roadmap_with_simulations(
     
     if scenarios is None:
         scenarios = ["steady_growth", "aggressive_growth", "lateral_mobility", "specialization"]
+    else:
+        scenarios = [s for s in scenarios if s]
+        if not scenarios:
+            scenarios = ["steady_growth", "aggressive_growth", "lateral_mobility", "specialization"]
+
+    scenario_order = tuple(dict.fromkeys(scenarios))  # Preserve order, remove duplicates
+    roles_signature = build_roles_signature(all_roles)
+    use_ai = bool(azure_client)
+    cache_key = build_prediction_cache_key(
+        employee.get('employee_id', ''),
+        scenario_order,
+        roles_signature,
+        use_ai
+    )
+
+    cache_entry = PREDICTIONS_CACHE.get(cache_key)
+    if cache_entry:
+        age = time.time() - cache_entry['timestamp']
+        if age <= CACHE_TTL_SECONDS:
+            cached_copy = copy.deepcopy(cache_entry['predictions'])
+            cached_copy['analysis_date'] = datetime.now().isoformat()
+            return cached_copy
+        else:
+            PREDICTIONS_CACHE.pop(cache_key, None)
     
     predictions = {
         'employee_id': employee['employee_id'],
@@ -246,7 +424,7 @@ def calculate_predicted_roadmap_with_simulations(
     
     # Use AI to generate enhanced predictions if available
     if azure_client:
-        for scenario in scenarios:
+        for scenario in scenario_order:
             predictions['scenarios'][scenario] = simulate_career_path_with_ai(
                 employee, 
                 all_roles, 
@@ -254,7 +432,7 @@ def calculate_predicted_roadmap_with_simulations(
             )
     else:
         # Fallback to rule-based simulation
-        for scenario in scenarios:
+        for scenario in scenario_order:
             predictions['scenarios'][scenario] = simulate_career_path(
                 employee, 
                 all_roles, 
@@ -265,6 +443,11 @@ def calculate_predicted_roadmap_with_simulations(
     predictions['optimal_path'] = determine_optimal_path(predictions['scenarios'])
     predictions['risk_factors'] = identify_risks(employee, predictions)
     predictions['retention_factors'] = identify_retention_factors(employee)
+
+    PREDICTIONS_CACHE[cache_key] = {
+        'timestamp': time.time(),
+        'predictions': copy.deepcopy(predictions)
+    }
     
     return predictions
 
@@ -1132,26 +1315,59 @@ def generate_competency_growth(scenario_type: str, year: int) -> List[Dict[str, 
 
 
 def calculate_success_probability(employee: Dict[str, Any], scenario_type: str, path: Dict[str, Any]) -> float:
-    """Calculate probability of success in this career path"""
-    score = 0.5  # Start at 50%
+    """
+    Estimate the probability that the employee can successfully realise the simulated scenario.
+    Combines baseline readiness, domain continuity, progression cadence, and scenario-specific fit.
+    """
+    metrics = evaluate_path_metrics(employee, path)
+    total_years = metrics['total_years'] or 1
+    progression_ratio = metrics['progression_ratio']
+    blocked_ratio = metrics['blocked_ratio']
+    domain_consistency = metrics['domain_consistency']
+    skill_alignment = metrics['skill_alignment']
+    forward_moves = metrics['forward_moves']
+    lateral_moves = metrics['lateral_moves']
+    max_level_gain = metrics['max_level_gain']
+    valid_years = metrics['valid_years'] or 1
     
-    # Increase probability if employee has relevant skills
-    current_skills = set(skill['skill_name'] for skill in employee['skills'])
-    if len(current_skills) >= 8:
-        score += 0.15
-    
-    # Increase for tenure (stability)
+    employee_skills = set(skill.get('skill_name', '') for skill in employee.get('skills', []))
     tenure = calculate_tenure(employee['employment_info']['in_role_since'])
-    if tenure >= 1:
-        score += 0.1
     
-    # Scenario fit
-    if scenario_type == "specialization" and tenure >= 2:
-        score += 0.1
-    elif scenario_type == "aggressive_growth" and tenure >= 3:
-        score += 0.05  # Already well-established
+    score = 0.2  # baseline confidence
     
-    return min(score, 0.95)  # Cap at 95%
+    # Employee readiness
+    skill_depth = min(len(employee_skills) / 12.0, 1.0)
+    score += 0.1 * skill_depth
+    score += 0.05 * min(tenure / 5.0, 1.0)
+    
+    # Path quality
+    score += 0.25 * domain_consistency
+    score += 0.2 * progression_ratio
+    score += 0.15 * skill_alignment
+    score += 0.05 * min(max_level_gain / 3.0, 1.0)
+    score -= 0.15 * blocked_ratio
+    
+    # Scenario-specific alignment
+    if scenario_type == "aggressive_growth":
+        promotion_intensity = min(forward_moves / valid_years, 1.0)
+        score += 0.15 * promotion_intensity
+        score += 0.05 * min(max_level_gain / 3.0, 1.0)
+    elif scenario_type == "steady_growth":
+        steady_progress = 0.6 * progression_ratio + 0.4 * min(max_level_gain / 2.0, 1.0)
+        score += 0.12 * steady_progress
+    elif scenario_type == "lateral_mobility":
+        lateral_ratio = min(lateral_moves / valid_years, 1.0)
+        score += 0.15 * lateral_ratio
+        score += 0.05 * (1 - min(forward_moves / valid_years, 1.0))
+    elif scenario_type == "specialization":
+        lateral_ratio = min(lateral_moves / valid_years, 1.0)
+        score += 0.15 * skill_alignment
+        score += 0.05 * (1 - lateral_ratio)
+    
+    # Penalties for inconsistent progress
+    score -= 0.05 * min(metrics['downward_moves'] / valid_years, 1.0)
+    
+    return max(0.05, min(score, 0.95))
 
 
 def determine_optimal_path(scenarios: Dict[str, Dict[str, Any]]) -> str:
