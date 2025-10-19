@@ -180,7 +180,7 @@ export default function EmployeeCareerTimeline({ employeeData, timeline }) {
       </div>
 
       {/* Summary Stats */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-4">
         <div className="glass-panel p-5 border border-white/40 text-center">
           <p className="text-sm text-slate-600 mb-1">Total Positions</p>
           <p className="text-3xl font-bold text-indigo-600">{timeline.length}</p>
@@ -198,6 +198,24 @@ export default function EmployeeCareerTimeline({ employeeData, timeline }) {
               employeeData.years_of_service.toFixed(1) : 
               "0.0"}
           </p>
+        </div>
+        <div className="glass-panel p-5 border border-white/40 text-center">
+          <p className="text-sm text-slate-600 mb-1">Tenure Percentile</p>
+          <p className="text-3xl font-bold text-emerald-600">
+            {employeeData?.tenure_percentile !== undefined ? 
+              `${employeeData.tenure_percentile}%` : 
+              "N/A"}
+          </p>
+          <p className="text-xs text-slate-500 mt-1">vs all employees</p>
+        </div>
+        <div className="glass-panel p-5 border border-white/40 text-center">
+          <p className="text-sm text-slate-600 mb-1">Promotion Speed</p>
+          <p className="text-3xl font-bold text-cyan-600">
+            {employeeData?.promotion_speed_percentile !== undefined ? 
+              `${employeeData.promotion_speed_percentile}%` : 
+              "N/A"}
+          </p>
+          <p className="text-xs text-slate-500 mt-1">faster than peers</p>
         </div>
       </div>
     </div>

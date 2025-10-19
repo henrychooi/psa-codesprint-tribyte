@@ -1019,6 +1019,138 @@ def compare_career_scenarios(employee_id):
         session.close()
 
 
+def calculate_years_at_psa(positions_history):
+    """
+    Calculate total years at PSA by summing all position durations
+    Returns: float (years)
+    """
+    from datetime import datetime
+    
+    if not positions_history:
+        return 0.0
+    
+    total_years = 0.0
+    for position in positions_history:
+        period = position.get('period', {})
+        start_date_str = period.get('start')
+        end_date_str = period.get('end')
+        
+        if not start_date_str:
+            continue
+        
+        try:
+            start_date = datetime.strptime(start_date_str, '%Y-%m-%d')
+            
+            # Use current date if end_date is None/null/empty (ongoing position)
+            if end_date_str:
+                try:
+                    end_date = datetime.strptime(end_date_str, '%Y-%m-%d')
+                except:
+                    continue
+            else:
+                end_date = datetime.now()
+            
+            # Calculate duration in years
+            duration_days = (end_date - start_date).days
+            duration_years = duration_days / 365.25
+            
+            if duration_years >= 0:
+                total_years += duration_years
+                
+        except Exception as e:
+            continue
+    
+    return total_years
+
+
+def count_non_trainee_positions(positions_history):
+    """
+    Count positions excluding trainee roles
+    Returns: int (number of positions)
+    """
+    if not positions_history:
+        return 0
+    
+    count = 0
+    trainee_keywords = ['trainee', 'intern', 'apprentice']
+    
+    for position in positions_history:
+        role_title = position.get('role_title', '').lower()
+        
+        # Check if this is a trainee role
+        is_trainee = any(keyword in role_title for keyword in trainee_keywords)
+        
+        if not is_trainee:
+            count += 1
+    
+    return count
+
+
+def calculate_all_employee_metrics(session):
+    """
+    Calculate years_at_psa and promotion_speed for all employees
+    Returns: dict with employee_id as key and metrics as values
+    """
+    all_employees = session.query(Employee).all()
+    metrics = {}
+    
+    for employee in all_employees:
+        years_at_psa = calculate_years_at_psa(employee.positions_history or [])
+        non_trainee_positions = count_non_trainee_positions(employee.positions_history or [])
+        
+        # Calculate promotion speed (years per position)
+        # Higher ratio = slower promotion speed
+        # We'll invert this for percentile (so lower ratio = higher percentile)
+        if non_trainee_positions > 0:
+            promotion_speed_ratio = years_at_psa / non_trainee_positions
+        else:
+            promotion_speed_ratio = float('inf')  # No positions = worst score
+        
+        metrics[employee.employee_id] = {
+            'years_at_psa': years_at_psa,
+            'non_trainee_positions': non_trainee_positions,
+            'promotion_speed_ratio': promotion_speed_ratio
+        }
+    
+    return metrics
+
+
+def calculate_percentile(value, all_values, lower_is_better=False):
+    """
+    Calculate percentile rank for a value among all values
+    Returns: float (0-100) representing percentile
+    
+    Args:
+        value: The value to rank
+        all_values: List of all values to compare against
+        lower_is_better: If True, lower values get higher percentiles (for promotion speed)
+    """
+    if not all_values:
+        return 50.0
+    
+    # Filter out invalid values
+    valid_values = [v for v in all_values if v != float('inf') and v is not None]
+    
+    if not valid_values:
+        return 50.0
+    
+    if value == float('inf'):
+        return 0.0 if lower_is_better else 100.0
+    
+    # Count how many values are less than current value
+    if lower_is_better:
+        # For promotion speed: lower ratio = faster promotion = better
+        count_worse = sum(1 for v in valid_values if v > value)
+    else:
+        # For tenure: higher years = better
+        count_worse = sum(1 for v in valid_values if v < value)
+    
+    # Calculate percentile (what percentage of others are worse)
+    percentile = (count_worse / len(valid_values)) * 100
+    
+    return round(percentile, 1)
+
+
 @app.route('/api/employee/career-timeline', methods=['GET'])
 @require_employee
 def get_employee_career_timeline():
@@ -1122,6 +1254,27 @@ def get_employee_career_timeline():
                 print(f"Warning: Could not parse dates for position {position.get('role_title', 'Unknown')}: {e}")
                 continue
         
+        # Calculate percentile rankings for this employee
+        all_employee_metrics = calculate_all_employee_metrics(session)
+        current_employee_metrics = all_employee_metrics.get(employee.employee_id, {})
+        
+        # Extract all values for percentile calculation
+        all_years_at_psa = [m['years_at_psa'] for m in all_employee_metrics.values()]
+        all_promotion_speed_ratios = [m['promotion_speed_ratio'] for m in all_employee_metrics.values()]
+        
+        # Calculate percentiles
+        tenure_percentile = calculate_percentile(
+            current_employee_metrics.get('years_at_psa', total_years),
+            all_years_at_psa,
+            lower_is_better=False  # Higher tenure = better
+        )
+        
+        promotion_speed_percentile = calculate_percentile(
+            current_employee_metrics.get('promotion_speed_ratio', float('inf')),
+            all_promotion_speed_ratios,
+            lower_is_better=True  # Lower ratio (faster promotion) = better
+        )
+        
         return jsonify({
             'success': True,
             'employee': {
@@ -1131,7 +1284,10 @@ def get_employee_career_timeline():
                 'current_role': employee.job_title,
                 'department': employee.department,
                 'hire_date': employee.hire_date,
-                'years_of_service': round(total_years, 2)
+                'years_of_service': round(total_years, 2),
+                'tenure_percentile': tenure_percentile,
+                'promotion_speed_percentile': promotion_speed_percentile,
+                'non_trainee_positions': current_employee_metrics.get('non_trainee_positions', 0)
             },
             'timeline': sorted_timeline,
             'timeline_count': len(sorted_timeline)
