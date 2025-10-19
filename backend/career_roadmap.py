@@ -6,7 +6,8 @@ Career Roadmap Generation and Simulation Engine
 """
 
 from datetime import datetime, timedelta
-from typing import Dict, List, Any, Tuple
+from typing import Dict, List, Any, Tuple, Optional, Set
+from collections import Counter
 import json
 import random
 import os
@@ -32,6 +33,148 @@ if AZURE_API_KEY and AZURE_ENDPOINT:
     print(f"✅ Azure OpenAI client initialized for career roadmap with deployment: {AZURE_CHAT_DEPLOYMENT}")
     print(f"   Note: {AZURE_CHAT_DEPLOYMENT} is a reasoning model using max_completion_tokens parameter")
 
+
+NO_DOMAIN_PROGRESSION_MESSAGE = "No suitable progression within domain—requires reskilling evidence."
+
+_RAW_DOMAIN_ALIASES = {
+    'information technology': 'information technology',
+    'info tech': 'information technology',
+    'it': 'information technology',
+    'operations': 'operations',
+    'terminal operations': 'operations',
+    'port operations': 'operations',
+    'finance': 'finance',
+    'treasury': 'finance',
+    'legal & compliance': 'legal',
+    'legal and corporate secretariat': 'legal',
+    'legal': 'legal',
+    'risk & compliance': 'risk & compliance',
+    'risk and compliance': 'risk & compliance',
+    'communications & marketing': 'communications & marketing',
+    'communications and marketing': 'communications & marketing',
+    'communications': 'communications & marketing',
+    'marketing': 'communications & marketing',
+    'commercial': 'commercial',
+    'procurement': 'procurement',
+    'supply chain and logistics': 'supply chain and logistics',
+    'supply chain': 'supply chain and logistics',
+    'logistics': 'supply chain and logistics',
+    'human resource': 'human resources',
+    'human resources': 'human resources',
+    'people and culture': 'human resources',
+    'corporate affairs': 'corporate affairs',
+    'automation and robotics': 'automation and robotics',
+    'data & ai': 'data & ai',
+    'data and ai': 'data & ai',
+    'data science': 'data & ai',
+    'data engineering': 'data & ai',
+    'ui/ux design & development': 'design & experience',
+    'customer experience management': 'design & experience',
+    'design': 'design & experience',
+    'sustainability': 'sustainability',
+    'health, safety & security': 'health, safety & security',
+    'health safety security': 'health, safety & security',
+    'health safety and security': 'health, safety & security',
+    'safety': 'health, safety & security'
+}
+
+
+def _sanitize_domain_label(value: Optional[str]) -> str:
+    """Normalize raw labels (department, function areas) for comparison."""
+    if not value:
+        return ''
+    label = value.strip()
+    if ':' in label:
+        label = label.split(':', 1)[0]
+    label = label.lower()
+    label = label.replace('/', ' ')
+    label = label.replace('&', ' and ')
+    label = label.replace('-', ' ')
+    label = ''.join(ch for ch in label if ch.isalnum() or ch.isspace())
+    return ' '.join(label.split())
+
+
+DOMAIN_ALIAS_MAP = {
+    _sanitize_domain_label(key): _sanitize_domain_label(value)
+    for key, value in _RAW_DOMAIN_ALIASES.items()
+    if _sanitize_domain_label(key) and _sanitize_domain_label(value)
+}
+
+
+def normalize_domain_label(value: Optional[str]) -> str:
+    """Return a canonical domain label for consistent comparisons."""
+    sanitized = _sanitize_domain_label(value)
+    if not sanitized:
+        return ''
+    if sanitized in DOMAIN_ALIAS_MAP:
+        return DOMAIN_ALIAS_MAP[sanitized]
+    for alias_key, canonical in DOMAIN_ALIAS_MAP.items():
+        if alias_key and alias_key in sanitized:
+            return canonical
+    return sanitized
+
+
+def extract_domain_profile(employee: Dict[str, Any]) -> Dict[str, Any]:
+    """
+    Derive the employee's functional domain footprint from roles, skills, and employment data.
+    Returns primary/internal domains plus evidence-backed external domains.
+    """
+    employment = employee.get('employment_info', {})
+    skill_domains: Counter = Counter()
+    domain_skill_evidence: Dict[str, List[str]] = {}
+
+    for skill in employee.get('skills', []):
+        domain_label = normalize_domain_label(skill.get('function_area'))
+        if not domain_label:
+            continue
+        skill_domains[domain_label] += 1
+        domain_skill_evidence.setdefault(domain_label, []).append(skill.get('skill_name') or '')
+
+    dept_domain = normalize_domain_label(employment.get('department'))
+    unit_domain = normalize_domain_label(employment.get('unit'))
+
+    primary_domain = ''
+    if skill_domains:
+        primary_domain = skill_domains.most_common(1)[0][0]
+    if not primary_domain:
+        primary_domain = dept_domain or unit_domain
+
+    primary_domains: Set[str] = {d for d in (primary_domain, dept_domain, unit_domain) if d}
+
+    external_domains: Set[str] = set()
+    for domain, count in skill_domains.items():
+        if domain != primary_domain and count >= 2:
+            external_domains.add(domain)
+
+    return {
+        'primary_domain': primary_domain,
+        'primary_domains': primary_domains,
+        'external_domains': external_domains,
+        'skill_domain_counts': skill_domains,
+        'domain_skill_evidence': {k: v for k, v in domain_skill_evidence.items() if v},
+        'has_external_evidence': bool(external_domains)
+    }
+
+
+def derive_role_domain(role: Dict[str, Any]) -> str:
+    """Infer the functional domain for a prospective role."""
+    for key in ('department', 'function_area', 'unit', 'domain'):
+        domain = normalize_domain_label(role.get(key))
+        if domain:
+            return domain
+    return normalize_domain_label(role.get('title'))
+
+
+def role_domain_allowed(role: Dict[str, Any], domain_profile: Dict[str, Any], allow_external: bool = False) -> bool:
+    """Check whether a role stays within the employee's permitted domain scope."""
+    if not domain_profile:
+        return True
+    allowed_domains = set(domain_profile.get('primary_domains', set()))
+    if allow_external:
+        allowed_domains.update(domain_profile.get('external_domains', set()))
+    role_domain = derive_role_domain(role)
+    return bool(role_domain and role_domain in allowed_domains)
+
 def calculate_current_roadmap(employee: Dict[str, Any], all_roles: List[Dict[str, Any]]) -> Dict[str, Any]:
     """
     Calculate current career roadmap based on:
@@ -42,6 +185,8 @@ def calculate_current_roadmap(employee: Dict[str, Any], all_roles: List[Dict[str
     
     Returns roadmap for next 2-3 years based on current trajectory
     """
+    domain_profile = extract_domain_profile(employee)
+
     current_roadmap = {
         'current_position': {
             'title': employee['employment_info']['job_title'],
@@ -52,8 +197,17 @@ def calculate_current_roadmap(employee: Dict[str, Any], all_roles: List[Dict[str
             'current_skills': count_skills(employee['skills']),
             'current_competencies': employee['competencies']
         },
-        'next_logical_roles': find_next_roles(employee, all_roles, years=2),
-        'skills_to_develop': identify_skills_gaps(employee, all_roles),
+        'next_logical_roles': find_next_roles(
+            employee,
+            all_roles,
+            years=2,
+            domain_profile=domain_profile
+        ),
+        'skills_to_develop': identify_skills_gaps(
+            employee,
+            all_roles,
+            domain_profile=domain_profile
+        ),
         'timeline': {
             'current': datetime.now().isoformat(),
             'next_milestone': (datetime.now() + timedelta(days=365)).isoformat(),
@@ -135,6 +289,22 @@ def simulate_career_path_with_ai(
         print("   Please check AZURE_OPENAI_API_KEY and AZURE_OPENAI_ENDPOINT environment variables")
         return base_simulation
     
+    domain_profile = extract_domain_profile(employee)
+
+    primary_domains_display = (
+        ', '.join(domain.title() for domain in sorted(domain_profile.get('primary_domains', [])))
+        or 'Unknown'
+    )
+    external_domain_evidence = domain_profile.get('domain_skill_evidence', {})
+    external_domains_detail = []
+    for domain in sorted(domain_profile.get('external_domains', [])):
+        skills = [skill for skill in external_domain_evidence.get(domain, []) if skill]
+        if skills:
+            external_domains_detail.append(f"{domain.title()} (skills: {', '.join(skills[:3])})")
+        else:
+            external_domains_detail.append(domain.title())
+    external_domains_display = ', '.join(external_domains_detail) if external_domains_detail else 'None documented'
+
     # Prepare employee context for AI
     employee_context = {
         'current_role': employee['employment_info']['job_title'],
@@ -145,7 +315,11 @@ def simulate_career_path_with_ai(
         'top_skills': [s['skill_name'] for s in employee['skills'][:5]],
         'all_skills': [s['skill_name'] for s in employee['skills']],
         'competencies': employee.get('competencies', {}),
-        'projects_count': len(employee.get('projects', []))
+        'projects_count': len(employee.get('projects', [])),
+        'primary_domains': sorted(domain_profile.get('primary_domains', [])),
+        'external_domains': sorted(domain_profile.get('external_domains', [])),
+        'primary_domains_display': primary_domains_display,
+        'external_domains_display': external_domains_display
     }
     
     # Extract skill taxonomy and functional areas
@@ -164,7 +338,13 @@ def simulate_career_path_with_ai(
             skill_areas.add(skill['area'])
     
     # Get available next roles
-    next_roles = find_next_roles(employee, all_roles, years=5)
+    next_roles = find_next_roles(
+        employee,
+        all_roles,
+        years=5,
+        domain_profile=domain_profile,
+        allow_external=domain_profile.get('has_external_evidence', False)
+    )
     next_role_titles = [role['title'] for role in next_roles[:5]]
     
     # Prepare prompt for AI
@@ -211,6 +391,8 @@ Position History (ALL roles held): {', '.join(position_history_context) if posit
 === SKILL TAXONOMY & FUNCTIONAL ALIGNMENT ===
 Primary Function(s): {', '.join(skill_functions) if skill_functions else 'Infer from current role'}
 Skill Specializations: {', '.join(skill_specializations) if skill_specializations else 'Infer from current role'}
+Primary Domain Constraint: {employee_context['primary_domains_display']}
+Documented External Domain Evidence: {employee_context['external_domains_display']}
 All Skills ({employee_context['skills_count']} total): {', '.join(employee_context['all_skills'][:10])}
 Competencies: {', '.join([c.get('name', c) if isinstance(c, dict) else str(c) for c in employee_context['competencies']]) if isinstance(employee_context['competencies'], list) else str(employee_context['competencies'])}
 Projects Delivered: {employee_context['projects_count']}
@@ -499,9 +681,11 @@ def simulate_career_path(
         'success_probability': 0.0
     }
     
+    domain_profile = extract_domain_profile(employee)
     current_role = employee['employment_info']['job_title']
     current_skills = set(skill['skill_name'] for skill in employee['skills'])
     tenure = calculate_tenure(employee['employment_info']['in_role_since'])
+    no_progression_message = NO_DOMAIN_PROGRESSION_MESSAGE
     
     for year in range(1, years + 1):
         milestone = {
@@ -513,12 +697,18 @@ def simulate_career_path(
             'department': None,
             'level': None
         }
+        attempted_progression = False
         
         if scenario_type == "aggressive_growth":
             # Promotion every 1.5-2 years
             if year % 2 == 0 or (year % 2 == 1 and year > 3):
+                attempted_progression = True
                 next_role = find_promotion_role(
-                    employee, all_roles, current_role, years_experienced=tenure + year
+                    employee,
+                    all_roles,
+                    current_role,
+                    years_experienced=tenure + year,
+                    domain_profile=domain_profile
                 )
                 if next_role:
                     milestone['role'] = next_role['title']
@@ -526,12 +716,20 @@ def simulate_career_path(
                     milestone['level'] = get_role_level(next_role['title'])
                     current_role = next_role['title']
                     milestone['skills_acquired'] = next_role.get('required_skills', [])
+                else:
+                    milestone['role'] = no_progression_message
+                    milestone['skills_acquired'] = generate_skill_deepening(employee['skills'])
         
         elif scenario_type == "steady_growth":
             # Promotion every 2-3 years
             if year % 3 == 0 or year == 2:
+                attempted_progression = True
                 next_role = find_promotion_role(
-                    employee, all_roles, current_role, years_experienced=tenure + year
+                    employee,
+                    all_roles,
+                    current_role,
+                    years_experienced=tenure + year,
+                    domain_profile=domain_profile
                 )
                 if next_role:
                     milestone['role'] = next_role['title']
@@ -539,26 +737,62 @@ def simulate_career_path(
                     milestone['level'] = get_role_level(next_role['title'])
                     current_role = next_role['title']
                     milestone['skills_acquired'] = next_role.get('required_skills', [])
+                else:
+                    milestone['role'] = no_progression_message
+                    milestone['skills_acquired'] = generate_skill_deepening(employee['skills'])
         
         elif scenario_type == "lateral_mobility":
             # Cross-functional moves every 2-2.5 years
             if year == 2 or year == 5 or year == 8:
-                lateral_role = find_lateral_role(employee, all_roles, current_role)
+                attempted_progression = True
+                lateral_role = find_lateral_role(
+                    employee,
+                    all_roles,
+                    current_role,
+                    domain_profile=domain_profile,
+                    allow_external=domain_profile.get('has_external_evidence', False)
+                )
                 if lateral_role:
                     milestone['role'] = lateral_role['title']
                     milestone['department'] = lateral_role.get('department')
                     milestone['skills_acquired'] = lateral_role.get('required_skills', [])
+                    milestone['level'] = get_role_level(lateral_role['title'])
+                    current_role = lateral_role['title']
+                else:
+                    milestone['role'] = no_progression_message
+                    milestone['skills_acquired'] = generate_skill_deepening(employee['skills'])
         
         elif scenario_type == "specialization":
             # Stay in domain, become expert, potential manager in year 5-7
             if year >= 5 and year % 2 == 1:
-                expert_role = find_expert_role(employee, all_roles, current_role)
+                attempted_progression = True
+                expert_role = find_expert_role(
+                    employee,
+                    all_roles,
+                    current_role,
+                    domain_profile=domain_profile
+                )
                 if expert_role:
                     milestone['role'] = expert_role['title']
                     milestone['skills_acquired'] = expert_role.get('required_skills', [])
+                    milestone['department'] = expert_role.get('department')
+                    milestone['level'] = get_role_level(expert_role['title'])
+                    current_role = expert_role['title']
+                else:
+                    milestone['role'] = no_progression_message
+                    milestone['skills_acquired'] = generate_skill_deepening(employee['skills'])
             else:
                 # Deepen expertise in current domain
                 milestone['skills_acquired'] = generate_skill_deepening(employee['skills'])
+
+        # Ensure domain continuity message is present when progression was attempted but blocked
+        if attempted_progression and milestone['role'] is None:
+            milestone['role'] = no_progression_message
+            if not milestone['skills_acquired']:
+                milestone['skills_acquired'] = generate_skill_deepening(employee['skills'])
+        
+        if not milestone['skills_acquired']:
+            milestone['skills_acquired'] = generate_skill_deepening(employee['skills'])
         
         milestone['competency_growth'] = generate_competency_growth(scenario_type, year)
         simulated_path['milestones'].append(milestone)
@@ -571,10 +805,17 @@ def simulate_career_path(
     return simulated_path
 
 
-def find_next_roles(employee: Dict[str, Any], all_roles: List[Dict[str, Any]], years: int = 2) -> List[Dict[str, Any]]:
+def find_next_roles(
+    employee: Dict[str, Any],
+    all_roles: List[Dict[str, Any]],
+    years: int = 2,
+    domain_profile: Optional[Dict[str, Any]] = None,
+    allow_external: bool = False
+) -> List[Dict[str, Any]]:
     """
     Find logical next roles based on current position and skills
     """
+    domain_profile = domain_profile or extract_domain_profile(employee)
     current_title = employee['employment_info']['job_title']
     current_skills = set(skill['skill_name'] for skill in employee['skills'])
     
@@ -583,6 +824,9 @@ def find_next_roles(employee: Dict[str, Any], all_roles: List[Dict[str, Any]], y
     for role in all_roles:
         # Skip current role
         if role['title'] == current_title:
+            continue
+        
+        if not role_domain_allowed(role, domain_profile, allow_external=allow_external):
             continue
         
         # Calculate skill match for this role
@@ -595,6 +839,7 @@ def find_next_roles(employee: Dict[str, Any], all_roles: List[Dict[str, Any]], y
                 'title': role['title'],
                 'department': role.get('department'),
                 'location': role.get('location'),
+                'required_skills': list(required_skills),
                 'skill_match': skill_match,
                 'skills_to_acquire': list(required_skills - current_skills),
                 'estimated_time_to_ready': estimate_readiness_time(
@@ -607,14 +852,25 @@ def find_next_roles(employee: Dict[str, Any], all_roles: List[Dict[str, Any]], y
     return next_roles[:3]  # Return top 3 candidates
 
 
-def identify_skills_gaps(employee: Dict[str, Any], all_roles: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+def identify_skills_gaps(
+    employee: Dict[str, Any],
+    all_roles: List[Dict[str, Any]],
+    domain_profile: Optional[Dict[str, Any]] = None,
+    allow_external: bool = False
+) -> List[Dict[str, Any]]:
     """
     Identify skills gaps needed for progression
     """
+    domain_profile = domain_profile or extract_domain_profile(employee)
     current_skills = set(skill['skill_name'] for skill in employee['skills'])
     
     # Collect all required skills from potential next roles
-    next_roles = find_next_roles(employee, all_roles)
+    next_roles = find_next_roles(
+        employee,
+        all_roles,
+        domain_profile=domain_profile,
+        allow_external=allow_external
+    )
     all_required_skills = set()
     
     for role in next_roles:
@@ -637,41 +893,100 @@ def find_promotion_role(
     employee: Dict[str, Any],
     all_roles: List[Dict[str, Any]],
     current_role: str,
-    years_experienced: int
+    years_experienced: int,
+    domain_profile: Optional[Dict[str, Any]] = None,
+    allow_external: bool = False
 ) -> Dict[str, Any]:
     """Find next level promotion role"""
+    domain_profile = domain_profile or extract_domain_profile(employee)
     current_level = get_role_level(current_role)
     next_level = current_level + 1
-    
-    for role in all_roles:
-        if (get_role_level(role['title']) == next_level and 
-            years_experienced >= 2):  # Minimum 2 years in current level
-            return role
-    
-    return None
-
-
-def find_lateral_role(employee: Dict[str, Any], all_roles: List[Dict[str, Any]], current_role: str) -> Dict[str, Any]:
-    """Find cross-functional lateral move"""
-    current_dept = employee['employment_info']['department']
     current_skills = set(skill['skill_name'] for skill in employee['skills'])
+    best_match = -1.0
+    best_role = None
     
     for role in all_roles:
-        if (role.get('department') != current_dept and 
-            len(set(role.get('required_skills', [])) & current_skills) >= 3):
-            return role
+        if get_role_level(role['title']) != next_level:
+            continue
+        if not role_domain_allowed(role, domain_profile, allow_external=allow_external):
+            continue
+        required_experience = max(2, role.get('min_experience_years', 0))
+        if years_experienced < required_experience:
+            continue
+        required_skills = set(role.get('required_skills', []))
+        skill_match = (
+            len(current_skills & required_skills) / len(required_skills)
+            if required_skills else 0
+        )
+        if skill_match > best_match:
+            best_match = skill_match
+            best_role = role
+    
+    return best_role
+
+
+def find_lateral_role(
+    employee: Dict[str, Any],
+    all_roles: List[Dict[str, Any]],
+    current_role: str,
+    domain_profile: Optional[Dict[str, Any]] = None,
+    allow_external: bool = False
+) -> Optional[Dict[str, Any]]:
+    """Find cross-functional lateral move"""
+    domain_profile = domain_profile or extract_domain_profile(employee)
+    current_skills = set(skill['skill_name'] for skill in employee['skills'])
+    primary_domains = set(domain_profile.get('primary_domains', set()))
+    external_domains = set(domain_profile.get('external_domains', set())) if allow_external else set()
+    
+    primary_candidates: List[Tuple[int, Dict[str, Any]]] = []
+    external_candidates: List[Tuple[int, Dict[str, Any]]] = []
+    
+    for role in all_roles:
+        if role.get('title') == current_role:
+            continue
+        required_skills = set(role.get('required_skills', []))
+        overlap = len(required_skills & current_skills)
+        if overlap < 3:
+            continue
+        role_domain = derive_role_domain(role)
+        if role_domain in primary_domains:
+            primary_candidates.append((overlap, role))
+        elif role_domain in external_domains:
+            external_candidates.append((overlap, role))
+    
+    if primary_candidates:
+        primary_candidates.sort(key=lambda item: item[0], reverse=True)
+        return primary_candidates[0][1]
+    if allow_external and external_candidates:
+        external_candidates.sort(key=lambda item: item[0], reverse=True)
+        return external_candidates[0][1]
     
     return None
 
 
-def find_expert_role(employee: Dict[str, Any], all_roles: List[Dict[str, Any]], current_role: str) -> Dict[str, Any]:
+def find_expert_role(
+    employee: Dict[str, Any],
+    all_roles: List[Dict[str, Any]],
+    current_role: str,
+    domain_profile: Optional[Dict[str, Any]] = None,
+    allow_external: bool = False
+) -> Optional[Dict[str, Any]]:
     """Find expert/principal level role in same domain"""
-    current_dept = employee['employment_info']['department']
+    domain_profile = domain_profile or extract_domain_profile(employee)
+    candidate_roles: List[Tuple[int, Dict[str, Any]]] = []
     
     for role in all_roles:
-        if (role.get('department') == current_dept and 
-            ('Expert' in role['title'] or 'Principal' in role['title'] or 'Lead' in role['title'])):
-            return role
+        if role.get('title') == current_role:
+            continue
+        if not role_domain_allowed(role, domain_profile, allow_external=allow_external):
+            continue
+        title = role.get('title', '')
+        if any(keyword in title for keyword in ('Expert', 'Principal', 'Lead', 'Specialist')):
+            candidate_roles.append((get_role_level(title), role))
+    
+    if candidate_roles:
+        candidate_roles.sort(key=lambda item: item[0], reverse=True)
+        return candidate_roles[0][1]
     
     return None
 
