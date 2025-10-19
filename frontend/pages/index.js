@@ -191,30 +191,6 @@ function Home() {
                 </button>
 
                 <button
-                  onClick={() => router.push("/copilot")}
-                  className="group glass-panel p-5 text-left transition-transform duration-300 hover:-translate-y-1.5 hover:shadow-2xl border border-white/40 min-h-[200px] flex flex-col"
-                >
-                  <div className="flex items-center justify-between mb-4">
-                    <div className="p-3 rounded-xl bg-gradient-to-br from-emerald-400/90 to-teal-500/90 text-white shadow-lg shadow-emerald-500/30">
-                      <Sparkles className="w-6 h-6" />
-                    </div>
-                    <ArrowRight className="w-5 h-5 text-emerald-300 transition-transform duration-300 group-hover:translate-x-1 flex-shrink-0" />
-                  </div>
-                  <div className="flex-1 flex flex-col">
-                    <p className="text-xs font-semibold text-slate-600 uppercase tracking-widest mb-2">
-                      Compass Copilot
-                    </p>
-                    <h3 className="text-lg font-semibold text-slate-900 mb-2">
-                      Open Employee View
-                    </h3>
-                    <p className="text-sm text-slate-600 mt-auto">
-                      Experience the conversational assistant your employees
-                      rely on.
-                    </p>
-                  </div>
-                </button>
-
-                <button
                   onClick={() => router.push("/career-roadmap")}
                   className="group glass-panel p-5 text-left transition-transform duration-300 hover:-translate-y-1.5 hover:shadow-2xl border border-white/40 min-h-[200px] flex flex-col"
                 >

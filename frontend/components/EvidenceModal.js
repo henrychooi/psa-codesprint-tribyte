@@ -47,10 +47,10 @@ const EvidenceModal = ({ isOpen, onClose, componentKey, componentData, evidence 
       aria-labelledby="modal-title"
     >
       <div
-        className="glass-card border border-white/55 max-w-2xl w-full max-h-[90vh] overflow-y-auto"
+        className="glass-card border border-white/55 max-w-2xl w-full max-h-[90vh] overflow-y-auto rounded-2xl"
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="sticky top-0 bg-white/80 backdrop-blur-md border-b border-white/60 px-6 py-4 flex items-center justify-between z-10">
+        <div className="sticky top-0 bg-white/80 backdrop-blur-md border-b border-white/60 px-6 py-4 flex items-center justify-between z-10 rounded-t-2xl">
           <div className="flex items-center gap-3">
             <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${info.color}`}>
               <Icon className="w-6 h-6" />
@@ -70,7 +70,7 @@ const EvidenceModal = ({ isOpen, onClose, componentKey, componentData, evidence 
         </div>
 
         <div className="px-6 py-6 space-y-6 bg-white/70">
-          <div className="glass-panel border border-white/60 px-6 py-6 text-center">
+          <div className="glass-panel border border-white/60 px-6 py-6 text-center rounded-2xl">
             <div className="text-5xl font-semibold text-indigo-500 mb-2">
               {componentData}%
             </div>
