@@ -79,12 +79,20 @@ Built with ❤️ for PSA Code Sprint 2025 hackathon.
 
 ### 🔍 AI-Powered Role Matching
 
-- **Intelligent Matching Algorithm**: Combines semantic similarity and skill analysis
+**Intelligent career opportunity discovery** combining semantic AI with skill-based analysis for optimal employee-role alignment.
+
 - **Dual-Weight Scoring System**:
-  - 60% Semantic similarity using embeddings
-  - 40% Skill gap analysis
-- **Career Narrative Generation**: AI-generated personalized career stories using Azure OpenAI
-- **Development Plans**: Prioritized action plans with timelines
+  - **60% Semantic Similarity**: Azure OpenAI embeddings for contextual profile-to-role matching
+  - **40% Skill Gap Analysis**: Precise calculation of required vs. preferred skill alignment
+- **Comprehensive Match Details**:
+  - Match score with recommendation strength (Excellent/Strong/Good/Potential/Stretch)
+  - Detailed skill breakdown (matched skills, skills to acquire)
+  - Required vs. preferred skills differentiation
+- **AI-Generated Career Narratives**: Personalized career stories using Azure OpenAI GPT-5-mini
+- **Actionable Development Plans**: Prioritized learning paths with estimated timelines and resources
+- **Interactive UI**: Expandable role cards with evidence-based recommendations
+
+[📖 View Role Matching Documentation](./docs/ROLE_MATCHING.md)
 
 ### 🔐 Authentication & Role-Based Access Control
 

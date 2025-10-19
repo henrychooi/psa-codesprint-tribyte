@@ -26,20 +26,25 @@
 
 ### Purpose
 
-Assesses employee leadership readiness through quantifiable metrics and AI-powered analysis, providing:
-- **Transparent Scoring**: 4-component breakdown with evidence linking
-- **AI Augmentation**: Azure OpenAI sentiment analysis and stakeholder detection
-- **Actionable Insights**: Personalized improvement suggestions
-- **Percentile Ranking**: Comparative assessment across workforce
-- **Explainability**: Full methodology disclosure and citation trails
+Leadership Potential assesses employee leadership readiness through quantifiable metrics and AI-powered analysis, providing transparent, actionable insights for talent development. The system delivers:
+
+- **Transparent Scoring**: 4-component breakdown with clear evidence linking
+- **AI Augmentation**: Azure OpenAI sentiment analysis and stakeholder detection for enhanced accuracy
+- **Actionable Insights**: Personalized improvement suggestions based on component performance
+- **Percentile Ranking**: Comparative assessment to understand relative positioning
+- **Explainability**: Full methodology disclosure and citation trails for trust and transparency
 
 ### Key Features
 
-- **Evidence-Based Assessment**: Every score component links to specific projects, competencies, or career progression
-- **Hybrid Scoring**: 60% heuristic base + 40% Azure OpenAI augmentation
-- **Real-Time Computation**: Optimized to return results in <5 seconds
-- **Interactive Visualizations**: Bar charts, score cards, evidence modals
-- **Feedback Loop**: Users can provide feedback on scoring accuracy
+- **Evidence-Based Assessment**: Every score component links to specific projects, competencies, or career progression milestones
+- **Hybrid Scoring Methodology**: Combines 60% heuristic base scoring with 40% Azure OpenAI augmentation for balanced accuracy
+- **Real-Time Computation**: Optimized algorithms return comprehensive results in under 5 seconds
+- **Interactive Visualizations**: Bar charts, score cards, and evidence modals for intuitive understanding
+- **Feedback Loop**: Continuous improvement through user feedback on scoring accuracy
+
+### Access Control
+
+**Available to All Users**: Leadership Potential assessment is accessible to both employees (for self-assessment and development) and administrators (for talent management and succession planning). Employees can view their own leadership potential, while administrators can assess all employees.
 
 ---
 

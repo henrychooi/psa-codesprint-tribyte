@@ -25,21 +25,26 @@
 
 ### Purpose
 
-Compass Copilot acts as a 24/7 career advisor, leveraging employee profile data and Azure OpenAI to provide:
-- **Profile summaries** with achievement highlighting
-- **Role recommendations** based on skills and experience
-- **Skill gap analysis** for target roles
-- **Wellbeing support** for work-life balance and mental health
-- **General career Q&A** with conversational flexibility
+Compass Copilot acts as a 24/7 AI-powered career advisor, leveraging employee profile data and Azure OpenAI to provide personalized, context-aware career guidance exclusively to PSA employees. The system provides:
+
+- **Profile Summaries**: Comprehensive career overviews with achievement highlighting
+- **Role Recommendations**: AI-matched career opportunities based on skills and experience
+- **Skill Gap Analysis**: Targeted development plans for specific career goals
+- **Wellbeing Support**: Empathetic guidance for work-life balance and mental health
+- **General Career Q&A**: Conversational flexibility for diverse career questions
 
 ### Key Features
 
-- **Context-Aware**: Automatically accesses authenticated employee's complete profile (skills, projects, competencies, career history)
-- **Intent-Driven**: Classifies user queries into specific intents for optimized response generation
-- **Evidence-Based**: Links responses to specific achievements, projects, and skills with citations
+- **Context-Aware Responses**: Automatically accesses authenticated employee's complete profile including skills, projects, competencies, and career history
+- **Intent-Driven Intelligence**: Classifies user queries into specific intents for optimized response generation
+- **Evidence-Based Guidance**: Links responses to specific achievements, projects, and skills with proper citations
 - **Conversational Memory**: Maintains conversation history for contextual follow-up questions
-- **Empathetic Responses**: Uses Azure OpenAI GPT-5-mini for human-like, supportive interactions
-- **Actionable Guidance**: Provides suggested next steps and actions after each response
+- **Empathetic Interactions**: Uses Azure OpenAI GPT-5-mini for human-like, supportive conversations
+- **Actionable Next Steps**: Provides suggested actions and resources after each response
+
+### Access Control
+
+**Employee-Only Feature**: Compass Copilot is exclusively available to employees for their own career development. Administrators do not have access to this feature, ensuring privacy and personalization for employee career conversations.
 
 ---
 

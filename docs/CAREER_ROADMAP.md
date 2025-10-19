@@ -25,18 +25,25 @@
 
 ### Purpose
 
-Career Roadmap helps employees and HR administrators visualize career progression paths:
-- **Employees**: See realistic next 2-3 year progression based on current trajectory
-- **Admins**: Access predictive 10-year simulations across multiple career scenarios for workforce planning
+Career Roadmap helps employees visualize their career progression paths and empowers HR administrators with predictive analytics for strategic workforce planning:
+
+- **For Employees**: Gain clarity on realistic next 2-3 year progression based on current trajectory, identify skill gaps, and understand career development opportunities
+- **For Employers (Admins)**: Access predictive 10-year simulations across multiple career scenarios for succession planning, talent development strategy, and retention risk assessment
 
 ### Key Features
 
-- **Current Roadmap**: Realistic progression analysis with skill gaps and milestones
-- **Predicted Simulations**: Four scenario types modeling different career paths
-- **Risk Analysis**: Identify retention risks and optimal development paths
-- **Skills Gap Identification**: Prioritized learning recommendations
-- **Career Anchor Detection**: Understand what drives employee motivation
-- **Performance Optimized**: Lazy loading for admin features, limited role queries
+#### Employee Features
+- **Current Roadmap**: Realistic progression analysis showing next logical roles with skill match scores
+- **Skills Gap Identification**: Prioritized learning recommendations with estimated timelines
+- **Career Anchor Detection**: Understand personal motivations and career drivers
+- **Timeline Visualization**: Interactive timeline with estimated milestones and progression paths
+
+#### Employer/Admin Features
+- **Predicted Simulations**: Four scenario types modeling different career paths over 10 years
+- **Risk Analysis**: Identify retention risks and provide optimal development paths
+- **Workforce Planning**: Strategic insights for succession planning and talent pipeline management
+- **Comparative Analysis**: Side-by-side scenario comparison for informed decision-making
+- **Performance Optimized**: Lazy loading and limited role queries for fast response times
 
 ---
 
@@ -98,13 +105,31 @@ User Request
 
 ## Current Roadmap (All Users)
 
+### Overview
+
+The Current Roadmap feature provides **all users** (employees and admins) with a realistic view of career progression opportunities over the next 2-3 years based on their current trajectory.
+
 ### Features
 
 Provides realistic 2-3 year career progression based on:
-- Current role and tenure
-- Skills and competencies
-- Career history
-- Position in organization
+- **Current Role and Tenure**: Analyzes your position in the organizational hierarchy
+- **Skills and Competencies**: Evaluates existing capabilities against role requirements
+- **Career History**: Reviews progression patterns and growth trajectory
+- **Position in Organization**: Considers department, location, and organizational fit
+
+### Employee Benefits
+
+- **Clear Career Path**: Understand realistic next steps in your career journey
+- **Skill Development Focus**: Identify specific skills to acquire for advancement
+- **Timeline Planning**: Estimate when you'll be ready for the next opportunity
+- **Personal Growth Insights**: Discover your career anchors and motivations
+
+### Employer Benefits
+
+- **Talent Development**: Understand employee readiness for advancement
+- **Skills Gap Analysis**: Identify training needs across the organization
+- **Succession Planning**: Prepare for future role transitions
+- **Retention Strategy**: Address career development needs proactively
 
 ### Output Structure
 
@@ -211,13 +236,33 @@ def analyze_career_anchors(employee):
 
 ## Predicted Roadmap with Simulations (Admin Only)
 
+### Overview
+
+The Predicted Roadmap feature provides **HR administrators only** with advanced predictive analytics for strategic workforce planning and talent development.
+
 ### Purpose
 
 Provides HR administrators with predictive analytics for:
-- Workforce planning
-- Succession planning
-- Retention risk assessment
-- Talent development strategy
+- **Workforce Planning**: Anticipate future talent needs and capacity
+- **Succession Planning**: Identify and prepare high-potential employees
+- **Retention Risk Assessment**: Proactively address factors that may lead to turnover
+- **Talent Development Strategy**: Design targeted development programs aligned with organizational goals
+
+### Employer Benefits
+
+- **Strategic Insights**: 10-year projections for long-term workforce planning
+- **Scenario Modeling**: Compare multiple career paths to determine optimal strategies
+- **Risk Mitigation**: Identify and address retention risks before they become critical
+- **Data-Driven Decisions**: Evidence-based recommendations for talent management
+- **ROI Planning**: Understand the impact of different development investments
+
+### Employee Context
+
+While employees cannot access predicted roadmaps directly, the insights generated help employers:
+- Design better career development programs
+- Provide more relevant training opportunities
+- Create personalized retention strategies
+- Offer appropriate advancement opportunities
 
 ### Four Scenario Types
 
