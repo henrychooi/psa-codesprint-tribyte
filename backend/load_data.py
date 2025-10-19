@@ -26,37 +26,176 @@ def load_employees(session: Session, json_file: str = '../Employee_Profiles.json
     with open(json_file, 'r') as f:
         employees_data = json.load(f)
     
+    added_count = 0
+    updated_count = 0
+    
     for emp_data in employees_data:
         personal = emp_data.get('personal_info', {})
         employment = emp_data.get('employment_info', {})
+        emp_id = emp_data['employee_id']
         
-        employee = Employee(
-            employee_id=emp_data['employee_id'],
-            name=personal.get('name', ''),
-            email=personal.get('email', ''),
-            office_location=personal.get('office_location', ''),
-            languages=personal.get('languages', []),
-            
-            job_title=employment.get('job_title', ''),
-            department=employment.get('department', ''),
-            unit=employment.get('unit', ''),
-            line_manager=employment.get('line_manager', ''),
-            in_role_since=parse_date(employment.get('in_role_since')),
-            hire_date=parse_date(employment.get('hire_date')),
-            
-            skills=emp_data.get('skills', []),
-            competencies=emp_data.get('competencies', []),
-            experiences=emp_data.get('experiences', []),
-            positions_history=emp_data.get('positions_history', []),
-            projects=emp_data.get('projects', []),
-            education=emp_data.get('education', [])
-        )
+        # Check if employee already exists
+        existing_employee = session.query(Employee).filter_by(employee_id=emp_id).first()
         
-        session.add(employee)
-        print(f"  ✅ Added {personal.get('name', 'Unknown')}")
+        if existing_employee:
+            # Update existing employee
+            existing_employee.name = personal.get('name', '')
+            existing_employee.email = personal.get('email', '')
+            existing_employee.office_location = personal.get('office_location', '')
+            existing_employee.languages = personal.get('languages', [])
+            existing_employee.job_title = employment.get('job_title', '')
+            existing_employee.department = employment.get('department', '')
+            existing_employee.unit = employment.get('unit', '')
+            existing_employee.line_manager = employment.get('line_manager', '')
+            existing_employee.in_role_since = parse_date(employment.get('in_role_since'))
+            existing_employee.hire_date = parse_date(employment.get('hire_date'))
+            existing_employee.skills = emp_data.get('skills', [])
+            existing_employee.competencies = emp_data.get('competencies', [])
+            existing_employee.experiences = emp_data.get('experiences', [])
+            existing_employee.positions_history = emp_data.get('positions_history', [])
+            existing_employee.projects = emp_data.get('projects', [])
+            existing_employee.education = emp_data.get('education', [])
+            print(f"  🔄 Updated {personal.get('name', 'Unknown')}")
+            updated_count += 1
+        else:
+            # Create new employee
+            employee = Employee(
+                employee_id=emp_id,
+                name=personal.get('name', ''),
+                email=personal.get('email', ''),
+                office_location=personal.get('office_location', ''),
+                languages=personal.get('languages', []),
+                
+                job_title=employment.get('job_title', ''),
+                department=employment.get('department', ''),
+                unit=employment.get('unit', ''),
+                line_manager=employment.get('line_manager', ''),
+                in_role_since=parse_date(employment.get('in_role_since')),
+                hire_date=parse_date(employment.get('hire_date')),
+                
+                skills=emp_data.get('skills', []),
+                competencies=emp_data.get('competencies', []),
+                experiences=emp_data.get('experiences', []),
+                positions_history=emp_data.get('positions_history', []),
+                projects=emp_data.get('projects', []),
+                education=emp_data.get('education', [])
+            )
+            
+            session.add(employee)
+            print(f"  ✅ Added {personal.get('name', 'Unknown')}")
+            added_count += 1
     
     session.commit()
-    print(f"✅ Loaded {len(employees_data)} employees")
+    print(f"✅ Loaded employees - Added: {added_count}, Updated: {updated_count}")
+
+
+def infer_min_experience(title: str) -> int:
+    """Basic heuristic to keep role seniority reasonable."""
+    normalized = title.lower()
+    if any(keyword in normalized for keyword in ['chief', 'director', 'principal']):
+        return 8
+    if any(keyword in normalized for keyword in ['senior', 'lead', 'head']):
+        return 6
+    if 'manager' in normalized or 'architect' in normalized:
+        return 5
+    if any(keyword in normalized for keyword in ['analyst', 'engineer', 'consultant', 'specialist']):
+        return 3
+    return 4
+
+
+def choose_department(primary: str, fallback: str) -> str:
+    """Return the most relevant department label."""
+    return primary or fallback or 'PSA Singapore'
+
+
+def merge_competency_levels(existing: str, incoming: str) -> str:
+    """Keep the higher competency level when combining multiple employees."""
+    order = {
+        'beginner': 1,
+        'basic': 1,
+        'intermediate': 2,
+        'proficient': 3,
+        'advanced': 4,
+        'expert': 5
+    }
+    existing_rank = order.get((existing or '').lower(), 0)
+    incoming_rank = order.get((incoming or '').lower(), 0)
+    return incoming if incoming_rank >= existing_rank else existing
+
+
+def build_roles_from_employee_profiles(json_file: str, start_index: int):
+    """Create role entries using actual job titles from employee profiles."""
+    if not os.path.exists(json_file):
+        print(f"  ⚠️ Employee data not found at {json_file}, skipping role generation.")
+        return []
+    
+    with open(json_file, 'r') as f:
+        employees_data = json.load(f)
+    
+    aggregated = {}
+    for profile in employees_data:
+        employment = profile.get('employment_info', {})
+        job_title = (employment.get('job_title') or '').strip()
+        if not job_title:
+            continue
+        
+        role_bucket = aggregated.setdefault(job_title, {
+            'department': employment.get('department', '').strip(),
+            'unit': employment.get('unit', '').strip(),
+            'skills': set(),
+            'specializations': set(),
+            'competencies': {}
+        })
+        
+        for skill in profile.get('skills', []):
+            skill_name = (skill.get('skill_name') or '').strip()
+            specialization = (skill.get('specialization') or '').strip()
+            if skill_name:
+                role_bucket['skills'].add(skill_name)
+            if specialization:
+                role_bucket['specializations'].add(specialization)
+        
+        for competency in profile.get('competencies', []):
+            name = (competency.get('name') or '').strip()
+            level = (competency.get('level') or '').strip()
+            if not name or not level:
+                continue
+            existing_level = role_bucket['competencies'].get(name)
+            role_bucket['competencies'][name] = merge_competency_levels(existing_level, level)
+    
+    generated_roles = []
+    for offset, job_title in enumerate(sorted(aggregated.keys())):
+        bucket = aggregated[job_title]
+        department = choose_department(bucket.get('department', ''), bucket.get('unit', ''))
+        role_number = start_index + offset
+        role_id = f"ROLE-{role_number:03d}"
+        
+        required_skills = sorted(bucket['skills'])
+        preferred_skills = sorted(bucket['specializations'])
+        competencies = [
+            {'name': name, 'min_level': level}
+            for name, level in sorted(bucket['competencies'].items())
+        ]
+        
+        generated_roles.append({
+            'role_id': role_id,
+            'title': job_title,
+            'department': department,
+            'location': 'PSA Singapore',
+            'required_skills': required_skills,
+            'preferred_skills': preferred_skills,
+            'required_competencies': competencies,
+            'description': f"Serve as the {job_title} within {department}, delivering impact through deep functional expertise and collaboration.",
+            'responsibilities': [
+                f"Lead key initiatives as the {job_title} supporting {department}.",
+                "Partner with stakeholders to drive measurable improvements.",
+                "Uphold best practices and mentor peers within the function."
+            ],
+            'min_experience_years': infer_min_experience(job_title)
+        })
+    
+    print(f"  ℹ️ Generated {len(generated_roles)} roles from employee profiles.")
+    return generated_roles
 
 
 def load_sample_roles(session: Session):
@@ -211,13 +350,33 @@ def load_sample_roles(session: Session):
         }
     ]
     
+    employee_roles = build_roles_from_employee_profiles('../Employee_Profiles.json', len(sample_roles) + 1)
+    sample_roles.extend(employee_roles)
+    
+    added_count = 0
+    updated_count = 0
+    
     for role_data in sample_roles:
-        role = Role(**role_data)
-        session.add(role)
-        print(f"  ✅ Added {role_data['title']}")
+        role_id = role_data['role_id']
+        
+        # Check if role already exists
+        existing_role = session.query(Role).filter_by(role_id=role_id).first()
+        
+        if existing_role:
+            # Update existing role
+            for key, value in role_data.items():
+                setattr(existing_role, key, value)
+            print(f"  🔄 Updated {role_data['title']}")
+            updated_count += 1
+        else:
+            # Create new role
+            role = Role(**role_data)
+            session.add(role)
+            print(f"  ✅ Added {role_data['title']}")
+            added_count += 1
     
     session.commit()
-    print(f"✅ Loaded {len(sample_roles)} roles")
+    print(f"✅ Loaded roles - Added: {added_count}, Updated: {updated_count}")
 
 
 def main():

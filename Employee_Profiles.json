@@ -552,5 +552,2201 @@
         "period": { "start": "2018-08-01", "end": "2022-05-31" }
       }
     ]
+  },
+  {
+    "employee_id": "EMP-20006",
+    "personal_info": {
+      "name": "Michael Chen",
+      "email": "michael.chen@globalpsa.com",
+      "office_location": "PSA Singapore",
+      "languages": [
+        { "language": "English", "proficiency": "Fluent" },
+        { "language": "Mandarin", "proficiency": "Fluent" }
+      ]
+    },
+    "employment_info": {
+      "job_title": "Senior Operations Manager",
+      "department": "Operations",
+      "unit": "Terminal Operations",
+      "line_manager": "David Wong",
+      "in_role_since": "2021-03-01",
+      "hire_date": "2015-05-20",
+      "last_updated": "2025-10-19"
+    },
+    "skills": [
+      {
+        "function_area": "Operations",
+        "specialization": "Operations Management",
+        "skill_name": "Operations Management"
+      },
+      {
+        "function_area": "Operations",
+        "specialization": "Process Optimization",
+        "skill_name": "Process Optimization"
+      },
+      {
+        "function_area": "Operations",
+        "specialization": "Supply Chain Management",
+        "skill_name": "Supply Chain Management"
+      },
+      {
+        "function_area": "Operations",
+        "specialization": "Safety & Compliance",
+        "skill_name": "Safety & Compliance"
+      },
+      {
+        "function_area": "Operations",
+        "specialization": "Equipment Maintenance",
+        "skill_name": "Equipment Maintenance"
+      }
+    ],
+    "competencies": [
+      { "name": "Leadership & Team Management", "level": "Advanced" },
+      { "name": "Process Improvement & Optimisation", "level": "Advanced" },
+      { "name": "Risk Management", "level": "Intermediate" }
+    ],
+    "experiences": [
+      {
+        "type": "Program",
+        "organization": "PSA Singapore",
+        "program": "Terminal Modernization",
+        "period": { "start": "2021-03-01", "end": null },
+        "focus": "Led operational excellence initiatives; equipment automation; safety protocols."
+      },
+      {
+        "type": "Rotation",
+        "organization": "PSA Singapore",
+        "program": "Container Operations",
+        "period": { "start": "2017-06-01", "end": "2021-02-28" },
+        "focus": "Container handling optimization; workforce scheduling; throughput improvement."
+      }
+    ],
+    "positions_history": [
+      {
+        "role_title": "Senior Operations Manager",
+        "organization": "PSA Singapore",
+        "period": { "start": "2021-03-01", "end": null },
+        "focus_areas": ["Terminal operations management", "Safety protocols", "Performance metrics"],
+        "key_skills_used": ["Operations Management", "Process Optimization"]
+      },
+      {
+        "role_title": "Operations Supervisor",
+        "organization": "PSA Singapore",
+        "period": { "start": "2017-06-01", "end": "2021-02-28" },
+        "focus_areas": ["Team supervision", "Equipment operations"]
+      }
+    ],
+    "projects": [
+      {
+        "project_name": "Automated Container Handling System",
+        "role": "Project Lead",
+        "period": { "start": "2022-01-01", "end": "2023-06-30" },
+        "description": "Implemented automated stacking cranes and intelligent scheduling system.",
+        "outcomes": ["20% increase in throughput", "Reduced operational incidents by 35%"]
+      }
+    ],
+    "education": [
+      {
+        "degree": "Master's Degree, Supply Chain Management",
+        "institution": "Nanyang Technological University (NTU)",
+        "period": { "start": "2013-08-01", "end": "2015-04-30" }
+      },
+      {
+        "degree": "Bachelor's Degree, Industrial Engineering",
+        "institution": "National University of Singapore (NUS)",
+        "period": { "start": "2009-08-01", "end": "2013-05-31" }
+      }
+    ]
+  },
+  {
+    "employee_id": "EMP-20007",
+    "personal_info": {
+      "name": "Priya Kapoor",
+      "email": "priya.kapoor@globalpsa.com",
+      "office_location": "PSA Singapore",
+      "languages": [
+        { "language": "English", "proficiency": "Fluent" },
+        { "language": "Hindi", "proficiency": "Fluent" }
+      ]
+    },
+    "employment_info": {
+      "job_title": "Business Analyst",
+      "department": "Information Technology",
+      "unit": "Digital Transformation",
+      "line_manager": "Sarah Thompson",
+      "in_role_since": "2023-09-01",
+      "hire_date": "2020-06-15",
+      "last_updated": "2025-10-19"
+    },
+    "skills": [
+      {
+        "function_area": "Info Tech: Business Analysis",
+        "specialization": "Requirements Analysis",
+        "skill_name": "Requirements Analysis"
+      },
+      {
+        "function_area": "Info Tech: Business Analysis",
+        "specialization": "Process Modeling",
+        "skill_name": "Process Modeling"
+      },
+      {
+        "function_area": "Info Tech: Business Analysis",
+        "specialization": "Data Analytics",
+        "skill_name": "Data Analytics"
+      },
+      {
+        "function_area": "Info Tech: Business Analysis",
+        "specialization": "Stakeholder Management",
+        "skill_name": "Stakeholder Management"
+      }
+    ],
+    "competencies": [
+      { "name": "Problem Solving & Analysis", "level": "Advanced" },
+      { "name": "Communication & Presentation", "level": "Advanced" },
+      { "name": "Project Coordination", "level": "Intermediate" }
+    ],
+    "experiences": [
+      {
+        "type": "Program",
+        "organization": "PSA Singapore",
+        "program": "Digital Transformation Initiative",
+        "period": { "start": "2023-09-01", "end": null },
+        "focus": "Business requirements gathering; process documentation; system design."
+      },
+      {
+        "type": "Project",
+        "organization": "PSA Singapore",
+        "program": "ERP Implementation",
+        "period": { "start": "2021-03-01", "end": "2023-08-31" },
+        "focus": "Configuration and testing; change management; user training."
+      }
+    ],
+    "positions_history": [
+      {
+        "role_title": "Business Analyst",
+        "organization": "PSA Singapore",
+        "period": { "start": "2023-09-01", "end": null },
+        "focus_areas": ["Requirements gathering", "Process improvement", "Data analytics"],
+        "key_skills_used": ["Requirements Analysis", "Data Analytics"]
+      },
+      {
+        "role_title": "Associate Business Analyst",
+        "organization": "PSA Singapore",
+        "period": { "start": "2020-06-15", "end": "2023-08-31" },
+        "focus_areas": ["System testing", "Documentation"]
+      }
+    ],
+    "projects": [
+      {
+        "project_name": "Port Operations Analytics Platform",
+        "role": "Lead Business Analyst",
+        "period": { "start": "2023-10-01", "end": "2024-12-31" },
+        "description": "Built analytics dashboards for real-time operational insights.",
+        "outcomes": ["Decision-making time reduced by 40%", "Data accuracy improved to 99.8%"]
+      }
+    ],
+    "education": [
+      {
+        "degree": "Master's Degree, Business Analytics",
+        "institution": "National University of Singapore (NUS)",
+        "period": { "start": "2018-08-01", "end": "2020-05-31" }
+      },
+      {
+        "degree": "Bachelor's Degree, Information Technology",
+        "institution": "Delhi Technological University",
+        "period": { "start": "2014-08-01", "end": "2018-05-31" }
+      }
+    ]
+  },
+  {
+    "employee_id": "EMP-20008",
+    "personal_info": {
+      "name": "Amanda Wong",
+      "email": "amanda.wong@globalpsa.com",
+      "office_location": "PSA Singapore",
+      "languages": [
+        { "language": "English", "proficiency": "Fluent" },
+        { "language": "Mandarin", "proficiency": "Fluent" },
+        { "language": "Cantonese", "proficiency": "Fluent" }
+      ]
+    },
+    "employment_info": {
+      "job_title": "Marketing Manager",
+      "department": "Communications & Marketing",
+      "unit": "Brand & Corporate Communications",
+      "line_manager": "Jennifer Lee",
+      "in_role_since": "2022-11-01",
+      "hire_date": "2018-09-10",
+      "last_updated": "2025-10-19"
+    },
+    "skills": [
+      {
+        "function_area": "Communications & Marketing",
+        "specialization": "Brand Management",
+        "skill_name": "Brand Management"
+      },
+      {
+        "function_area": "Communications & Marketing",
+        "specialization": "Digital Marketing",
+        "skill_name": "Digital Marketing"
+      },
+      {
+        "function_area": "Communications & Marketing",
+        "specialization": "Content Strategy",
+        "skill_name": "Content Strategy"
+      },
+      {
+        "function_area": "Communications & Marketing",
+        "specialization": "Campaign Management",
+        "skill_name": "Campaign Management"
+      },
+      {
+        "function_area": "Communications & Marketing",
+        "specialization": "Corporate Communications",
+        "skill_name": "Corporate Communications"
+      }
+    ],
+    "competencies": [
+      { "name": "Creativity & Innovation", "level": "Advanced" },
+      { "name": "Stakeholder & Partnership Management", "level": "Advanced" },
+      { "name": "Project Management", "level": "Intermediate" }
+    ],
+    "experiences": [
+      {
+        "type": "Program",
+        "organization": "PSA Singapore",
+        "program": "Brand Refresh Initiative",
+        "period": { "start": "2022-11-01", "end": "2024-06-30" },
+        "focus": "Rebranded corporate identity; digital presence; stakeholder communication."
+      },
+      {
+        "type": "Project",
+        "organization": "PSA Singapore",
+        "program": "Sustainability Campaign",
+        "period": { "start": "2021-04-01", "end": "2022-10-31" },
+        "focus": "ESG messaging; community engagement; media relations."
+      }
+    ],
+    "positions_history": [
+      {
+        "role_title": "Marketing Manager",
+        "organization": "PSA Singapore",
+        "period": { "start": "2022-11-01", "end": null },
+        "focus_areas": ["Brand strategy", "Digital campaigns", "Stakeholder engagement"],
+        "key_skills_used": ["Brand Management", "Digital Marketing"]
+      },
+      {
+        "role_title": "Marketing Executive",
+        "organization": "PSA Singapore",
+        "period": { "start": "2018-09-10", "end": "2022-10-31" },
+        "focus_areas": ["Campaign execution", "Content creation"]
+      }
+    ],
+    "projects": [
+      {
+        "project_name": "Digital Marketing Transformation",
+        "role": "Campaign Lead",
+        "period": { "start": "2023-03-01", "end": "2024-05-31" },
+        "description": "Launched integrated digital marketing strategy across social, web, and email.",
+        "outcomes": ["Website traffic increased by 65%", "Social media engagement up 120%"]
+      }
+    ],
+    "education": [
+      {
+        "degree": "Bachelor's Degree, Marketing",
+        "institution": "Singapore Management University (SMU)",
+        "period": { "start": "2014-08-01", "end": "2018-05-31" }
+      }
+    ]
+  },
+  {
+    "employee_id": "EMP-20009",
+    "personal_info": {
+      "name": "Vikram Singh",
+      "email": "vikram.singh@globalpsa.com",
+      "office_location": "PSA Singapore",
+      "languages": [
+        { "language": "English", "proficiency": "Fluent" },
+        { "language": "Hindi", "proficiency": "Fluent" },
+        { "language": "Punjabi", "proficiency": "Intermediate" }
+      ]
+    },
+    "employment_info": {
+      "job_title": "Systems Engineer",
+      "department": "Information Technology",
+      "unit": "Infrastructure Operations",
+      "line_manager": "Victor Tan",
+      "in_role_since": "2024-01-15",
+      "hire_date": "2023-06-01",
+      "last_updated": "2025-10-19"
+    },
+    "skills": [
+      {
+        "function_area": "Info Tech: Infrastructure",
+        "specialization": "Systems Administration",
+        "skill_name": "Systems Administration"
+      },
+      {
+        "function_area": "Info Tech: Infrastructure",
+        "specialization": "Cloud Infrastructure",
+        "skill_name": "Cloud Infrastructure"
+      },
+      {
+        "function_area": "Info Tech: Infrastructure",
+        "specialization": "Network Administration",
+        "skill_name": "Network Administration"
+      },
+      {
+        "function_area": "Info Tech: Infrastructure",
+        "specialization": "Linux Administration",
+        "skill_name": "Linux Administration"
+      },
+      {
+        "function_area": "Info Tech: Infrastructure",
+        "specialization": "Incident Management",
+        "skill_name": "Incident Management"
+      }
+    ],
+    "competencies": [
+      { "name": "Technical Troubleshooting", "level": "Intermediate" },
+      { "name": "Problem Resolution", "level": "Intermediate" },
+      { "name": "Documentation & Knowledge Sharing", "level": "Beginner" }
+    ],
+    "experiences": [
+      {
+        "type": "Rotation",
+        "organization": "PSA Singapore",
+        "program": "Infrastructure Support",
+        "period": { "start": "2024-01-15", "end": null },
+        "focus": "System monitoring; incident response; infrastructure maintenance."
+      },
+      {
+        "type": "Training",
+        "organization": "PSA Singapore",
+        "program": "Graduate Development Program",
+        "period": { "start": "2023-06-01", "end": "2024-01-14" },
+        "focus": "Foundational IT skills; mentoring; system administration basics."
+      }
+    ],
+    "positions_history": [
+      {
+        "role_title": "Systems Engineer",
+        "organization": "PSA Singapore",
+        "period": { "start": "2024-01-15", "end": null },
+        "focus_areas": ["Systems administration", "Infrastructure monitoring"],
+        "key_skills_used": ["Systems Administration", "Cloud Infrastructure"]
+      },
+      {
+        "role_title": "IT Graduate Trainee",
+        "organization": "PSA Singapore",
+        "period": { "start": "2023-06-01", "end": "2024-01-14" },
+        "focus_areas": ["Learning fundamentals", "Support ticketing"]
+      }
+    ],
+    "projects": [
+      {
+        "project_name": "Cloud Migration Support",
+        "role": "Support Engineer",
+        "period": { "start": "2024-02-01", "end": "2024-10-31" },
+        "description": "Assisted in migrating on-premises systems to cloud infrastructure.",
+        "outcomes": ["Successfully migrated 50+ servers", "Zero downtime achieved"]
+      }
+    ],
+    "education": [
+      {
+        "degree": "Bachelor's Degree, Computer Science",
+        "institution": "Guru Nanak Dev University",
+        "period": { "start": "2019-08-01", "end": "2023-05-31" }
+      }
+    ]
+  },
+  {
+    "employee_id": "EMP-20010",
+    "personal_info": {
+      "name": "Sophie Martinez",
+      "email": "sophie.martinez@globalpsa.com",
+      "office_location": "PSA Singapore",
+      "languages": [
+        { "language": "English", "proficiency": "Fluent" },
+        { "language": "Spanish", "proficiency": "Fluent" },
+        { "language": "French", "proficiency": "Professional" }
+      ]
+    },
+    "employment_info": {
+      "job_title": "Legal Counsel",
+      "department": "Legal & Compliance",
+      "unit": "Corporate Legal",
+      "line_manager": "James Ng",
+      "in_role_since": "2020-08-01",
+      "hire_date": "2019-02-01",
+      "last_updated": "2025-10-19"
+    },
+    "skills": [
+      {
+        "function_area": "Legal & Compliance",
+        "specialization": "Corporate Law",
+        "skill_name": "Corporate Law"
+      },
+      {
+        "function_area": "Legal & Compliance",
+        "specialization": "Contract Management",
+        "skill_name": "Contract Management"
+      },
+      {
+        "function_area": "Legal & Compliance",
+        "specialization": "Regulatory Compliance",
+        "skill_name": "Regulatory Compliance"
+      },
+      {
+        "function_area": "Legal & Compliance",
+        "specialization": "Risk Management",
+        "skill_name": "Risk Management"
+      },
+      {
+        "function_area": "Legal & Compliance",
+        "specialization": "Dispute Resolution",
+        "skill_name": "Dispute Resolution"
+      }
+    ],
+    "competencies": [
+      { "name": "Legal Analysis & Judgment", "level": "Advanced" },
+      { "name": "Stakeholder & Partnership Management", "level": "Advanced" },
+      { "name": "Risk Management", "level": "Advanced" }
+    ],
+    "experiences": [
+      {
+        "type": "Program",
+        "organization": "PSA Singapore",
+        "program": "Regulatory Compliance Enhancement",
+        "period": { "start": "2020-08-01", "end": null },
+        "focus": "Legal compliance; contract negotiations; policy development."
+      },
+      {
+        "type": "Project",
+        "organization": "PSA Singapore",
+        "program": "International Agreements",
+        "period": { "start": "2021-01-01", "end": "2023-12-31" },
+        "focus": "Cross-border contracts; international law compliance."
+      }
+    ],
+    "positions_history": [
+      {
+        "role_title": "Legal Counsel",
+        "organization": "PSA Singapore",
+        "period": { "start": "2020-08-01", "end": null },
+        "focus_areas": ["Contract management", "Legal compliance", "Risk mitigation"],
+        "key_skills_used": ["Corporate Law", "Contract Management"]
+      },
+      {
+        "role_title": "Legal Associate",
+        "organization": "PSA Singapore",
+        "period": { "start": "2019-02-01", "end": "2020-07-31" },
+        "focus_areas": ["Legal research", "Document drafting"]
+      }
+    ],
+    "projects": [
+      {
+        "project_name": "Enterprise Contract Management System",
+        "role": "Legal Lead",
+        "period": { "start": "2022-03-01", "end": "2023-09-30" },
+        "description": "Implemented centralized contract management platform and governance framework.",
+        "outcomes": ["Contract review time reduced by 45%", "Compliance rate improved to 99%"]
+      }
+    ],
+    "education": [
+      {
+        "degree": "Juris Doctor (J.D.)",
+        "institution": "University of Barcelona",
+        "period": { "start": "2014-09-01", "end": "2017-06-30" }
+      },
+      {
+        "degree": "Bachelor's Degree, Law",
+        "institution": "University of Madrid",
+        "period": { "start": "2010-09-01", "end": "2014-06-30" }
+      }
+    ]
+  },
+  {
+    "employee_id": "EMP-20011",
+    "personal_info": {
+      "name": "Toh Jun Meng",
+      "email": "junmeng.toh@globalpsa.com",
+      "office_location": "PSA Singapore",
+      "languages": [
+        { "language": "English", "proficiency": "Fluent" },
+        { "language": "Mandarin", "proficiency": "Fluent" }
+      ]
+    },
+    "employment_info": {
+      "job_title": "Project Manager",
+      "department": "Operations",
+      "unit": "Strategic Projects",
+      "line_manager": "Robert Koh",
+      "in_role_since": "2023-03-01",
+      "hire_date": "2018-11-15",
+      "last_updated": "2025-10-19"
+    },
+    "skills": [
+      {
+        "function_area": "Operations",
+        "specialization": "Project Management",
+        "skill_name": "Project Management"
+      },
+      {
+        "function_area": "Operations",
+        "specialization": "Strategic Planning",
+        "skill_name": "Strategic Planning"
+      },
+      {
+        "function_area": "Operations",
+        "specialization": "Stakeholder Management",
+        "skill_name": "Stakeholder Management"
+      },
+      {
+        "function_area": "Operations",
+        "specialization": "Risk & Resource Management",
+        "skill_name": "Risk & Resource Management"
+      },
+      {
+        "function_area": "Operations",
+        "specialization": "Performance Metrics & Analytics",
+        "skill_name": "Performance Metrics & Analytics"
+      }
+    ],
+    "competencies": [
+      { "name": "Leadership & Team Management", "level": "Advanced" },
+      { "name": "Strategic Thinking", "level": "Advanced" },
+      { "name": "Communication & Presentation", "level": "Advanced" }
+    ],
+    "experiences": [
+      {
+        "type": "Program",
+        "organization": "PSA Singapore",
+        "program": "Port Expansion Project",
+        "period": { "start": "2023-03-01", "end": null },
+        "focus": "Strategic project management; cross-functional coordination; budget oversight."
+      },
+      {
+        "type": "Project",
+        "organization": "PSA Singapore",
+        "program": "Infrastructure Enhancement Initiative",
+        "period": { "start": "2020-07-01", "end": "2023-02-28" },
+        "focus": "Capital projects delivery; vendor management; timeline optimization."
+      }
+    ],
+    "positions_history": [
+      {
+        "role_title": "Project Manager",
+        "organization": "PSA Singapore",
+        "period": { "start": "2023-03-01", "end": null },
+        "focus_areas": ["Strategic planning", "Project delivery", "Resource management"],
+        "key_skills_used": ["Project Management", "Strategic Planning"]
+      },
+      {
+        "role_title": "Senior Project Coordinator",
+        "organization": "PSA Singapore",
+        "period": { "start": "2020-01-01", "end": "2023-02-28" },
+        "focus_areas": ["Project coordination", "Documentation", "Timeline management"]
+      },
+      {
+        "role_title": "Project Coordinator",
+        "organization": "PSA Singapore",
+        "period": { "start": "2018-11-15", "end": "2019-12-31" },
+        "focus_areas": ["Administrative support", "Scheduling"]
+      }
+    ],
+    "projects": [
+      {
+        "project_name": "West Terminal Expansion Phase 2",
+        "role": "Project Manager",
+        "period": { "start": "2023-04-01", "end": "2025-03-31" },
+        "description": "Managed $50M infrastructure expansion project with multiple stakeholders and workstreams.",
+        "outcomes": ["Project delivered on schedule", "Budget maintained within 2% variance", "Zero safety incidents"]
+      },
+      {
+        "project_name": "Operational Technology Integration",
+        "role": "Program Lead",
+        "period": { "start": "2021-06-01", "end": "2022-12-31" },
+        "description": "Coordinated integration of IoT systems across terminal facilities.",
+        "outcomes": ["System uptime 99.7%", "Operational efficiency improved by 18%"]
+      }
+    ],
+    "education": [
+      {
+        "degree": "Master's Degree, Project Management",
+        "institution": "National University of Singapore (NUS)",
+        "period": { "start": "2016-08-01", "end": "2018-06-30" }
+      },
+      {
+        "degree": "Bachelor's Degree, Civil Engineering",
+        "institution": "Nanyang Technological University (NTU)",
+        "period": { "start": "2012-08-01", "end": "2016-05-31" }
+      }
+    ]
+  },
+  {
+    "employee_id": "EMP-20012",
+    "personal_info": {
+      "name": "Melissa Ong",
+      "email": "melissa.ong@globalpsa.com",
+      "office_location": "PSA Singapore",
+      "languages": [
+        { "language": "English", "proficiency": "Fluent" },
+        { "language": "Mandarin", "proficiency": "Intermediate" }
+      ]
+    },
+    "employment_info": {
+      "job_title": "Data Governance Lead",
+      "department": "Information Technology",
+      "unit": "Data Strategy & Governance",
+      "line_manager": "Priyanka Rao",
+      "in_role_since": "2023-05-01",
+      "hire_date": "2017-02-13",
+      "last_updated": "2025-10-20"
+    },
+    "skills": [
+      {
+        "function_area": "Data & AI: Data Strategy & Management",
+        "specialization": "Data Strategy & Management: Data Governance",
+        "skill_name": "Data Governance Frameworks"
+      },
+      {
+        "function_area": "Data & AI: Data Strategy & Management",
+        "specialization": "Relational database/datagrid design and management",
+        "skill_name": "Master Data Management"
+      },
+      {
+        "function_area": "Data & AI: Data Strategy & Management",
+        "specialization": "Data Strategy & Management: Data Governance",
+        "skill_name": "Data Policy Development"
+      },
+      {
+        "function_area": "Info Tech: IT Governance & Strategy",
+        "specialization": "Business Unit IT Management",
+        "skill_name": "Stakeholder Alignment"
+      }
+    ],
+    "competencies": [
+      { "name": "Technology Management & Innovation", "level": "Advanced" },
+      { "name": "Stakeholder & Partnership Management", "level": "Advanced" },
+      { "name": "Process Improvement & Optimisation and Problem Management", "level": "Intermediate" }
+    ],
+    "experiences": [
+      {
+        "type": "Program",
+        "organization": "PSA Singapore",
+        "program": "Enterprise Data Governance Rollout",
+        "period": { "start": "2023-05-01", "end": null },
+        "focus": "Defined stewardship model, cataloguing standards, and compliance KPIs for group-wide data assets."
+      },
+      {
+        "type": "Project",
+        "organization": "PSA Singapore",
+        "program": "Data Quality Improvement Sprint",
+        "period": { "start": "2021-01-01", "end": "2022-12-31" },
+        "focus": "Instituted data quality dashboards; orchestrated remediation playbooks."
+      }
+    ],
+    "positions_history": [
+      {
+        "role_title": "Data Governance Lead",
+        "organization": "PSA Singapore",
+        "period": { "start": "2023-05-01", "end": null },
+        "focus_areas": ["Data stewardship", "Policy enforcement", "Compliance reporting"],
+        "key_skills_used": ["Data Governance Frameworks", "Stakeholder Alignment"]
+      },
+      {
+        "role_title": "Senior Data Governance Specialist",
+        "organization": "PSA Singapore",
+        "period": { "start": "2020-01-01", "end": "2023-04-30" },
+        "focus_areas": ["Metadata management", "Data quality remediation"]
+      },
+      {
+        "role_title": "Data Analyst",
+        "organization": "PSA Singapore",
+        "period": { "start": "2017-02-13", "end": "2019-12-31" },
+        "focus_areas": ["Reporting", "Data integration"]
+      }
+    ],
+    "projects": [
+      {
+        "project_name": "Data Catalog Modernisation",
+        "role": "Project Lead",
+        "period": { "start": "2023-06-01", "end": "2024-06-30" },
+        "description": "Implemented self-service data catalog with automated lineage discovery and stewardship workflows.",
+        "outcomes": ["Data issue resolution time reduced by 35%", "Regulatory compliance audit passed with no findings"]
+      }
+    ],
+    "education": [
+      {
+        "degree": "Master's Degree, Data Science",
+        "institution": "Singapore Management University",
+        "period": { "start": "2018-01-01", "end": "2020-12-31" }
+      },
+      {
+        "degree": "Bachelor's Degree, Information Systems",
+        "institution": "Singapore Management University",
+        "period": { "start": "2012-08-01", "end": "2016-05-31" }
+      }
+    ]
+  },
+  {
+    "employee_id": "EMP-20013",
+    "personal_info": {
+      "name": "Gabriel Fernandez",
+      "email": "gabriel.fernandez@globalpsa.com",
+      "office_location": "PSA Singapore",
+      "languages": [
+        { "language": "English", "proficiency": "Fluent" },
+        { "language": "Spanish", "proficiency": "Fluent" }
+      ]
+    },
+    "employment_info": {
+      "job_title": "AI Product Manager",
+      "department": "Information Technology",
+      "unit": "Digital Solutions & AI",
+      "line_manager": "Lim Siew Lin",
+      "in_role_since": "2024-02-01",
+      "hire_date": "2019-04-08",
+      "last_updated": "2025-10-20"
+    },
+    "skills": [
+      {
+        "function_area": "Info Tech: Product Management",
+        "specialization": "Product Life Cycle Management: Product Development Lifecycle Management",
+        "skill_name": "Product Roadmapping"
+      },
+      {
+        "function_area": "Info Tech: Product Management",
+        "specialization": "Product Life Cycle Management: Customer Experience Management - CX",
+        "skill_name": "User Research"
+      },
+      {
+        "function_area": "Data & AI: Data Science",
+        "specialization": "Machine Learning & AI",
+        "skill_name": "ML Use Case Design"
+      },
+      {
+        "function_area": "Data & AI: Data Engineering",
+        "specialization": "Data Model Design",
+        "skill_name": "Data Requirements Mapping"
+      }
+    ],
+    "competencies": [
+      { "name": "Stakeholder & Partnership Management", "level": "Advanced" },
+      { "name": "Technology Management & Innovation", "level": "Advanced" },
+      { "name": "Change & Transformation Management", "level": "Intermediate" }
+    ],
+    "experiences": [
+      {
+        "type": "Program",
+        "organization": "PSA Singapore",
+        "program": "AI Copilot Launch",
+        "period": { "start": "2024-02-01", "end": null },
+        "focus": "Led product discovery, pilot deployments, and adoption analytics for AI-enabled employee tools."
+      },
+      {
+        "type": "Project",
+        "organization": "PSA Singapore",
+        "program": "Predictive Berthing Optimisation",
+        "period": { "start": "2021-03-01", "end": "2023-12-31" },
+        "focus": "Coordinated multi-disciplinary squad to deliver ML models improving berth allocation accuracy."
+      }
+    ],
+    "positions_history": [
+      {
+        "role_title": "AI Product Manager",
+        "organization": "PSA Singapore",
+        "period": { "start": "2024-02-01", "end": null },
+        "focus_areas": ["AI strategy", "Product discovery", "Adoption metrics"],
+        "key_skills_used": ["Product Roadmapping", "ML Use Case Design"]
+      },
+      {
+        "role_title": "Senior Product Owner",
+        "organization": "PSA Singapore",
+        "period": { "start": "2021-01-01", "end": "2024-01-31" },
+        "focus_areas": ["Agile delivery", "Feature prioritisation"]
+      },
+      {
+        "role_title": "Product Owner",
+        "organization": "PSA Singapore",
+        "period": { "start": "2019-04-08", "end": "2020-12-31" },
+        "focus_areas": ["Requirements grooming", "Backlog management"]
+      }
+    ],
+    "projects": [
+      {
+        "project_name": "AI Copilot Pilot Programme",
+        "role": "Product Manager",
+        "period": { "start": "2024-02-01", "end": "2024-09-30" },
+        "description": "Conceptualised and launched AI copilot features for HR and operations teams with iterative feedback loops.",
+        "outcomes": ["User adoption reached 68% within six months", "Processing time for routine queries reduced by 40%"]
+      }
+    ],
+    "education": [
+      {
+        "degree": "Master of Business Administration",
+        "institution": "INSEAD",
+        "period": { "start": "2017-08-01", "end": "2018-07-31" }
+      },
+      {
+        "degree": "Bachelor's Degree, Computer Science",
+        "institution": "University of Melbourne",
+        "period": { "start": "2010-02-01", "end": "2013-12-31" }
+      }
+    ]
+  },
+  {
+    "employee_id": "EMP-20014",
+    "personal_info": {
+      "name": "Nurul Hidayah",
+      "email": "nurul.hidayah@globalpsa.com",
+      "office_location": "PSA Pasir Panjang",
+      "languages": [
+        { "language": "English", "proficiency": "Fluent" },
+        { "language": "Malay", "proficiency": "Fluent" }
+      ]
+    },
+    "employment_info": {
+      "job_title": "Terminal Operations Supervisor",
+      "department": "Operations",
+      "unit": "Yard & Vessel Operations",
+      "line_manager": "Soh Wei Liang",
+      "in_role_since": "2022-11-01",
+      "hire_date": "2014-07-07",
+      "last_updated": "2025-10-20"
+    },
+    "skills": [
+      {
+        "function_area": "Operations",
+        "specialization": "Yard Operations and Planning",
+        "skill_name": "Yard Planning"
+      },
+      {
+        "function_area": "Operations",
+        "specialization": "Container Terminal Management",
+        "skill_name": "Terminal Operations Control"
+      },
+      {
+        "function_area": "Operations",
+        "specialization": "Resource Planning, Deployment and Support",
+        "skill_name": "Shift Planning"
+      },
+      {
+        "function_area": "Operations",
+        "specialization": "Transhipment",
+        "skill_name": "Transhipment Coordination"
+      }
+    ],
+    "competencies": [
+      { "name": "Leadership & Team Management", "level": "Advanced" },
+      { "name": "Vendor and Contract Management", "level": "Intermediate" },
+      { "name": "Quality Standards", "level": "Advanced" }
+    ],
+    "experiences": [
+      {
+        "type": "Rotation",
+        "organization": "PSA Singapore",
+        "program": "Terminal Command Centre",
+        "period": { "start": "2022-11-01", "end": null },
+        "focus": "Oversees real-time berth and yard coordination, crisis response drills, and workforce deployment."
+      },
+      {
+        "type": "Project",
+        "organization": "PSA Singapore",
+        "program": "Automated Yard Crane Pilot",
+        "period": { "start": "2019-04-01", "end": "2021-12-31" },
+        "focus": "Led night-shift adoption of automated yard cranes and updated SOPs."
+      }
+    ],
+    "positions_history": [
+      {
+        "role_title": "Terminal Operations Supervisor",
+        "organization": "PSA Singapore",
+        "period": { "start": "2022-11-01", "end": null },
+        "focus_areas": ["Berth operations control", "Workforce coordination", "Safety compliance"],
+        "key_skills_used": ["Terminal Operations Control", "Shift Planning"]
+      },
+      {
+        "role_title": "Senior Yard Planner",
+        "organization": "PSA Singapore",
+        "period": { "start": "2018-01-01", "end": "2022-10-31" },
+        "focus_areas": ["Yard capacity planning", "Equipment dispatch"]
+      },
+      {
+        "role_title": "Yard Planner",
+        "organization": "PSA Singapore",
+        "period": { "start": "2014-07-07", "end": "2017-12-31" },
+        "focus_areas": ["Stowage coordination", "Shift handovers"]
+      }
+    ],
+    "projects": [
+      {
+        "project_name": "Terminal Command Centre Optimisation",
+        "role": "Operations Lead",
+        "period": { "start": "2023-01-01", "end": "2024-03-31" },
+        "description": "Redesigned command centre workflows integrating automation dashboards for yard equipment.",
+        "outcomes": ["Turnaround time reduced by 12%", "Incidents per 10,000 moves dropped by 18%"]
+      }
+    ],
+    "education": [
+      {
+        "degree": "Diploma, Maritime Studies",
+        "institution": "Singapore Maritime Academy",
+        "period": { "start": "2011-04-01", "end": "2014-03-31" }
+      }
+    ]
+  },
+  {
+    "employee_id": "EMP-20015",
+    "personal_info": {
+      "name": "Andre Tan",
+      "email": "andre.tan@globalpsa.com",
+      "office_location": "PSA Singapore",
+      "languages": [
+        { "language": "English", "proficiency": "Fluent" },
+        { "language": "Mandarin", "proficiency": "Fluent" }
+      ]
+    },
+    "employment_info": {
+      "job_title": "Sustainability Program Manager",
+      "department": "Sustainability",
+      "unit": "Green Initiatives Office",
+      "line_manager": "Elaine Chia",
+      "in_role_since": "2023-01-01",
+      "hire_date": "2015-06-15",
+      "last_updated": "2025-10-18"
+    },
+    "skills": [
+      {
+        "function_area": "Sustainability",
+        "specialization": "ESG policies and strategies",
+        "skill_name": "ESG Strategy"
+      },
+      {
+        "function_area": "Sustainability",
+        "specialization": "Sustainable Supply Chain Management: Green Logistics",
+        "skill_name": "Green Logistics"
+      },
+      {
+        "function_area": "Sustainability",
+        "specialization": "Energy Policy and Regulations",
+        "skill_name": "Energy Policy Compliance"
+      },
+      {
+        "function_area": "Sustainability",
+        "specialization": "International Forum Green Advocacy",
+        "skill_name": "Stakeholder Advocacy"
+      }
+    ],
+    "competencies": [
+      { "name": "Change & Transformation Management", "level": "Advanced" },
+      { "name": "Stakeholder & Partnership Management", "level": "Advanced" },
+      { "name": "Technology Management & Innovation", "level": "Intermediate" }
+    ],
+    "experiences": [
+      {
+        "type": "Program",
+        "organization": "PSA Group",
+        "program": "Carbon Neutral Roadmap",
+        "period": { "start": "2023-01-01", "end": null },
+        "focus": "Drives decarbonisation projects, carbon accounting standards, and ESG reporting cadence."
+      },
+      {
+        "type": "Rotation",
+        "organization": "PSA Antwerp",
+        "program": "Green Port Exchange",
+        "period": { "start": "2020-04-01", "end": "2020-09-30" },
+        "focus": "Studied European port electrification practices and adapted for Asia operations."
+      }
+    ],
+    "positions_history": [
+      {
+        "role_title": "Sustainability Program Manager",
+        "organization": "PSA Singapore",
+        "period": { "start": "2023-01-01", "end": null },
+        "focus_areas": ["Decarbonisation roadmap", "ESG reporting", "Stakeholder engagement"],
+        "key_skills_used": ["ESG Strategy", "Stakeholder Advocacy"]
+      },
+      {
+        "role_title": "Senior Sustainability Analyst",
+        "organization": "PSA Singapore",
+        "period": { "start": "2018-07-01", "end": "2022-12-31" },
+        "focus_areas": ["Carbon accounting", "Sustainability metrics"]
+      },
+      {
+        "role_title": "Sustainability Analyst",
+        "organization": "PSA Singapore",
+        "period": { "start": "2015-06-15", "end": "2018-06-30" },
+        "focus_areas": ["Environmental reporting", "Stakeholder outreach"]
+      }
+    ],
+    "projects": [
+      {
+        "project_name": "Green Port Accelerator",
+        "role": "Program Manager",
+        "period": { "start": "2023-02-01", "end": "2024-08-31" },
+        "description": "Coordinated cross-terminal green initiatives including electrified yard vehicles and shore power pilots.",
+        "outcomes": ["Achieved 12% reduction in Scope 1 emissions", "Published PSA's first integrated sustainability report"]
+      }
+    ],
+    "education": [
+      {
+        "degree": "Master's Degree, Sustainability Management",
+        "institution": "Columbia University",
+        "period": { "start": "2013-09-01", "end": "2015-05-31" }
+      },
+      {
+        "degree": "Bachelor's Degree, Environmental Engineering",
+        "institution": "Nanyang Technological University (NTU)",
+        "period": { "start": "2009-08-01", "end": "2013-05-31" }
+      }
+    ]
+  },
+  {
+    "employee_id": "EMP-20016",
+    "personal_info": {
+      "name": "Rachel Koh",
+      "email": "rachel.koh@globalpsa.com",
+      "office_location": "PSA Singapore",
+      "languages": [
+        { "language": "English", "proficiency": "Fluent" },
+        { "language": "Mandarin", "proficiency": "Intermediate" }
+      ]
+    },
+    "employment_info": {
+      "job_title": "Procurement Category Lead",
+      "department": "Procurement",
+      "unit": "Strategic Sourcing",
+      "line_manager": "Ng Wei Kiat",
+      "in_role_since": "2022-06-01",
+      "hire_date": "2014-01-20",
+      "last_updated": "2025-10-15"
+    },
+    "skills": [
+      {
+        "function_area": "Procurement",
+        "specialization": "Category Management",
+        "skill_name": "Category Strategy"
+      },
+      {
+        "function_area": "Procurement",
+        "specialization": "Supplier Management",
+        "skill_name": "Supplier Relationship Management"
+      },
+      {
+        "function_area": "Procurement",
+        "specialization": "Global Framework Agreement development",
+        "skill_name": "Contract Negotiation"
+      },
+      {
+        "function_area": "Procurement",
+        "specialization": "Sustainable Procurement",
+        "skill_name": "Sustainable Procurement"
+      }
+    ],
+    "competencies": [
+      { "name": "Vendor and Contract Management", "level": "Advanced" },
+      { "name": "Stakeholder & Partnership Management", "level": "Advanced" },
+      { "name": "Process Improvement & Optimisation and Problem Management", "level": "Intermediate" }
+    ],
+    "experiences": [
+      {
+        "type": "Program",
+        "organization": "PSA Singapore",
+        "program": "Strategic Sourcing Transformation",
+        "period": { "start": "2022-06-01", "end": null },
+        "focus": "Rebuilt category playbooks, supplier segmentation, and SRM scorecards."
+      },
+      {
+        "type": "Project",
+        "organization": "PSA Singapore",
+        "program": "Global Crane Procurement",
+        "period": { "start": "2019-01-01", "end": "2021-12-31" },
+        "focus": "Led tender and negotiation for port equipment global framework agreement."
+      }
+    ],
+    "positions_history": [
+      {
+        "role_title": "Procurement Category Lead",
+        "organization": "PSA Singapore",
+        "period": { "start": "2022-06-01", "end": null },
+        "focus_areas": ["Category strategy", "Supplier governance", "Cost optimisation"],
+        "key_skills_used": ["Category Strategy", "Contract Negotiation"]
+      },
+      {
+        "role_title": "Senior Procurement Specialist",
+        "organization": "PSA Singapore",
+        "period": { "start": "2017-01-01", "end": "2022-05-31" },
+        "focus_areas": ["Tender management", "Supplier onboarding"]
+      },
+      {
+        "role_title": "Procurement Specialist",
+        "organization": "PSA Singapore",
+        "period": { "start": "2014-01-20", "end": "2016-12-31" },
+        "focus_areas": ["Purchase requisitions", "Vendor due diligence"]
+      }
+    ],
+    "projects": [
+      {
+        "project_name": "Green Procurement Initiative",
+        "role": "Category Lead",
+        "period": { "start": "2023-01-01", "end": "2024-04-30" },
+        "description": "Embedded sustainability metrics into supplier scorecards and sourcing decisions.",
+        "outcomes": ["15% reduction in lifecycle cost for strategic categories", "80% of strategic suppliers met sustainability criteria"]
+      }
+    ],
+    "education": [
+      {
+        "degree": "Bachelor's Degree, Supply Chain Management",
+        "institution": "Singapore University of Social Sciences",
+        "period": { "start": "2009-01-01", "end": "2012-12-31" }
+      }
+    ]
+  },
+  {
+    "employee_id": "EMP-20017",
+    "personal_info": {
+      "name": "Jonathan Yap",
+      "email": "jonathan.yap@globalpsa.com",
+      "office_location": "PSA Singapore",
+      "languages": [
+        { "language": "English", "proficiency": "Fluent" },
+        { "language": "Mandarin", "proficiency": "Fluent" }
+      ]
+    },
+    "employment_info": {
+      "job_title": "DevSecOps Engineer",
+      "department": "Information Technology",
+      "unit": "Platform Engineering",
+      "line_manager": "Sharon Peh",
+      "in_role_since": "2023-04-01",
+      "hire_date": "2018-08-06",
+      "last_updated": "2025-10-19"
+    },
+    "skills": [
+      {
+        "function_area": "Info Tech: Application Development",
+        "specialization": "Software Engineering: DevOps / DevSecOps",
+        "skill_name": "CI/CD Automation"
+      },
+      {
+        "function_area": "Info Tech: Application Development",
+        "specialization": "Software Engineering: Automated Test Development and Testing",
+        "skill_name": "Automated Testing"
+      },
+      {
+        "function_area": "Info Tech: Cybersecurity",
+        "specialization": "Cybersecurity Governance : Cybersecurity Architecture",
+        "skill_name": "Secure Pipeline Design"
+      },
+      {
+        "function_area": "Info Tech: Infrastructure",
+        "specialization": "Systems & Middleware Management: Desktops / Servers Management",
+        "skill_name": "Container Orchestration"
+      }
+    ],
+    "competencies": [
+      { "name": "Technology Management & Innovation", "level": "Advanced" },
+      { "name": "Process Improvement & Optimisation and Problem Management", "level": "Advanced" },
+      { "name": "Stakeholder & Partnership Management", "level": "Intermediate" }
+    ],
+    "experiences": [
+      {
+        "type": "Program",
+        "organization": "PSA Singapore",
+        "program": "Secure Platform Modernisation",
+        "period": { "start": "2023-04-01", "end": null },
+        "focus": "Embedded security gates within CI/CD, championed infrastructure-as-code guardrails."
+      },
+      {
+        "type": "Project",
+        "organization": "PSA Singapore",
+        "program": "Container Platform Upgrade",
+        "period": { "start": "2020-05-01", "end": "2022-12-31" },
+        "focus": "Migrated on-prem workloads to Kubernetes with automated observability and compliance checks."
+      }
+    ],
+    "positions_history": [
+      {
+        "role_title": "DevSecOps Engineer",
+        "organization": "PSA Singapore",
+        "period": { "start": "2023-04-01", "end": null },
+        "focus_areas": ["Pipeline automation", "Security controls", "Platform reliability"],
+        "key_skills_used": ["CI/CD Automation", "Secure Pipeline Design"]
+      },
+      {
+        "role_title": "Senior DevOps Engineer",
+        "organization": "PSA Singapore",
+        "period": { "start": "2020-01-01", "end": "2023-03-31" },
+        "focus_areas": ["Infrastructure as code", "Monitoring automation"]
+      },
+      {
+        "role_title": "DevOps Engineer",
+        "organization": "PSA Singapore",
+        "period": { "start": "2018-08-06", "end": "2019-12-31" },
+        "focus_areas": ["Build pipeline support", "Deployment automation"]
+      }
+    ],
+    "projects": [
+      {
+        "project_name": "Secure CI/CD Initiative",
+        "role": "Lead Engineer",
+        "period": { "start": "2023-05-01", "end": "2024-02-29" },
+        "description": "Implemented policy-as-code to enforce security testing, secrets management, and artifact integrity.",
+        "outcomes": ["Mean time to deploy reduced by 25%", "Security vulnerabilities caught pre-production increased by 60%"]
+      }
+    ],
+    "education": [
+      {
+        "degree": "Bachelor's Degree, Computer Engineering",
+        "institution": "National University of Singapore (NUS)",
+        "period": { "start": "2011-08-01", "end": "2015-06-30" }
+      },
+      {
+        "degree": "Graduate Certificate, Cybersecurity",
+        "institution": "SANS Institute",
+        "period": { "start": "2019-01-01", "end": "2019-12-31" }
+      }
+    ]
+  },
+  {
+    "employee_id": "EMP-20018",
+    "personal_info": {
+      "name": "Lim Wei Han",
+      "email": "weihan.lim@globalpsa.com",
+      "office_location": "PSA Singapore",
+      "languages": [
+        { "language": "English", "proficiency": "Fluent" },
+        { "language": "Mandarin", "proficiency": "Fluent" }
+      ]
+    },
+    "employment_info": {
+      "job_title": "Maritime Safety Officer",
+      "department": "Health, Safety & Security",
+      "unit": "Maritime Safety",
+      "line_manager": "Kok Wen Hao",
+      "in_role_since": "2021-09-01",
+      "hire_date": "2012-03-05",
+      "last_updated": "2025-10-16"
+    },
+    "skills": [
+      {
+        "function_area": "Operations",
+        "specialization": "Auxiliary, Governmental and Customs Management",
+        "skill_name": "Port Safety Regulations"
+      },
+      {
+        "function_area": "Operations",
+        "specialization": "Resource Planning, Deployment and Support",
+        "skill_name": "Emergency Response Planning"
+      },
+      {
+        "function_area": "Operations",
+        "specialization": "Container Terminal Management",
+        "skill_name": "Operational Risk Assessments"
+      },
+      {
+        "function_area": "Operations",
+        "specialization": "Multi-purpose Terminals",
+        "skill_name": "Hazard Control"
+      }
+    ],
+    "competencies": [
+      { "name": "Quality Standards", "level": "Advanced" },
+      { "name": "Vendor and Contract Management", "level": "Intermediate" },
+      { "name": "Stakeholder & Partnership Management", "level": "Intermediate" }
+    ],
+    "experiences": [
+      {
+        "type": "Program",
+        "organization": "PSA Singapore",
+        "program": "Port Safety Excellence",
+        "period": { "start": "2021-09-01", "end": null },
+        "focus": "Leads port safety audits, emergency drills, and compliance with maritime regulations."
+      },
+      {
+        "type": "Project",
+        "organization": "PSA Singapore",
+        "program": "ISPS Code Enhancement",
+        "period": { "start": "2018-02-01", "end": "2020-12-31" },
+        "focus": "Updated security assessments and training modules across terminals."
+      }
+    ],
+    "positions_history": [
+      {
+        "role_title": "Maritime Safety Officer",
+        "organization": "PSA Singapore",
+        "period": { "start": "2021-09-01", "end": null },
+        "focus_areas": ["Safety audits", "Incident investigation", "Emergency preparedness"],
+        "key_skills_used": ["Port Safety Regulations", "Emergency Response Planning"]
+      },
+      {
+        "role_title": "Senior Safety Executive",
+        "organization": "PSA Singapore",
+        "period": { "start": "2016-01-01", "end": "2021-08-31" },
+        "focus_areas": ["Safety inspections", "Training facilitation"]
+      },
+      {
+        "role_title": "Safety Executive",
+        "organization": "PSA Singapore",
+        "period": { "start": "2012-03-05", "end": "2015-12-31" },
+        "focus_areas": ["On-site risk assessments", "Incident reporting"]
+      }
+    ],
+    "projects": [
+      {
+        "project_name": "Maritime Safety Digital Dashboard",
+        "role": "Project Sponsor",
+        "period": { "start": "2022-01-01", "end": "2023-03-31" },
+        "description": "Developed real-time safety dashboard integrating incident data, inspection schedules, and compliance metrics.",
+        "outcomes": ["Safety incident rate reduced by 22%", "Audit findings closed within 30 days"]
+      }
+    ],
+    "education": [
+      {
+        "degree": "Bachelor's Degree, Maritime Studies",
+        "institution": "Nanyang Technological University (NTU)",
+        "period": { "start": "2007-08-01", "end": "2011-05-31" }
+      }
+    ]
+  },
+  {
+    "employee_id": "EMP-20019",
+    "personal_info": {
+      "name": "Chen Yu Xin",
+      "email": "yuxin.chen@globalpsa.com",
+      "office_location": "PSA Singapore",
+      "languages": [
+        { "language": "English", "proficiency": "Fluent" },
+        { "language": "Mandarin", "proficiency": "Fluent" }
+      ]
+    },
+    "employment_info": {
+      "job_title": "Learning & Development Specialist",
+      "department": "Human Resource",
+      "unit": "People Development",
+      "line_manager": "Amanda Yeo",
+      "in_role_since": "2022-01-01",
+      "hire_date": "2016-10-10",
+      "last_updated": "2025-10-12"
+    },
+    "skills": [
+      {
+        "function_area": "Human Resource",
+        "specialization": "Training / Learning and Development",
+        "skill_name": "Learning Program Design"
+      },
+      {
+        "function_area": "Human Resource",
+        "specialization": "Talent Management",
+        "skill_name": "Competency Frameworks"
+      },
+      {
+        "function_area": "Human Resource",
+        "specialization": "Generalist / Business Partner",
+        "skill_name": "Stakeholder Consultation"
+      },
+      {
+        "function_area": "Human Resource",
+        "specialization": "Organisation Development",
+        "skill_name": "Change Enablement"
+      }
+    ],
+    "competencies": [
+      { "name": "Stakeholder & Partnership Management", "level": "Advanced" },
+      { "name": "Change & Transformation Management", "level": "Intermediate" },
+      { "name": "Process Improvement & Optimisation and Problem Management", "level": "Intermediate" }
+    ],
+    "experiences": [
+      {
+        "type": "Program",
+        "organization": "PSA Singapore",
+        "program": "Future Skills Academy",
+        "period": { "start": "2022-01-01", "end": null },
+        "focus": "Designs leadership and digital upskilling journeys; manages internal facilitators network."
+      },
+      {
+        "type": "Project",
+        "organization": "PSA Singapore",
+        "program": "Learning Experience Platform Deployment",
+        "period": { "start": "2019-04-01", "end": "2021-12-31" },
+        "focus": "Implemented LXP with personalised learning paths and analytics."
+      }
+    ],
+    "positions_history": [
+      {
+        "role_title": "Learning & Development Specialist",
+        "organization": "PSA Singapore",
+        "period": { "start": "2022-01-01", "end": null },
+        "focus_areas": ["Program design", "Leadership development", "Skills analytics"],
+        "key_skills_used": ["Learning Program Design", "Competency Frameworks"]
+      },
+      {
+        "role_title": "Senior Learning Partner",
+        "organization": "PSA Singapore",
+        "period": { "start": "2019-01-01", "end": "2021-12-31" },
+        "focus_areas": ["Training delivery", "Stakeholder management"]
+      },
+      {
+        "role_title": "Learning Partner",
+        "organization": "PSA Singapore",
+        "period": { "start": "2016-10-10", "end": "2018-12-31" },
+        "focus_areas": ["Curriculum design", "Workshop facilitation"]
+      }
+    ],
+    "projects": [
+      {
+        "project_name": "Leadership in Port 4.0",
+        "role": "Program Designer",
+        "period": { "start": "2022-02-01", "end": "2023-06-30" },
+        "description": "Curated blended learning pathway with simulations, peer learning, and capstone projects.",
+        "outcomes": ["85% participant satisfaction", "Leadership bench strength index improved by 10 points"]
+      }
+    ],
+    "education": [
+      {
+        "degree": "Master's Degree, Organisational Psychology",
+        "institution": "University College London",
+        "period": { "start": "2014-09-01", "end": "2015-09-30" }
+      },
+      {
+        "degree": "Bachelor's Degree, Business Administration",
+        "institution": "National University of Singapore (NUS)",
+        "period": { "start": "2010-08-01", "end": "2014-05-31" }
+      }
+    ]
+  },
+  {
+    "employee_id": "EMP-20020",
+    "personal_info": {
+      "name": "Farah Rahim",
+      "email": "farah.rahim@globalpsa.com",
+      "office_location": "PSA Singapore",
+      "languages": [
+        { "language": "English", "proficiency": "Fluent" },
+        { "language": "Malay", "proficiency": "Fluent" }
+      ]
+    },
+    "employment_info": {
+      "job_title": "Corporate Communications Manager",
+      "department": "Corporate Affairs",
+      "unit": "Communications & Media",
+      "line_manager": "Anthony Koh",
+      "in_role_since": "2023-07-01",
+      "hire_date": "2015-09-14",
+      "last_updated": "2025-10-13"
+    },
+    "skills": [
+      {
+        "function_area": "Corporate Affairs",
+        "specialization": "Public Relations Management",
+        "skill_name": "Media Relations"
+      },
+      {
+        "function_area": "Corporate Affairs",
+        "specialization": "Public Relations Management",
+        "skill_name": "Crisis Communications"
+      },
+      {
+        "function_area": "Sustainability",
+        "specialization": "ESG policies and strategies",
+        "skill_name": "ESG Messaging"
+      },
+      {
+        "function_area": "Corporate Affairs",
+        "specialization": "Corporate Affairs",
+        "skill_name": "Executive Communications"
+      }
+    ],
+    "competencies": [
+      { "name": "Stakeholder & Partnership Management", "level": "Advanced" },
+      { "name": "Technology Management & Innovation", "level": "Intermediate" },
+      { "name": "Change & Transformation Management", "level": "Intermediate" }
+    ],
+    "experiences": [
+      {
+        "type": "Program",
+        "organization": "PSA Singapore",
+        "program": "Integrated Communications Office",
+        "period": { "start": "2023-07-01", "end": null },
+        "focus": "Leads corporate storytelling, media strategy, and executive communications for regional stakeholders."
+      },
+      {
+        "type": "Project",
+        "organization": "PSA Singapore",
+        "program": "Sustainability Communications Launch",
+        "period": { "start": "2021-01-01", "end": "2022-12-31" },
+        "focus": "Crafted narrative and campaigns for PSA's sustainability roadmap."
+      }
+    ],
+    "positions_history": [
+      {
+        "role_title": "Corporate Communications Manager",
+        "organization": "PSA Singapore",
+        "period": { "start": "2023-07-01", "end": null },
+        "focus_areas": ["Media strategy", "Executive communications", "Reputation management"],
+        "key_skills_used": ["Media Relations", "Crisis Communications"]
+      },
+      {
+        "role_title": "Senior Communications Executive",
+        "organization": "PSA Singapore",
+        "period": { "start": "2018-01-01", "end": "2023-06-30" },
+        "focus_areas": ["Campaign planning", "Stakeholder engagement"]
+      },
+      {
+        "role_title": "Communications Executive",
+        "organization": "PSA Singapore",
+        "period": { "start": "2015-09-14", "end": "2017-12-31" },
+        "focus_areas": ["Media monitoring", "Content creation"]
+      }
+    ],
+    "projects": [
+      {
+        "project_name": "Port of Singapore Global Media Tour",
+        "role": "Project Manager",
+        "period": { "start": "2023-08-01", "end": "2024-02-29" },
+        "description": "Organised immersive media programme showcasing PSA innovations and sustainability milestones.",
+        "outcomes": ["Positive media sentiment improved by 20%", "Secured coverage in top-tier publications"]
+      }
+    ],
+    "education": [
+      {
+        "degree": "Bachelor's Degree, Communications Studies",
+        "institution": "Nanyang Technological University (NTU)",
+        "period": { "start": "2011-08-01", "end": "2015-05-31" }
+      }
+    ]
+  },
+  {
+    "employee_id": "EMP-20021",
+    "personal_info": {
+      "name": "Harish Pillai",
+      "email": "harish.pillai@globalpsa.com",
+      "office_location": "PSA Singapore",
+      "languages": [
+        { "language": "English", "proficiency": "Fluent" },
+        { "language": "Hindi", "proficiency": "Fluent" }
+      ]
+    },
+    "employment_info": {
+      "job_title": "Business Continuity Analyst",
+      "department": "Risk & Compliance",
+      "unit": "Enterprise Resilience",
+      "line_manager": "Evelyn Cheong",
+      "in_role_since": "2022-04-01",
+      "hire_date": "2017-07-17",
+      "last_updated": "2025-10-17"
+    },
+    "skills": [
+      {
+        "function_area": "Operations",
+        "specialization": "Resource Planning, Deployment and Support",
+        "skill_name": "Business Continuity Planning"
+      },
+      {
+        "function_area": "Operations",
+        "specialization": "Process Improvement & Optimisation and Problem Management",
+        "skill_name": "Risk Assessment"
+      },
+      {
+        "function_area": "Operations",
+        "specialization": "Operations and Management: IT Service Management",
+        "skill_name": "IT Disaster Recovery"
+      },
+      {
+        "function_area": "Operations",
+        "specialization": "Change Management and Transformation",
+        "skill_name": "Crisis Response Coordination"
+      }
+    ],
+    "competencies": [
+      { "name": "Quality Standards", "level": "Advanced" },
+      { "name": "Process Improvement & Optimisation and Problem Management", "level": "Advanced" },
+      { "name": "Stakeholder & Partnership Management", "level": "Intermediate" }
+    ],
+    "experiences": [
+      {
+        "type": "Program",
+        "organization": "PSA Singapore",
+        "program": "Enterprise Resilience Framework",
+        "period": { "start": "2022-04-01", "end": null },
+        "focus": "Maintains BCM plans, runs crisis simulations, and supports disaster recovery exercises."
+      },
+      {
+        "type": "Project",
+        "organization": "PSA Singapore",
+        "program": "Critical Systems DR Refresh",
+        "period": { "start": "2019-01-01", "end": "2021-12-31" },
+        "focus": "Updated recovery playbooks and automated failover testing."
+      }
+    ],
+    "positions_history": [
+      {
+        "role_title": "Business Continuity Analyst",
+        "organization": "PSA Singapore",
+        "period": { "start": "2022-04-01", "end": null },
+        "focus_areas": ["Continuity planning", "Crisis exercises", "Risk mitigation"],
+        "key_skills_used": ["Business Continuity Planning", "IT Disaster Recovery"]
+      },
+      {
+        "role_title": "Senior Risk Executive",
+        "organization": "PSA Singapore",
+        "period": { "start": "2019-01-01", "end": "2022-03-31" },
+        "focus_areas": ["Risk reviews", "Incident response"]
+      },
+      {
+        "role_title": "Risk Executive",
+        "organization": "PSA Singapore",
+        "period": { "start": "2017-07-17", "end": "2018-12-31" },
+        "focus_areas": ["Risk reporting", "Controls documentation"]
+      }
+    ],
+    "projects": [
+      {
+        "project_name": "Enterprise Resilience Playbook",
+        "role": "Project Coordinator",
+        "period": { "start": "2022-05-01", "end": "2023-01-31" },
+        "description": "Created integrated response guide covering IT, facilities, and operations recovery steps.",
+        "outcomes": ["Recovery drill success rate increased to 95%", "Incident response time improved by 30%"]
+      }
+    ],
+    "education": [
+      {
+        "degree": "Bachelor's Degree, Business (Risk Management)",
+        "institution": "Monash University",
+        "period": { "start": "2010-02-01", "end": "2013-11-30" }
+      },
+      {
+        "degree": "Professional Certificate, Business Continuity",
+        "institution": "DRI International",
+        "period": { "start": "2018-01-01", "end": "2018-12-31" }
+      }
+    ]
+  },
+  {
+    "employee_id": "EMP-20022",
+    "personal_info": {
+      "name": "Irene Sim",
+      "email": "irene.sim@globalpsa.com",
+      "office_location": "PSA Singapore",
+      "languages": [
+        { "language": "English", "proficiency": "Fluent" },
+        { "language": "Mandarin", "proficiency": "Intermediate" }
+      ]
+    },
+    "employment_info": {
+      "job_title": "Robotics Automation Engineer",
+      "department": "Information Technology",
+      "unit": "Automation & Robotics",
+      "line_manager": "Marcus Yong",
+      "in_role_since": "2023-03-01",
+      "hire_date": "2016-06-06",
+      "last_updated": "2025-10-14"
+    },
+    "skills": [
+      {
+        "function_area": "Automation and Robotics",
+        "specialization": "Engineering Systems",
+        "skill_name": "Robotics Integration"
+      },
+      {
+        "function_area": "Automation and Robotics",
+        "specialization": "Robotic Process Automation",
+        "skill_name": "RPA Development"
+      },
+      {
+        "function_area": "Automation and Robotics",
+        "specialization": "Engineering Systems",
+        "skill_name": "Control Systems"
+      },
+      {
+        "function_area": "Info Tech: Application Development",
+        "specialization": "Software Engineering: Agile Methodology",
+        "skill_name": "Agile Delivery"
+      }
+    ],
+    "competencies": [
+      { "name": "Technology Management & Innovation", "level": "Advanced" },
+      { "name": "Process Improvement & Optimisation and Problem Management", "level": "Advanced" },
+      { "name": "Stakeholder & Partnership Management", "level": "Intermediate" }
+    ],
+    "experiences": [
+      {
+        "type": "Program",
+        "organization": "PSA Singapore",
+        "program": "Automation & Robotics Centre",
+        "period": { "start": "2023-03-01", "end": null },
+        "focus": "Designs robotics solutions for yard automation, orchestrates pilots, and supports scaling."
+      },
+      {
+        "type": "Project",
+        "organization": "PSA Singapore",
+        "program": "Robotic Systems Upgrade",
+        "period": { "start": "2019-01-01", "end": "2022-12-31" },
+        "focus": "Modernised control systems for automated guided vehicles."
+      }
+    ],
+    "positions_history": [
+      {
+        "role_title": "Robotics Automation Engineer",
+        "organization": "PSA Singapore",
+        "period": { "start": "2023-03-01", "end": null },
+        "focus_areas": ["Robotics integration", "Pilot design", "Operational support"],
+        "key_skills_used": ["Robotics Integration", "RPA Development"]
+      },
+      {
+        "role_title": "Senior Automation Engineer",
+        "organization": "PSA Singapore",
+        "period": { "start": "2018-01-01", "end": "2023-02-28" },
+        "focus_areas": ["Automation design", "System testing"]
+      },
+      {
+        "role_title": "Automation Engineer",
+        "organization": "PSA Singapore",
+        "period": { "start": "2016-06-06", "end": "2017-12-31" },
+        "focus_areas": ["RPA scripting", "Process analysis"]
+      }
+    ],
+    "projects": [
+      {
+        "project_name": "Autonomous Container Shuttle Pilot",
+        "role": "Technical Lead",
+        "period": { "start": "2023-04-01", "end": "2024-05-31" },
+        "description": "Developed control algorithms and monitoring dashboards for autonomous shuttle operations.",
+        "outcomes": ["Throughput improved by 15%", "Safety incident rate at zero during pilot"]
+      }
+    ],
+    "education": [
+      {
+        "degree": "Master's Degree, Robotics",
+        "institution": "Carnegie Mellon University",
+        "period": { "start": "2013-08-01", "end": "2015-05-31" }
+      },
+      {
+        "degree": "Bachelor's Degree, Mechanical Engineering",
+        "institution": "National University of Singapore (NUS)",
+        "period": { "start": "2008-08-01", "end": "2012-05-31" }
+      }
+    ]
+  },
+  {
+    "employee_id": "EMP-20023",
+    "personal_info": {
+      "name": "Adeline Quek",
+      "email": "adeline.quek@globalpsa.com",
+      "office_location": "PSA Singapore",
+      "languages": [
+        { "language": "English", "proficiency": "Fluent" },
+        { "language": "Mandarin", "proficiency": "Fluent" }
+      ]
+    },
+    "employment_info": {
+      "job_title": "Customer Experience Strategist",
+      "department": "Commercial",
+      "unit": "Customer Experience Office",
+      "line_manager": "Jasmine Ong",
+      "in_role_since": "2023-09-01",
+      "hire_date": "2016-01-11",
+      "last_updated": "2025-10-16"
+    },
+    "skills": [
+      {
+        "function_area": "Commercial",
+        "specialization": "Account Management",
+        "skill_name": "Customer Journey Mapping"
+      },
+      {
+        "function_area": "Commercial",
+        "specialization": "Business Development",
+        "skill_name": "Voice of Customer Analytics"
+      },
+      {
+        "function_area": "UI/UX Design & Development: Customer Experience Management",
+        "specialization": "Customer Experience Management",
+        "skill_name": "Experience Design"
+      },
+      {
+        "function_area": "Supply Chain and Logistics",
+        "specialization": "Port Ecosystem",
+        "skill_name": "Port Ecosystem Insights"
+      }
+    ],
+    "competencies": [
+      { "name": "Stakeholder & Partnership Management", "level": "Advanced" },
+      { "name": "Technology Management & Innovation", "level": "Intermediate" },
+      { "name": "Process Improvement & Optimisation and Problem Management", "level": "Intermediate" }
+    ],
+    "experiences": [
+      {
+        "type": "Program",
+        "organization": "PSA Singapore",
+        "program": "Customer Experience Office",
+        "period": { "start": "2023-09-01", "end": null },
+        "focus": "Leads CX roadmap, service design sprints, and experience measurement for strategic accounts."
+      },
+      {
+        "type": "Project",
+        "organization": "PSA Singapore",
+        "program": "Customer Portal Revamp",
+        "period": { "start": "2020-02-01", "end": "2022-08-31" },
+        "focus": "Reimagined digital touchpoints with self-service and predictive alerts."
+      }
+    ],
+    "positions_history": [
+      {
+        "role_title": "Customer Experience Strategist",
+        "organization": "PSA Singapore",
+        "period": { "start": "2023-09-01", "end": null },
+        "focus_areas": ["Experience strategy", "Service design", "Analytics"],
+        "key_skills_used": ["Customer Journey Mapping", "Experience Design"]
+      },
+      {
+        "role_title": "Senior Customer Success Manager",
+        "organization": "PSA Singapore",
+        "period": { "start": "2019-01-01", "end": "2023-08-31" },
+        "focus_areas": ["Customer retention", "Service improvement"]
+      },
+      {
+        "role_title": "Customer Success Manager",
+        "organization": "PSA Singapore",
+        "period": { "start": "2016-01-11", "end": "2018-12-31" },
+        "focus_areas": ["Account onboarding", "Feedback management"]
+      }
+    ],
+    "projects": [
+      {
+        "project_name": "Customer Journey Optimisation 2024",
+        "role": "Program Lead",
+        "period": { "start": "2023-09-01", "end": "2024-12-31" },
+        "description": "Drove service blueprinting workshops and analytics to remove friction in customer lifecycle.",
+        "outcomes": ["Customer satisfaction score improved by 12 points", "Net revenue retention increased by 6%"]
+      }
+    ],
+    "education": [
+      {
+        "degree": "Master's Degree, Service Leadership",
+        "institution": "Singapore University of Social Sciences",
+        "period": { "start": "2017-08-01", "end": "2019-06-30" }
+      },
+      {
+        "degree": "Bachelor's Degree, Business (Marketing)",
+        "institution": "University of Queensland",
+        "period": { "start": "2008-02-01", "end": "2011-12-31" }
+      }
+    ]
+  },
+  {
+    "employee_id": "EMP-20024",
+    "personal_info": {
+      "name": "Marcus de Souza",
+      "email": "marcus.desouza@globalpsa.com",
+      "office_location": "PSA Singapore",
+      "languages": [
+        { "language": "English", "proficiency": "Fluent" },
+        { "language": "Portuguese", "proficiency": "Intermediate" }
+      ]
+    },
+    "employment_info": {
+      "job_title": "Treasury Risk Manager",
+      "department": "Finance",
+      "unit": "Global Treasury",
+      "line_manager": "Wong Li Kiat",
+      "in_role_since": "2023-10-01",
+      "hire_date": "2015-03-16",
+      "last_updated": "2025-10-20"
+    },
+    "skills": [
+      {
+        "function_area": "Finance",
+        "specialization": "Risk Management",
+        "skill_name": "Financial Risk Modelling"
+      },
+      {
+        "function_area": "Finance",
+        "specialization": "Treasury",
+        "skill_name": "Liquidity Management"
+      },
+      {
+        "function_area": "Finance",
+        "specialization": "Financial Modeling",
+        "skill_name": "Scenario Modelling"
+      },
+      {
+        "function_area": "Finance",
+        "specialization": "Accounting and Consolidation",
+        "skill_name": "Hedging Accounting"
+      }
+    ],
+    "competencies": [
+      { "name": "Risk Management", "level": "Advanced" },
+      { "name": "Stakeholder & Partnership Management", "level": "Advanced" },
+      { "name": "Process Improvement & Optimisation and Problem Management", "level": "Intermediate" }
+    ],
+    "experiences": [
+      {
+        "type": "Program",
+        "organization": "PSA Singapore",
+        "program": "Global Treasury Risk Office",
+        "period": { "start": "2023-10-01", "end": null },
+        "focus": "Oversees FX, interest rate, and liquidity risk policies across global entities."
+      },
+      {
+        "type": "Project",
+        "organization": "PSA Singapore",
+        "program": "Treasury Systems Transformation",
+        "period": { "start": "2020-01-01", "end": "2022-12-31" },
+        "focus": "Implemented new treasury management system with integrated risk analytics."
+      }
+    ],
+    "positions_history": [
+      {
+        "role_title": "Treasury Risk Manager",
+        "organization": "PSA Singapore",
+        "period": { "start": "2023-10-01", "end": null },
+        "focus_areas": ["Risk governance", "Liquidity oversight", "Policy compliance"],
+        "key_skills_used": ["Financial Risk Modelling", "Liquidity Management"]
+      },
+      {
+        "role_title": "Senior Treasury Analyst",
+        "organization": "PSA Singapore",
+        "period": { "start": "2018-01-01", "end": "2023-09-30" },
+        "focus_areas": ["Cash management", "Hedging strategy"]
+      },
+      {
+        "role_title": "Treasury Analyst",
+        "organization": "PSA Singapore",
+        "period": { "start": "2015-03-16", "end": "2017-12-31" },
+        "focus_areas": ["Cash forecasting", "FX settlements"]
+      }
+    ],
+    "projects": [
+      {
+        "project_name": "Liquidity Stress Testing Automation",
+        "role": "Project Lead",
+        "period": { "start": "2024-01-01", "end": "2024-08-31" },
+        "description": "Automated stress testing and reporting workflows across 10 global treasury centres.",
+        "outcomes": ["Scenario analysis turnaround reduced by 50%", "Improved compliance with group risk appetite"]
+      }
+    ],
+    "education": [
+      {
+        "degree": "Chartered Financial Analyst (CFA)",
+        "institution": "CFA Institute",
+        "period": { "start": "2016-01-01", "end": "2019-08-31" }
+      },
+      {
+        "degree": "Bachelor's Degree, Finance",
+        "institution": "Singapore Management University",
+        "period": { "start": "2009-08-01", "end": "2013-06-30" }
+      }
+    ]
+  },
+  {
+    "employee_id": "EMP-20025",
+    "personal_info": {
+      "name": "Hannah Lee",
+      "email": "hannah.lee@globalpsa.com",
+      "office_location": "PSA Tuas",
+      "languages": [
+        { "language": "English", "proficiency": "Fluent" },
+        { "language": "Mandarin", "proficiency": "Fluent" }
+      ]
+    },
+    "employment_info": {
+      "job_title": "Port Logistics Coordinator",
+      "department": "Operations",
+      "unit": "Port Ecosystem Partnerships",
+      "line_manager": "Daniel Fong",
+      "in_role_since": "2023-02-01",
+      "hire_date": "2018-05-14",
+      "last_updated": "2025-10-18"
+    },
+    "skills": [
+      {
+        "function_area": "Supply Chain and Logistics",
+        "specialization": "Port Ecosystem",
+        "skill_name": "Ecosystem Coordination"
+      },
+      {
+        "function_area": "Supply Chain and Logistics",
+        "specialization": "Contract Logistics",
+        "skill_name": "Logistics Planning"
+      },
+      {
+        "function_area": "Supply Chain and Logistics",
+        "specialization": "Sustainable Supply Chain Management: Green Logistics",
+        "skill_name": "Green Logistics Execution"
+      },
+      {
+        "function_area": "Operations",
+        "specialization": "Resource Planning, Deployment and Support",
+        "skill_name": "Operational Scheduling"
+      }
+    ],
+    "competencies": [
+      { "name": "Stakeholder & Partnership Management", "level": "Advanced" },
+      { "name": "Vendor and Contract Management", "level": "Intermediate" },
+      { "name": "Process Improvement & Optimisation and Problem Management", "level": "Intermediate" }
+    ],
+    "experiences": [
+      {
+        "type": "Program",
+        "organization": "PSA Singapore",
+        "program": "Port Ecosystem Partnerships",
+        "period": { "start": "2023-02-01", "end": null },
+        "focus": "Coordinates end-to-end logistics partnerships, digital slot reservations, and collaboration with shipping lines."
+      },
+      {
+        "type": "Project",
+        "organization": "PSA Singapore",
+        "program": "Green Distribution Corridor",
+        "period": { "start": "2021-01-01", "end": "2022-12-31" },
+        "focus": "Worked with logistics partners to pilot low-emission truck scheduling."
+      }
+    ],
+    "positions_history": [
+      {
+        "role_title": "Port Logistics Coordinator",
+        "organization": "PSA Singapore",
+        "period": { "start": "2023-02-01", "end": null },
+        "focus_areas": ["Partner coordination", "Slot optimisation", "Sustainability initiatives"],
+        "key_skills_used": ["Ecosystem Coordination", "Operational Scheduling"]
+      },
+      {
+        "role_title": "Senior Logistics Executive",
+        "organization": "PSA Singapore",
+        "period": { "start": "2020-01-01", "end": "2023-01-31" },
+        "focus_areas": ["Logistics planning", "Partner engagement"]
+      },
+      {
+        "role_title": "Logistics Executive",
+        "organization": "PSA Singapore",
+        "period": { "start": "2018-05-14", "end": "2019-12-31" },
+        "focus_areas": ["Operational scheduling", "Documentation"]
+      }
+    ],
+    "projects": [
+      {
+        "project_name": "Digital Slot Booking Platform",
+        "role": "Operations Representative",
+        "period": { "start": "2023-03-01", "end": "2024-01-31" },
+        "description": "Led operations requirements for digital platform coordinating berth and trucking slot bookings.",
+        "outcomes": ["Reduced turnaround time by 14%", "Partner satisfaction improved by 9 points"]
+      }
+    ],
+    "education": [
+      {
+        "degree": "Bachelor's Degree, Logistics & Supply Chain Management",
+        "institution": "Curtin University",
+        "period": { "start": "2013-02-01", "end": "2016-12-31" }
+      }
+    ]
+  },
+  {
+    "employee_id": "EMP-20026",
+    "personal_info": {
+      "name": "Sonia Malik",
+      "email": "sonia.malik@globalpsa.com",
+      "office_location": "PSA Singapore",
+      "languages": [
+        { "language": "English", "proficiency": "Fluent" },
+        { "language": "Hindi", "proficiency": "Fluent" }
+      ]
+    },
+    "employment_info": {
+      "job_title": "Legal Compliance Counsel",
+      "department": "Legal and Corporate Secretariat",
+      "unit": "Compliance Office",
+      "line_manager": "Geraldine Ng",
+      "in_role_since": "2022-07-01",
+      "hire_date": "2014-09-01",
+      "last_updated": "2025-10-15"
+    },
+    "skills": [
+      {
+        "function_area": "Legal and Corporate Secretariat",
+        "specialization": "Legal - Personal Data Protection - PDPA",
+        "skill_name": "Data Protection Compliance"
+      },
+      {
+        "function_area": "Legal and Corporate Secretariat",
+        "specialization": "Legal - Merger and Acquisition",
+        "skill_name": "Regulatory Due Diligence"
+      },
+      {
+        "function_area": "Finance",
+        "specialization": "Audit",
+        "skill_name": "Compliance Audits"
+      },
+      {
+        "function_area": "Operations",
+        "specialization": "Change Management and Transformation",
+        "skill_name": "Policy Implementation"
+      }
+    ],
+    "competencies": [
+      { "name": "Stakeholder & Partnership Management", "level": "Advanced" },
+      { "name": "Quality Standards", "level": "Advanced" },
+      { "name": "Process Improvement & Optimisation and Problem Management", "level": "Intermediate" }
+    ],
+    "experiences": [
+      {
+        "type": "Program",
+        "organization": "PSA Singapore",
+        "program": "Compliance Office",
+        "period": { "start": "2022-07-01", "end": null },
+        "focus": "Oversees compliance framework, privacy policies, and regulatory reporting."
+      },
+      {
+        "type": "Project",
+        "organization": "PSA Singapore",
+        "program": "Global Compliance Harmonisation",
+        "period": { "start": "2019-01-01", "end": "2021-12-31" },
+        "focus": "Aligned compliance policies and training across global operations."
+      }
+    ],
+    "positions_history": [
+      {
+        "role_title": "Legal Compliance Counsel",
+        "organization": "PSA Singapore",
+        "period": { "start": "2022-07-01", "end": null },
+        "focus_areas": ["Compliance governance", "Regulatory advisory", "Policy rollout"],
+        "key_skills_used": ["Data Protection Compliance", "Regulatory Due Diligence"]
+      },
+      {
+        "role_title": "Senior Legal Counsel",
+        "organization": "PSA Singapore",
+        "period": { "start": "2017-01-01", "end": "2022-06-30" },
+        "focus_areas": ["Commercial contract review", "Regulatory support"]
+      },
+      {
+        "role_title": "Legal Counsel",
+        "organization": "PSA Singapore",
+        "period": { "start": "2014-09-01", "end": "2016-12-31" },
+        "focus_areas": ["Contract drafting", "Policy advisory"]
+      }
+    ],
+    "projects": [
+      {
+        "project_name": "Compliance e-Learning Suite",
+        "role": "Project Sponsor",
+        "period": { "start": "2023-01-01", "end": "2023-09-30" },
+        "description": "Developed digital compliance curriculum to address PDPA, anti-bribery, and competition law requirements.",
+        "outcomes": ["Training completion reached 98%", "Audit exceptions decreased by 40%"]
+      }
+    ],
+    "education": [
+      {
+        "degree": "Master of Laws, Corporate & Financial Services",
+        "institution": "National University of Singapore (NUS)",
+        "period": { "start": "2012-08-01", "end": "2014-05-31" }
+      },
+      {
+        "degree": "Bachelor of Laws",
+        "institution": "University of Delhi",
+        "period": { "start": "2007-07-01", "end": "2011-05-31" }
+      }
+    ]
   }
 ]
