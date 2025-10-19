@@ -35,23 +35,23 @@ DEMO_USERS = {
         "job_title": "Finance Manager (FP&A)",
         "department": "Finance"
     },
-    "emily.wong": {
+    "grace.lee": {
         "password": "password123",
         "role": "employee",
-        "name": "Emily Wong",
+        "name": "Grace Lee",
         "employee_id": "EMP-20004",
-        "email": "emily.wong@globalpsa.com",
-        "job_title": "Data Scientist",
-        "department": "Business Analytics"
+        "email": "grace.lee@globalpsa.com",
+        "job_title": "Senior HR Business Partner",
+        "department": "Human Resource"
     },
-    "david.tan": {
+    "felicia.goh": {
         "password": "password123",
         "role": "employee",
-        "name": "David Tan",
+        "name": "Felicia Goh",
         "employee_id": "EMP-20005",
-        "email": "david.tan@globalpsa.com",
-        "job_title": "Operations Manager",
-        "department": "Terminal Operations"
+        "email": "felicia.goh@globalpsa.com",
+        "job_title": "Treasury Analyst",
+        "department": "Finance"
     },
     
     # Admins

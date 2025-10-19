@@ -171,6 +171,7 @@ notepad .env
 AZURE_OPENAI_API_KEY=your-apim-subscription-key
 AZURE_OPENAI_ENDPOINT=https://psacodesprint2025.azure-api.net/
 AZURE_EMBED_DEPLOYMENT=text-embedding-3-small
+AZURE_CHAT_DEPLOYMENT=gpt-5-mini
 
 # Embedding Model Selection
 # Set to 'true' to use local sentence-transformers first (fast, free, offline)
@@ -193,9 +194,25 @@ python load_data.py
 
 Expected output:
 ```
+🚀 Starting data load...
+📂 Loading employees from Employee_Profiles.json...
+  ✅ Added Samantha Lee
+  ✅ Added Nur Aisyah Binte Rahman
+  ✅ Added Rohan Mehta
+  ✅ Added Grace Lee
+  ✅ Added Felicia Goh
 ✅ Loaded 5 employees
+📂 Loading sample roles...
+  ✅ Added Senior Cloud Architect
+  ✅ Added Cybersecurity Manager
+  ✅ Added Financial Planning Director
+  ✅ Added HR Business Partner (Senior)
+  ✅ Added Treasury Manager
 ✅ Loaded 5 roles
-✅ Database initialized successfully
+
+✅ Data loading complete!
+   Employees: 5
+   Roles: 5
 ```
 
 ### 5. Start Backend Server
@@ -209,8 +226,8 @@ Backend API will start on `http://localhost:5000`
 ### 6. Frontend Setup (New Terminal)
 
 ```powershell
-# Navigate to frontend directory
-cd frontend
+# Navigate to frontend directory (from project root)
+cd ..\frontend
 
 # Install dependencies
 npm install
@@ -230,8 +247,8 @@ The system includes demo accounts for testing:
 Username: samantha.lee    Password: password123
 Username: aisyah.rahman   Password: password123
 Username: rohan.mehta     Password: password123
-Username: emily.wong      Password: password123
-Username: david.tan       Password: password123
+Username: grace.lee       Password: password123
+Username: felicia.goh     Password: password123
 ```
 
 ### Administrators (Full Access)
@@ -253,28 +270,58 @@ psa-codesprint-tribyte/
 │   ├── ai_engine.py                # AI matching & narrative generation
 │   ├── models.py                   # SQLAlchemy database models
 │   ├── database.py                 # Database configuration
+│   ├── auth.py                     # Authentication & user management
+│   ├── career_roadmap.py           # Career path prediction logic
+│   ├── leadership_potential.py     # Leadership scoring engine
+│   ├── leadership_augmentations.py # Azure OpenAI sentiment analysis
 │   ├── load_data.py                # Data loading script
+│   ├── test_career_roadmap.py      # Career roadmap tests
 │   ├── requirements.txt            # Python dependencies
 │   ├── .env.example               # Environment variables template
 │   └── compass.db                 # SQLite database (generated)
 ├── frontend/                       # Next.js React application
 │   ├── pages/                     # Next.js pages
-│   │   ├── index.js              # Main dashboard page
+│   │   ├── index.js              # Main dashboard (admin)
+│   │   ├── login.js              # Login page
+│   │   ├── employee-home.js      # Employee dashboard
+│   │   ├── career-matching.js    # AI role matching
+│   │   ├── career-roadmap.js     # Career roadmap
+│   │   ├── leadership.js         # Leadership potential
+│   │   ├── copilot.js            # Compass Copilot chat
+│   │   ├── settings.js           # User settings
 │   │   ├── _app.js               # App wrapper
 │   │   └── _document.js          # Document structure
 │   ├── components/                # React components
 │   │   ├── EmployeeSearch.js     # Search interface
 │   │   ├── EmployeeProfile.js    # Profile display
 │   │   ├── RoleMatches.js        # Match results
-│   │   └── CareerNarrative.js    # AI narrative
+│   │   ├── CareerNarrative.js    # AI narrative
+│   │   ├── CareerRoadmap.js      # Roadmap visualizations
+│   │   ├── ChatCopilot.js        # Chat interface
+│   │   ├── ComponentBreakdown.js # Leadership breakdown
+│   │   ├── EmployeeCareerTimeline.js # Career timeline
+│   │   ├── ScoreCard.js          # Score card display
+│   │   ├── EvidenceModal.js      # Evidence detail modal
+│   │   ├── FeedbackModal.js      # User feedback modal
+│   │   └── ProtectedRoute.js     # Auth wrapper
 │   ├── services/                  # API services
 │   │   └── api.js                # Axios API client
+│   ├── utils/                     # Utility functions
+│   │   └── auth.js               # Auth helpers
 │   ├── styles/                    # Global styles
 │   │   └── globals.css
+│   ├── public/                    # Static assets
 │   ├── package.json              # Node dependencies
 │   ├── next.config.js            # Next.js configuration
-│   └── tailwind.config.js        # Tailwind CSS configuration
+│   ├── tailwind.config.js        # Tailwind CSS configuration
+│   └── README.md                 # Frontend documentation
+├── docs/                          # Feature documentation
+│   ├── COMPASS_COPILOT.md        # Copilot guide
+│   ├── CAREER_ROADMAP.md         # Roadmap guide
+│   └── LEADERSHIP_POTENTIAL.md   # Leadership guide
 ├── Employee_Profiles.json         # Sample employee data
+├── USER_CREDENTIALS.md            # Demo user accounts
+├── ENHANCED_CONVERSATIONAL_SUPPORT.md # Copilot enhancements
 ├── README.md                      # This file
 └── LICENSE                        # MIT License
 ```
