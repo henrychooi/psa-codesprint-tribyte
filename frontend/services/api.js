@@ -149,6 +149,12 @@ export const careerCompassAPI = {
     const response = await api.get('/auth/demo-users');
     return response.data;
   },
+
+  // Employee career timeline
+  getEmployeeCareerTimeline: async () => {
+    const response = await api.get('/employee/career-timeline');
+    return response.data;
+  },
 };
 
 // Standalone auth functions for easier import

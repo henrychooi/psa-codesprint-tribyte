@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import Head from "next/head";
 import { useRouter } from "next/router";
-import { Sparkles, ArrowLeft, LogOut, User, Settings } from "lucide-react";
+import { Sparkles, ArrowLeft, LogOut, User, Settings, Home } from "lucide-react";
 import ChatCopilot from "../components/ChatCopilot";
 import ProtectedRoute from "../components/ProtectedRoute";
 import { getUser, logout } from "../utils/auth";
@@ -26,6 +26,10 @@ export default function CopilotPage() {
 
   const handleSettings = () => {
     router.push("/settings");
+  };
+
+  const handleBackHome = () => {
+    router.push("/employee-home");
   };
 
   return (
@@ -81,6 +85,14 @@ export default function CopilotPage() {
                     <span className="truncate">{currentUser.name}</span>
                   </div>
                 )}
+                <button
+                  onClick={handleBackHome}
+                  className="glass-button px-5 py-2.5 text-sm font-semibold flex items-center gap-2 whitespace-nowrap"
+                  title="Back to Home"
+                >
+                  <Home className="w-4 h-4 flex-shrink-0" />
+                  <span>Home</span>
+                </button>
                 <button
                   onClick={handleSettings}
                   className="glass-button px-5 py-2.5 text-sm font-semibold flex items-center gap-2 whitespace-nowrap"

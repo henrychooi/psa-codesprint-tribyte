@@ -44,7 +44,7 @@ export default function LoginPage() {
 
   const redirectByRole = (role) => {
     if (role === 'employee') {
-      router.push('/copilot');
+      router.push('/employee-home');
     } else if (role === 'admin') {
       router.push('/');
     }

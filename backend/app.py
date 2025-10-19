@@ -1019,6 +1019,136 @@ def compare_career_scenarios(employee_id):
         session.close()
 
 
+@app.route('/api/employee/career-timeline', methods=['GET'])
+@require_employee
+def get_employee_career_timeline():
+    """
+    Get the career timeline for the currently logged-in employee
+    Returns positions_history sorted by start_date in ascending order
+    
+    Response:
+        {
+            "success": true,
+            "employee": {
+                "employee_id": "EMP-20001",
+                "name": "Samantha Lee",
+                "current_role": "Cloud Solutions Architect",
+                "hire_date": "2016-03-15"
+            },
+            "timeline": [
+                {
+                    "role_title": "Systems Engineer",
+                    "organization": "PSA Singapore",
+                    "period": {"start": "2016-03-15", "end": "2018-12-31"},
+                    "focus_areas": [...],
+                    "key_skills_used": [...]
+                },
+                ...
+            ]
+        }
+    """
+    session = Session(engine)
+    try:
+        # Get employee_id from authenticated user
+        employee_id = request.user.get('employee_id')
+        
+        if not employee_id:
+            return jsonify({
+                'success': False,
+                'error': 'Employee ID not found in user session'
+            }), 400
+        
+        # Get employee from database
+        employee = session.query(Employee).filter_by(employee_id=employee_id).first()
+        
+        if not employee:
+            return jsonify({
+                'success': False,
+                'error': 'Employee not found'
+            }), 404
+        
+        # Get positions history
+        positions_history = employee.positions_history or []
+        
+        # Sort by start date (ascending order - earliest to latest)
+        from datetime import datetime
+        
+        def parse_date(date_str):
+            """Parse date string to datetime object for sorting"""
+            if not date_str:
+                return datetime.max  # Put None dates at the end
+            try:
+                return datetime.strptime(date_str, '%Y-%m-%d')
+            except:
+                return datetime.max
+        
+        sorted_timeline = sorted(
+            positions_history,
+            key=lambda pos: parse_date(pos.get('period', {}).get('start'))
+        )
+        
+        # Calculate total years of service by summing all position durations
+        total_years = 0.0
+        for position in positions_history:
+            period = position.get('period', {})
+            start_date_str = period.get('start')
+            end_date_str = period.get('end')
+            
+            if not start_date_str:
+                continue  # Skip entries without start date
+            
+            try:
+                start_date = datetime.strptime(start_date_str, '%Y-%m-%d')
+                
+                # Use current date if end_date is None/null/empty (ongoing position)
+                if end_date_str:
+                    try:
+                        end_date = datetime.strptime(end_date_str, '%Y-%m-%d')
+                    except:
+                        continue  # Skip if end_date is malformed
+                else:
+                    end_date = datetime.now()
+                
+                # Calculate duration in years using days / 365.25 for consistency
+                duration_days = (end_date - start_date).days
+                duration_years = duration_days / 365.25
+                
+                # Add to total (handling potential negative durations)
+                if duration_years >= 0:
+                    total_years += duration_years
+                    
+            except Exception as e:
+                # Log and skip malformed entries
+                print(f"Warning: Could not parse dates for position {position.get('role_title', 'Unknown')}: {e}")
+                continue
+        
+        return jsonify({
+            'success': True,
+            'employee': {
+                'employee_id': employee.employee_id,
+                'name': employee.name,
+                'email': employee.email,
+                'current_role': employee.job_title,
+                'department': employee.department,
+                'hire_date': employee.hire_date,
+                'years_of_service': round(total_years, 2)
+            },
+            'timeline': sorted_timeline,
+            'timeline_count': len(sorted_timeline)
+        }), 200
+        
+    except Exception as e:
+        print(f"ERROR in get_employee_career_timeline: {str(e)}")
+        import traceback
+        traceback.print_exc()
+        return jsonify({
+            'success': False,
+            'error': str(e)
+        }), 500
+    finally:
+        session.close()
+
+
 @app.errorhandler(404)
 def not_found(error):
     """404 handler"""
