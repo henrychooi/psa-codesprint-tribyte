@@ -1,5 +1,47 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { Send, Loader2, Sparkles, X, BookOpen, Target, User } from 'lucide-react';
+import React, { useState, useEffect, useRef } from "react";
+import {
+  Send,
+  Loader2,
+  Sparkles,
+  X,
+  BookOpen,
+  Target,
+  User,
+} from "lucide-react";
+
+/**
+ * Custom hook for typing animation effect
+ */
+function useTypingEffect(text, speed = 20) {
+  const [displayedText, setDisplayedText] = useState("");
+  const [isTyping, setIsTyping] = useState(true);
+
+  useEffect(() => {
+    if (!text) {
+      setDisplayedText("");
+      setIsTyping(false);
+      return;
+    }
+
+    setIsTyping(true);
+    setDisplayedText("");
+    let currentIndex = 0;
+
+    const intervalId = setInterval(() => {
+      if (currentIndex < text.length) {
+        setDisplayedText(text.substring(0, currentIndex + 1));
+        currentIndex++;
+      } else {
+        setIsTyping(false);
+        clearInterval(intervalId);
+      }
+    }, speed);
+
+    return () => clearInterval(intervalId);
+  }, [text, speed]);
+
+  return { displayedText, isTyping };
+}
 
 /**
  * ChatCopilot Component
@@ -7,15 +49,16 @@ import { Send, Loader2, Sparkles, X, BookOpen, Target, User } from 'lucide-react
  */
 export default function ChatCopilot({ employeeId, employeeName }) {
   const [messages, setMessages] = useState([]);
-  const [inputValue, setInputValue] = useState('');
+  const [inputValue, setInputValue] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [typingMessageIndex, setTypingMessageIndex] = useState(null);
   const messagesEndRef = useRef(null);
   const inputRef = useRef(null);
 
   // Auto-scroll to bottom when new messages arrive
   const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   };
 
   useEffect(() => {
@@ -25,19 +68,20 @@ export default function ChatCopilot({ employeeId, employeeName }) {
   // Initial greeting
   useEffect(() => {
     if (messages.length === 0 && employeeName) {
-      setMessages([
-        {
-          role: 'assistant',
-          content: `Hi ${employeeName}! 👋 I'm your Career Compass Copilot. I can help you with:\n\n📋 **Profile Summary** - Review your strengths and achievements\n🎯 **Role Recommendations** - Find opportunities that match your skills\n📚 **Skill Development** - Learn what you need for your dream role\n\nWhat would you like to explore today?`,
-          timestamp: new Date().toISOString(),
-          citations: [],
-          suggested_actions: [
-            'Show my profile',
-            'What roles fit me?',
-            'What skills do I need?'
-          ]
-        }
-      ]);
+      const greetingMessage = {
+        role: "assistant",
+        content: `Hi ${employeeName}! 👋 I'm your Career Compass Copilot. I can help you with:\n\n📋 **Profile Summary** - Review your strengths and achievements\n🎯 **Role Recommendations** - Find opportunities that match your skills\n📚 **Skill Development** - Learn what you need for your dream role\n\nWhat would you like to explore today?`,
+        timestamp: new Date().toISOString(),
+        citations: [],
+        suggested_actions: [
+          "Show my profile",
+          "What roles fit me?",
+          "What skills do I need?",
+        ],
+        isNew: true,
+      };
+      setMessages([greetingMessage]);
+      setTypingMessageIndex(0); // Trigger typing for greeting
     }
   }, [employeeName, messages.length]);
 
@@ -48,63 +92,80 @@ export default function ChatCopilot({ employeeId, employeeName }) {
 
     // Add user message to chat
     const userMessage = {
-      role: 'user',
+      role: "user",
       content: trimmedMessage,
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
     };
 
-    setMessages(prev => [...prev, userMessage]);
-    setInputValue('');
+    setMessages((prev) => [...prev, userMessage]);
+    setInputValue("");
     setIsLoading(true);
     setError(null);
 
     try {
       // Call chat API (employee_id now comes from auth token)
-      const authToken = typeof window !== 'undefined' ? localStorage.getItem('auth_token') : null;
-      
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api'}/chat`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${authToken}`
-        },
-        body: JSON.stringify({
-          message: trimmedMessage,
-          conversation_history: messages.filter(m => m.role === 'user' || m.role === 'assistant')
-        })
-      });
+      const authToken =
+        typeof window !== "undefined"
+          ? localStorage.getItem("auth_token")
+          : null;
+
+      const response = await fetch(
+        `${
+          process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api"
+        }/chat`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${authToken}`,
+          },
+          body: JSON.stringify({
+            message: trimmedMessage,
+            conversation_history: messages.filter(
+              (m) => m.role === "user" || m.role === "assistant"
+            ),
+          }),
+        }
+      );
 
       const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(data.error || 'Failed to get response');
+        throw new Error(data.error || "Failed to get response");
       }
 
-      // Add assistant response to chat
+      // Add assistant response to chat with typing animation
       const assistantMessage = {
-        role: 'assistant',
-        content: data.response_text || 'I apologize, but I couldn\'t generate a response.',
+        role: "assistant",
+        content:
+          data.response_text ||
+          "I apologize, but I couldn't generate a response.",
         timestamp: new Date().toISOString(),
         citations: data.citations || [],
         suggested_actions: data.suggested_actions || [],
-        intent: data.intent
+        intent: data.intent,
+        isNew: true, // Flag to trigger typing animation
       };
 
-      setMessages(prev => [...prev, assistantMessage]);
-
+      setMessages((prev) => {
+        const newMessages = [...prev, assistantMessage];
+        setTypingMessageIndex(newMessages.length - 1); // Set index for typing animation
+        return newMessages;
+      });
     } catch (err) {
-      console.error('Chat error:', err);
+      console.error("Chat error:", err);
       setError(err.message);
-      
+
       // Add error message to chat
       const errorMessage = {
-        role: 'assistant',
-        content: '❌ Sorry, I encountered an error. Please try again or rephrase your question.',
+        role: "assistant",
+        content:
+          "❌ Sorry, I encountered an error. Please try again or rephrase your question.",
         timestamp: new Date().toISOString(),
         citations: [],
-        suggested_actions: []
+        suggested_actions: [],
       };
-      setMessages(prev => [...prev, errorMessage]);
+      setMessages((prev) => [...prev, errorMessage]);
     } finally {
       setIsLoading(false);
       inputRef.current?.focus();
@@ -113,11 +174,11 @@ export default function ChatCopilot({ employeeId, employeeName }) {
 
   // Handle keyboard shortcuts
   const handleKeyPress = (e) => {
-    if (e.key === 'Enter' && !e.shiftKey) {
+    if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
       handleSendMessage();
-    } else if (e.key === 'Escape') {
-      setInputValue('');
+    } else if (e.key === "Escape") {
+      setInputValue("");
     }
   };
 
@@ -136,14 +197,14 @@ export default function ChatCopilot({ employeeId, employeeName }) {
   // Get icon for citation source
   const getCitationIcon = (source) => {
     switch (source) {
-      case 'project':
+      case "project":
         return <Target className="w-4 h-4" />;
-      case 'skill':
-      case 'skill_gap':
+      case "skill":
+      case "skill_gap":
         return <BookOpen className="w-4 h-4" />;
-      case 'competency':
+      case "competency":
         return <Sparkles className="w-4 h-4" />;
-      case 'role':
+      case "role":
         return <User className="w-4 h-4" />;
       default:
         return <Sparkles className="w-4 h-4" />;
@@ -160,7 +221,9 @@ export default function ChatCopilot({ employeeId, employeeName }) {
           </div>
           <div>
             <h3 className="text-lg font-semibold">Compass Copilot</h3>
-            <p className="text-xs text-indigo-100 tracking-[0.32em] uppercase">Career guidance</p>
+            <p className="text-xs text-indigo-100 tracking-[0.32em] uppercase">
+              Career guidance
+            </p>
           </div>
         </div>
         {messages.length > 1 && (
@@ -178,67 +241,25 @@ export default function ChatCopilot({ employeeId, employeeName }) {
       {/* Messages Container */}
       <div className="flex-1 overflow-y-auto bg-white/60 p-6 space-y-4 scroll-smooth">
         {messages.map((message, index) => (
-          <div
+          <MessageBubble
             key={index}
-            className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'} animate-fade-in`}
-          >
-            <div
-              className={`max-w-[80%] rounded-2xl px-4 py-3 ${
-                message.role === 'user'
-                  ? 'bg-gradient-to-r from-indigo-500 to-purple-500 text-white shadow-lg shadow-indigo-500/30'
-                  : 'glass-panel border border-white/60 bg-white/85 text-slate-700 shadow-lg'
-              }`}
-            >
-              {/* Message Content */}
-              <div className="whitespace-pre-wrap break-words space-y-2">
-                {message.content.split('\n').map((line, idx) => (
-                  <div key={idx}>{line}</div>
-                ))}
-              </div>
-
-              {/* Citations */}
-              {message.citations && message.citations.length > 0 && (
-                <div className="mt-3 pt-3 border-t border-gray-200/50">
-                  <p className="text-xs font-semibold text-gray-600 mb-2">📌 Evidence:</p>
-                  <div className="flex flex-wrap gap-2">
-                    {message.citations.map((citation, idx) => (
-                      <div
-                        key={idx}
-                        className="glass-chip px-2.5 py-1 text-xs font-medium text-purple-600 flex items-center gap-1"
-                        title={citation.details?.join(', ') || citation.text}
-                      >
-                        {getCitationIcon(citation.source)}
-                        <span>{citation.text}</span>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {/* Suggested Actions */}
-              {message.suggested_actions && message.suggested_actions.length > 0 && (
-                <div className="mt-3 pt-3 border-t border-gray-200/50">
-                  <p className="text-xs font-semibold text-gray-600 mb-2">💡 Try asking:</p>
-                  <div className="flex flex-wrap gap-2">
-                    {message.suggested_actions.map((action, idx) => (
-                      <button
-                        key={idx}
-                        onClick={() => handleSuggestedActionClick(action)}
-                        className="glass-chip px-3 py-1 text-xs font-semibold text-indigo-600 hover:shadow-lg transition-shadow"
-                      >
-                        {action}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {/* Timestamp */}
-              <p className="text-xs opacity-60 mt-2">
-                {new Date(message.timestamp).toLocaleTimeString()}
-              </p>
-            </div>
-          </div>
+            message={message}
+            index={index}
+            isTyping={index === typingMessageIndex}
+            onTypingComplete={() => {
+              if (index === typingMessageIndex) {
+                setTypingMessageIndex(null);
+                // Remove isNew flag after typing completes
+                setMessages((prev) =>
+                  prev.map((msg, i) =>
+                    i === index ? { ...msg, isNew: false } : msg
+                  )
+                );
+              }
+            }}
+            getCitationIcon={getCitationIcon}
+            handleSuggestedActionClick={handleSuggestedActionClick}
+          />
         ))}
 
         {/* Typing Indicator */}
@@ -277,7 +298,7 @@ export default function ChatCopilot({ employeeId, employeeName }) {
               rows={1}
               disabled={isLoading}
               aria-label="Chat message input"
-              style={{ minHeight: '48px', maxHeight: '120px' }}
+              style={{ minHeight: "48px", maxHeight: "120px" }}
             />
             <div className="absolute bottom-2 right-2 text-xs text-gray-400">
               Press Enter to send
@@ -298,8 +319,120 @@ export default function ChatCopilot({ employeeId, employeeName }) {
           </button>
         </div>
         <p className="text-xs text-slate-400 mt-2 text-center">
-          Press <kbd className="px-1.5 py-0.5 bg-slate-200 rounded text-xs">Enter</kbd> to send • 
-          <kbd className="px-1.5 py-0.5 bg-slate-200 rounded text-xs ml-1">Esc</kbd> to clear
+          Press{" "}
+          <kbd className="px-1.5 py-0.5 bg-slate-200 rounded text-xs">
+            Enter
+          </kbd>{" "}
+          to send •
+          <kbd className="px-1.5 py-0.5 bg-slate-200 rounded text-xs ml-1">
+            Esc
+          </kbd>{" "}
+          to clear
+        </p>
+      </div>
+    </div>
+  );
+}
+
+/**
+ * MessageBubble Component - Handles typing animation for assistant messages
+ */
+function MessageBubble({
+  message,
+  index,
+  isTyping,
+  onTypingComplete,
+  getCitationIcon,
+  handleSuggestedActionClick,
+}) {
+  const { displayedText, isTyping: stillTyping } = useTypingEffect(
+    message.role === "assistant" && message.isNew ? message.content : null,
+    15 // Typing speed in milliseconds
+  );
+
+  // Notify parent when typing completes
+  useEffect(() => {
+    if (isTyping && !stillTyping && displayedText === message.content) {
+      onTypingComplete();
+    }
+  }, [stillTyping, displayedText, message.content, isTyping, onTypingComplete]);
+
+  // Use displayed text if typing, otherwise use full content
+  const contentToShow =
+    message.role === "assistant" && message.isNew && isTyping
+      ? displayedText
+      : message.content;
+
+  return (
+    <div
+      className={`flex ${
+        message.role === "user" ? "justify-end" : "justify-start"
+      } animate-fade-in`}
+    >
+      <div
+        className={`max-w-[80%] rounded-2xl px-4 py-3 ${
+          message.role === "user"
+            ? "bg-gradient-to-r from-indigo-500 to-purple-500 text-white shadow-lg shadow-indigo-500/30"
+            : "glass-panel border border-white/60 bg-white/85 text-slate-700 shadow-lg"
+        }`}
+      >
+        {/* Message Content with Typing Effect */}
+        <div className="whitespace-pre-wrap break-words space-y-2">
+          {contentToShow.split("\n").map((line, idx) => (
+            <div key={idx}>{line}</div>
+          ))}
+        </div>
+
+        {/* Only show citations and actions after typing completes */}
+        {(!message.isNew || !isTyping) && (
+          <>
+            {/* Citations */}
+            {message.citations && message.citations.length > 0 && (
+              <div className="mt-3 pt-3 border-t border-gray-200/50 animate-fade-in">
+                <p className="text-xs font-semibold text-gray-600 mb-2">
+                  📌 Evidence:
+                </p>
+                <div className="flex flex-wrap gap-2">
+                  {message.citations.map((citation, idx) => (
+                    <div
+                      key={idx}
+                      className="glass-chip px-2.5 py-1 text-xs font-medium text-purple-600 flex items-center gap-1"
+                      title={citation.details?.join(", ") || citation.text}
+                    >
+                      {getCitationIcon(citation.source)}
+                      <span>{citation.text}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Suggested Actions */}
+            {message.suggested_actions &&
+              message.suggested_actions.length > 0 && (
+                <div className="mt-3 pt-3 border-t border-gray-200/50 animate-fade-in">
+                  <p className="text-xs font-semibold text-gray-600 mb-2">
+                    💡 Try asking:
+                  </p>
+                  <div className="flex flex-wrap gap-2">
+                    {message.suggested_actions.map((action, idx) => (
+                      <button
+                        key={idx}
+                        onClick={() => handleSuggestedActionClick(action)}
+                        className="glass-chip px-3 py-1 text-xs font-semibold text-indigo-600 hover:shadow-lg transition-shadow"
+                      >
+                        {action}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
+          </>
+        )}
+
+        {/* Timestamp */}
+        <p className="text-xs opacity-60 mt-2">
+          {new Date(message.timestamp).toLocaleTimeString()}
         </p>
       </div>
     </div>
