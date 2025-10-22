@@ -3,6 +3,7 @@ AI Engine for Career Compass
 - OpenAI embeddings generation (Azure OpenAI via APIM)
 - Cosine similarity matching
 - Narrative generation using gpt-5-mini (deployment)
+- Integrated caching for expensive operations
 """
 import os
 import re
@@ -11,6 +12,9 @@ from openai import AzureOpenAI
 from sklearn.metrics.pairwise import cosine_similarity
 from typing import List, Dict, Any
 from dotenv import load_dotenv
+
+# Import cache infrastructure
+from cache import cache_embedding, cache_role_matching, cache_ai_response
 
 # Local embeddings fallback (only if Azure fails)
 try:
@@ -118,6 +122,7 @@ def build_retention_response(employee: Dict[str, Any],
 # ----------------------------
 # Embeddings helper
 # ----------------------------
+@cache_embedding()
 def generate_embedding(text: str, model: str = None) -> List[float]:
     """
     Generate embedding vector for given text.
@@ -130,6 +135,8 @@ def generate_embedding(text: str, model: str = None) -> List[float]:
     Args:
         text: Input text to embed
         model: Embeddings deployment name (only used for Azure). If None, uses AZURE_EMBED_DEPLOYMENT
+    
+    Note: Results are cached for 24 hours by default
     """
     
     if USE_LOCAL_EMBEDDINGS_FIRST:
@@ -257,8 +264,13 @@ def calculate_skill_match(employee_skills: List[str], required_skills: List[str]
         'preferred_matched': list(preferred_matched)
     }
 
+@cache_role_matching()
 def match_employee_to_roles(employee: Dict[str, Any], roles: List[Dict[str, Any]],
                             top_k: int = 5) -> List[Dict[str, Any]]:
+    """
+    Match employee to roles using embeddings and skill matching.
+    Results are cached for 1 hour by default.
+    """
     if not roles:
         return []
 
@@ -310,8 +322,13 @@ def _get_strength_label(score: float) -> str:
 # ----------------------------
 # Narrative generation (uses gpt-5-mini deployment)
 # ----------------------------
+@cache_ai_response()
 def generate_career_narrative(employee: Dict[str, Any], matched_role: Dict[str, Any],
                                match_details: Dict[str, Any]) -> str:
+    """
+    Generate personalized career narrative for employee-role match.
+    Results are cached for 30 minutes by default.
+    """
     personal_info = employee.get('personal_info', {})
     employment_info = employee.get('employment_info', {})
 

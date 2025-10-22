@@ -3,6 +3,7 @@ Career Roadmap Generation and Simulation Engine
 - Current roadmap for all users
 - Predicted roadmap with simulations for admins
 - AI-powered predictions using Azure OpenAI
+- Integrated with caching infrastructure for performance
 """
 
 from datetime import datetime, timedelta
@@ -15,6 +16,9 @@ import random
 import os
 from openai import AzureOpenAI
 from dotenv import load_dotenv
+
+# Import cache infrastructure
+from cache import cache_career_roadmap
 
 # Load Azure OpenAI credentials
 load_dotenv()
@@ -329,6 +333,7 @@ def evaluate_path_metrics(
         'domain_profile': domain_profile
     }
 
+@cache_career_roadmap()
 def calculate_current_roadmap(employee: Dict[str, Any], all_roles: List[Dict[str, Any]]) -> Dict[str, Any]:
     """
     Calculate current career roadmap based on:
@@ -338,6 +343,7 @@ def calculate_current_roadmap(employee: Dict[str, Any], all_roles: List[Dict[str
     - Position in organization
     
     Returns roadmap for next 2-3 years based on current trajectory
+    Results are cached for 1 hour by default.
     """
     domain_profile = extract_domain_profile(employee)
 
@@ -373,6 +379,7 @@ def calculate_current_roadmap(employee: Dict[str, Any], all_roles: List[Dict[str
     return current_roadmap
 
 
+@cache_career_roadmap()
 def calculate_predicted_roadmap_with_simulations(
     employee: Dict[str, Any],
     all_roles: List[Dict[str, Any]],
@@ -381,6 +388,7 @@ def calculate_predicted_roadmap_with_simulations(
     """
     For ADMIN ONLY: Calculate predicted roadmap using multiple simulation scenarios
     Uses Azure OpenAI to generate AI-powered predictions
+    Results are cached for 1 hour by default.
     
     Scenarios:
     - "aggressive_growth": Fast-track progression

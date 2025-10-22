@@ -1,12 +1,16 @@
 """
 Leadership Potential Scoring Module
 Implements heuristic-based scoring with full explainability
+Integrated with caching infrastructure for performance optimization
 """
 from typing import Dict, List, Any, Tuple
 from datetime import datetime
 from dateutil.relativedelta import relativedelta
 import re
 from concurrent.futures import ThreadPoolExecutor, as_completed
+
+# Import cache infrastructure
+from cache import cache_leadership_score
 
 # Import augmentation functions (Azure OpenAI-based enhancements)
 try:
@@ -235,9 +239,11 @@ def get_change_leadership_evidence(competencies: List[Dict], projects: List[Dict
     return evidence if evidence else ["No explicit change leadership demonstrated"]
 
 
+@cache_leadership_score()
 def compute_leadership_potential(employee: Dict[str, Any], max_metrics: Dict[str, float], use_augmentations: bool = True) -> Dict[str, Any]:
     """
     Compute leadership potential score with full explainability
+    Results are cached for 2 hours by default.
     
     Args:
         employee: Employee data dictionary

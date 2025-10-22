@@ -1,5 +1,6 @@
 """
 Flask REST API for Career Compass Module
+Integrated with caching infrastructure for optimal performance
 """
 from flask import Flask, request, jsonify
 from flask_cors import CORS
@@ -32,6 +33,14 @@ from auth import authenticate_user, require_auth, require_admin, require_employe
 from career_roadmap import (
     calculate_current_roadmap,
     calculate_predicted_roadmap_with_simulations
+)
+from cache import (
+    get_cache_statistics,
+    reset_cache_stats,
+    cache_manager,
+    invalidate_employee_cache,
+    invalidate_role_cache,
+    warm_cache_for_employee
 )
 
 # Load environment variables
@@ -1313,6 +1322,156 @@ def get_employee_career_timeline():
         }), 500
     finally:
         session.close()
+
+
+# ============================================================================
+# CACHE MANAGEMENT ENDPOINTS
+# ============================================================================
+
+@app.route('/api/cache/stats', methods=['GET'])
+@require_auth
+def get_cache_stats():
+    """
+    Get cache statistics (available to all authenticated users)
+    
+    Response:
+        {
+            "success": true,
+            "stats": {
+                "type": "redis" or "in-memory",
+                "hits": 1234,
+                "misses": 567,
+                "hit_rate": "68.5%",
+                "size": 450,
+                "config": {...}
+            }
+        }
+    """
+    try:
+        stats = get_cache_statistics()
+        return jsonify({
+            'success': True,
+            'stats': stats
+        })
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'error': str(e)
+        }), 500
+
+
+@app.route('/api/cache/clear', methods=['POST'])
+@require_admin
+def clear_cache():
+    """
+    Clear cache (admin only)
+    
+    Request body (optional):
+        {
+            "namespace": "embedding|role_match|leadership|roadmap|ai_response",
+            "employee_id": "EMP-20001"  # Optional: clear specific employee cache
+        }
+    
+    Response:
+        {
+            "success": true,
+            "message": "Cache cleared successfully"
+        }
+    """
+    try:
+        data = request.get_json() or {}
+        namespace = data.get('namespace')
+        employee_id = data.get('employee_id')
+        
+        if employee_id:
+            invalidate_employee_cache(employee_id)
+            message = f"Cache cleared for employee: {employee_id}"
+        elif namespace:
+            cache_manager.clear(namespace)
+            message = f"Cache namespace '{namespace}' cleared"
+        else:
+            cache_manager.clear()
+            message = "All cache cleared"
+        
+        return jsonify({
+            'success': True,
+            'message': message
+        })
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'error': str(e)
+        }), 500
+
+
+@app.route('/api/cache/warm/<employee_id>', methods=['POST'])
+@require_admin
+def warm_employee_cache(employee_id):
+    """
+    Pre-warm cache for an employee (admin only)
+    Runs expensive computations in advance to speed up future requests
+    
+    Response:
+        {
+            "success": true,
+            "message": "Cache warmed for employee EMP-20001"
+        }
+    """
+    session = Session(engine)
+    try:
+        # Get employee
+        employee = session.query(Employee).filter_by(employee_id=employee_id).first()
+        if not employee:
+            return jsonify({
+                'success': False,
+                'error': 'Employee not found'
+            }), 404
+        
+        # Get roles
+        roles = session.query(Role).all()
+        roles_dict = [role.to_dict() for role in roles]
+        
+        # Warm cache
+        warm_cache_for_employee(employee.to_dict(), roles_dict)
+        
+        return jsonify({
+            'success': True,
+            'message': f'Cache warmed for employee {employee_id}',
+            'employee_name': employee.name
+        })
+        
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'error': str(e)
+        }), 500
+    finally:
+        session.close()
+
+
+@app.route('/api/cache/reset-stats', methods=['POST'])
+@require_admin
+def reset_cache_statistics():
+    """
+    Reset cache statistics counters (admin only)
+    
+    Response:
+        {
+            "success": true,
+            "message": "Cache statistics reset"
+        }
+    """
+    try:
+        reset_cache_stats()
+        return jsonify({
+            'success': True,
+            'message': 'Cache statistics reset successfully'
+        })
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'error': str(e)
+        }), 500
 
 
 @app.errorhandler(404)
