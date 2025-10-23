@@ -249,7 +249,7 @@ export default function CareerRoadmap({ employeeId, userRole = "employee" }) {
 
       {/* CURRENT ROADMAP TAB */}
       {activeTab === "current" && currentRoadmap && (
-        <CurrentRoadmapView roadmap={currentRoadmap} />
+        <CurrentRoadmapView roadmap={currentRoadmap} userRole={userRole} />
       )}
 
       {/* PREDICTED ROADMAP TAB - ADMIN ONLY */}
@@ -299,7 +299,7 @@ export default function CareerRoadmap({ employeeId, userRole = "employee" }) {
 // CURRENT ROADMAP VIEW - For Employees
 // ============================================================
 
-function CurrentRoadmapView({ roadmap }) {
+function CurrentRoadmapView({ roadmap, userRole }) {
   return (
     <div className="space-y-8">
       {/* Current Position */}
@@ -369,20 +369,22 @@ function CurrentRoadmapView({ roadmap }) {
                     {role.department}
                   </p>
 
-                  {/* Skills Readiness */}
-                  <div className="flex items-center gap-2 mb-3">
-                    <div className="flex-1 bg-slate-200 rounded-full h-2">
-                      <div
-                        className="bg-gradient-to-r from-indigo-500 to-blue-500 h-2 rounded-full transition-all"
-                        style={{
-                          width: `${(role.skill_match * 100).toFixed(0)}%`,
-                        }}
-                      />
+                  {/* Skills Readiness - Only for Admin */}
+                  {userRole === "admin" && (
+                    <div className="flex items-center gap-2 mb-3">
+                      <div className="flex-1 bg-slate-200 rounded-full h-2">
+                        <div
+                          className="bg-gradient-to-r from-indigo-500 to-blue-500 h-2 rounded-full transition-all"
+                          style={{
+                            width: `${(role.skill_match * 100).toFixed(0)}%`,
+                          }}
+                        />
+                      </div>
+                      <span className="text-sm font-semibold text-slate-700">
+                        {(role.skill_match * 100).toFixed(0)}% ready
+                      </span>
                     </div>
-                    <span className="text-sm font-semibold text-slate-700">
-                      {(role.skill_match * 100).toFixed(0)}% ready
-                    </span>
-                  </div>
+                  )}
 
                   {/* Skills to Develop */}
                   {role.skills_to_acquire.length > 0 && (
@@ -409,13 +411,15 @@ function CurrentRoadmapView({ roadmap }) {
                   )}
                 </div>
 
-                {/* Readiness Timeline */}
-                <div className="text-right">
-                  <p className="text-sm font-semibold text-indigo-600 flex items-center gap-1 justify-end">
-                    <Clock className="w-4 h-4" />
-                    {role.estimated_time_to_ready}
-                  </p>
-                </div>
+                {/* Readiness Timeline - Only for Admin */}
+                {userRole === "admin" && (
+                  <div className="text-right">
+                    <p className="text-sm font-semibold text-indigo-600 flex items-center gap-1 justify-end">
+                      <Clock className="w-4 h-4" />
+                      {role.estimated_time_to_ready}
+                    </p>
+                  </div>
+                )}
               </div>
             </div>
           ))}
