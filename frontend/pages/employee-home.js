@@ -15,7 +15,7 @@ import {
 import { careerCompassAPI } from "../services/api";
 import ProtectedRoute from "../components/ProtectedRoute";
 import { getUser, logout } from "../utils/auth";
-import EmployeeCareerTimeline from "../components/EmployeeCareerTimeline";
+import CareerRoadmap from "../components/CareerRoadmap";
 
 /**
  * Employee Home Page
@@ -25,9 +25,7 @@ function EmployeeHome() {
   const router = useRouter();
   const [apiHealth, setApiHealth] = useState(false);
   const [currentUser, setCurrentUser] = useState(null);
-  const [showCareerTimeline, setShowCareerTimeline] = useState(false);
-  const [timelineData, setTimelineData] = useState(null);
-  const [loading, setLoading] = useState(false);
+  const [showCareerRoadmap, setShowCareerRoadmap] = useState(false);
 
   // Check API health and get user on mount
   useEffect(() => {
@@ -52,26 +50,12 @@ function EmployeeHome() {
     router.push("/settings");
   };
 
-  const handleCareerTimeline = async () => {
-    setShowCareerTimeline(true);
-    
-    if (!timelineData) {
-      setLoading(true);
-      try {
-        const response = await careerCompassAPI.getEmployeeCareerTimeline();
-        if (response.success) {
-          setTimelineData(response);
-        }
-      } catch (error) {
-        console.error("Failed to load career timeline:", error);
-      } finally {
-        setLoading(false);
-      }
-    }
+  const handleCareerRoadmap = () => {
+    setShowCareerRoadmap(true);
   };
 
   const handleBackToDashboard = () => {
-    setShowCareerTimeline(false);
+    setShowCareerRoadmap(false);
   };
 
   return (
@@ -167,7 +151,7 @@ function EmployeeHome() {
                 </div>
               </div>
 
-              {!showCareerTimeline && (
+              {!showCareerRoadmap && (
                 <>
                   <div className="glass-divider my-8" />
 
@@ -197,7 +181,7 @@ function EmployeeHome() {
                     </button>
 
                     <button
-                      onClick={handleCareerTimeline}
+                      onClick={handleCareerRoadmap}
                       className="group glass-panel p-5 text-left transition-transform duration-300 hover:-translate-y-1.5 hover:shadow-2xl border border-white/40 min-h-[200px] flex flex-col"
                     >
                       <div className="flex items-center justify-between mb-4">
@@ -211,11 +195,11 @@ function EmployeeHome() {
                           Career Development
                         </p>
                         <h3 className="text-lg font-semibold text-slate-900 mb-2">
-                          My Career Timeline
+                          My Career Roadmap
                         </h3>
                         <p className="text-sm text-slate-600 mt-auto">
-                          View your complete career progression journey at PSA
-                          International.
+                          View your personalized career roadmap with next
+                          opportunities and skills development plan.
                         </p>
                       </div>
                     </button>
@@ -225,7 +209,7 @@ function EmployeeHome() {
             </div>
           </header>
 
-          {showCareerTimeline ? (
+          {showCareerRoadmap ? (
             <main className="space-y-8 fade-in">
               <div className="flex items-center gap-4">
                 <button
@@ -237,22 +221,11 @@ function EmployeeHome() {
                 </button>
               </div>
 
-              {loading ? (
-                <div className="glass-panel p-12 text-center border border-white/40">
-                  <div className="flex flex-col items-center gap-4">
-                    <div className="w-12 h-12 rounded-full border-4 border-indigo-200 border-t-indigo-600 animate-spin" />
-                    <p className="text-slate-600">Loading your career timeline...</p>
-                  </div>
-                </div>
-              ) : timelineData ? (
-                <EmployeeCareerTimeline
-                  employeeData={timelineData.employee}
-                  timeline={timelineData.timeline}
+              {currentUser && (
+                <CareerRoadmap
+                  employeeId={currentUser.employee_id}
+                  userRole="employee"
                 />
-              ) : (
-                <div className="glass-panel p-8 text-center border border-white/40">
-                  <p className="text-slate-600">Failed to load career timeline</p>
-                </div>
               )}
             </main>
           ) : (
@@ -279,7 +252,7 @@ function EmployeeHome() {
                           Available Features
                         </span>
                         <span className="glass-chip px-3 py-1 text-xs font-medium text-indigo-700">
-                          Copilot • Timeline
+                          Copilot • Roadmap
                         </span>
                       </div>
                       <div className="glass-divider" />
@@ -288,8 +261,8 @@ function EmployeeHome() {
                           Need guidance?
                         </span>{" "}
                         Start with the Compass Copilot to get personalized
-                        career advice, or explore your career timeline to see
-                        your growth at PSA.
+                        career advice, or explore your career roadmap to see
+                        your next opportunities at PSA.
                       </p>
                     </div>
                   </div>
@@ -327,17 +300,17 @@ function EmployeeHome() {
                         <MapPin className="w-5 h-5" />
                       </div>
                       <h4 className="text-lg font-semibold text-slate-900">
-                        Career Timeline
+                        Career Roadmap
                       </h4>
                     </div>
                     <p className="text-sm text-slate-600 mb-4">
-                      Visualize your complete career progression at PSA with a
-                      beautiful timeline.
+                      Visualize your personalized career roadmap with next
+                      opportunities and development plan.
                     </p>
                     <ul className="space-y-2 text-sm text-slate-500">
-                      <li>• See all your past positions</li>
-                      <li>• Track your growth and achievements</li>
-                      <li>• Review key skills and focus areas</li>
+                      <li>• See your next logical roles</li>
+                      <li>• Skills development recommendations</li>
+                      <li>• Timeline to career milestones</li>
                     </ul>
                   </div>
                 </div>

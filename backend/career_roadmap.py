@@ -373,7 +373,9 @@ def calculate_current_roadmap(employee: Dict[str, Any], all_roles: List[Dict[str
             'next_milestone': (datetime.now() + timedelta(days=365)).isoformat(),
             'estimated_progression': '1-2 years in current role, then step up'
         },
-        'career_anchors': analyze_career_anchors(employee)
+        'career_anchors': analyze_career_anchors(employee),
+        'positions_history': employee.get('positions_history', []),
+        'employment_info': employee.get('employment_info', {})
     }
     
     return current_roadmap

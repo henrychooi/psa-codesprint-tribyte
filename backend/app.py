@@ -878,6 +878,35 @@ def get_current_career_roadmap(employee_id):
         # Calculate current roadmap
         roadmap = calculate_current_roadmap(employee.to_dict(), roles_dict)
         
+        # Calculate percentile rankings for this employee
+        all_employee_metrics = calculate_all_employee_metrics(session)
+        current_employee_metrics = all_employee_metrics.get(employee.employee_id, {})
+        
+        # Extract all values for percentile calculation
+        all_years_at_psa = [m['years_at_psa'] for m in all_employee_metrics.values()]
+        all_promotion_speed_ratios = [m['promotion_speed_ratio'] for m in all_employee_metrics.values()]
+        
+        # Calculate percentiles
+        tenure_percentile = calculate_percentile(
+            current_employee_metrics.get('years_at_psa', 0),
+            all_years_at_psa,
+            lower_is_better=False  # Higher tenure = better
+        )
+        
+        promotion_speed_percentile = calculate_percentile(
+            current_employee_metrics.get('promotion_speed_ratio', float('inf')),
+            all_promotion_speed_ratios,
+            lower_is_better=True  # Lower ratio (faster promotion) = better
+        )
+        
+        # Add employee statistics to roadmap
+        roadmap['employee_statistics'] = {
+            'years_of_service': round(current_employee_metrics.get('years_at_psa', 0), 1),
+            'tenure_percentile': tenure_percentile,
+            'promotion_speed_percentile': promotion_speed_percentile,
+            'non_trainee_positions': current_employee_metrics.get('non_trainee_positions', 0)
+        }
+        
         return jsonify({
             'success': True,
             'data': roadmap,
